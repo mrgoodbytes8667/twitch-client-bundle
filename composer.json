@@ -1,0 +1,70 @@
+{
+    "name": "mrgoodbytes8667/twitch-client-bundle",
+    "type": "symfony-bundle",
+    "description": "A Symfony bundle that adds HttpClient (and other) mechanisms for Twitch",
+    "license": "CC-BY-NC-4.0",
+    "require": {
+        "php": "^8.0",
+        "ext-json": "*",
+        "doctrine/annotations": "^1.12",
+        "doctrine/collections": "^1.6",
+        "mrgoodbytes8667/command-bundle": "^1.0",
+        "mrgoodbytes8667/twitch-response-bundle": ">=0@BETA",
+        "mrgoodbytes8667/http-client-common": "^0.1.1",
+        "sensio/framework-extra-bundle": "^5.1",
+        "symfony/config": "^5.2",
+        "symfony/console": "^5.2",
+        "symfony/dependency-injection": "^5.2",
+        "symfony/framework-bundle": "^5.2",
+        "symfony/http-client": "^5.2",
+        "symfony/polyfill-uuid": "^1.20",
+        "symfony/property-access": "^5.2",
+        "symfony/property-info": "^5.2",
+        "symfony/security-core": "^5.2",
+        "symfony/serializer": "^5.2",
+        "symfony/string": "^5.2",
+        "symfony/validator": "^5.2"
+    },
+    "require-dev": {
+        "doctrine/common": "^3.0",
+        "fakerphp/faker": "^1.13",
+        "mrgoodbytes8667/test-common": ">=0.0.11",
+        "mrgoodbytes8667/test-common-faker": "^0.3.2",
+        "mrgoodbytes8667/test-twitch-faker": ">=0.0.1",
+        "phpunit/phpunit": "*",
+        "symfony/security-bundle": "^5.2",
+        "symfony/test-pack": "^1.0",
+        "symfony/var-dumper": "^5.2"
+    },
+    "authors": [
+        {
+            "name": "MrGoodBytes",
+            "email": "bytes@goodbytes.live"
+        }
+    ],
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "suggest": {
+        "symfony/security-bundle": ""
+    },
+    "conflict": {
+        "doctrine/annotations": "<1.11.1",
+        "doctrine/cache": "<1.10.2",
+        "doctrine/collections": "<1.6.7",
+        "doctrine/event-manager": "<1.1.1",
+        "doctrine/inflector": "<1.4.3",
+        "doctrine/lexer": "<1.2.1",
+        "doctrine/persistence": "<2.1.0",
+        "fakerphp/faker": "<1.14",
+        "mrgoodbytes8667/response-bundle": "<1.0.1",
+        "symfony/framework-bundle": "<5.2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bytes\\TwitchClientBundle\\": "src/",
+            "Bytes\\TwitchClientBundle\\Tests\\": "Tests/"
+        }
+    }
+}
