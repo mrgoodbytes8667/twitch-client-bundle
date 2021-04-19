@@ -23,12 +23,16 @@ class Configuration implements ConfigurationInterface
 
         $treeBuilder->getRootNode()
             ->children()
-            ->scalarNode('client_id')->defaultValue('')->end()
-            ->scalarNode('client_secret')->defaultValue('')->end()
-            ->scalarNode('hub_secret')->defaultValue('')->end()
-            ->scalarNode('user_agent')->defaultNull()->end()
-            ->scalarNode('eventsub_subscribe_callback_route_name')->defaultNull()->end()
-            ->end();
+                ->arrayNode('twitch')
+                    ->children()
+                        ->scalarNode('client_id')->defaultValue('')->end()
+                        ->scalarNode('client_secret')->defaultValue('')->end()
+                        ->scalarNode('hub_secret')->defaultValue('')->end()
+                        ->scalarNode('user_agent')->defaultNull()->end()
+                        ->scalarNode('eventsub_subscribe_callback_route_name')->defaultNull()->end()
+                    ->end() // end twitch children
+                ->end() // end twitch
+            ->end(); // end root children
 
         return $treeBuilder;
     }
