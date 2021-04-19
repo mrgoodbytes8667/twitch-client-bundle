@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "id": "d5439c6a-cd2b-3fa7-b93b-cc49d540858b",
+      "status": "webhook_callback_verification_pending",
+      "type": "channel.update",
+      "version": "1",
+      "condition": {
+        "broadcaster_user_id": "1031153029"
+      },
+      "created_at": "2021-04-16T19:22:39.109266699Z",
+      "transport": {
+        "method": "webhook",
+        "callback": "https://littel.com/sit-sunt-inventore-voluptatum-dolores-nobis-et-repudiandae.html"
+      },
+      "cost": 0
+    }
+  ],
+  "limit": 10000,
+  "total": 1,
+  "max_total_cost": 10000,
+  "total_cost": 0,
+  "pagination": {
+    "cursor": "eyJiIjp7IkN1cnNvciI6ImV5SnpJam96T0RZNU9DNDRORFEyTkRFeE5qZzFOalVzSW1RaU9tWmhiSE5sTENKMElqcDBjblZsZlE9PSJ9LCJhIjp7IkN1cnNvciI6ImV5SnpJam95TURNdU56YzJPRFk0TlRRME56WXlPQ3dpWkNJNlptRnNjMlVzSW5RaU9uUnlkV1Y5In19"
+  }
+}

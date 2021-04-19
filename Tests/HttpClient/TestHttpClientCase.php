@@ -3,22 +3,30 @@
 
 namespace Bytes\TwitchClientBundle\Tests\HttpClient;
 
-use Bytes\Common\Faker\Providers\Twitch;
 use Bytes\Common\Faker\Providers\MiscProvider;
-use Bytes\TwitchClientBundle\HttpClient\TwitchResponse;
-use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockStandaloneResponse;
+use Bytes\Common\Faker\Providers\Twitch;
+use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
+use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\Tests\Common\Constraint\ResponseContentSame;
 use Bytes\Tests\Common\Constraint\ResponseStatusCodeSame;
-use Bytes\Tests\Common\TestFullSerializerTrait;
 use Bytes\Tests\Common\TestFullValidatorTrait;
+use Bytes\Tests\Common\TestSerializerTrait;
+use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
+use Bytes\TwitchClientBundle\Tests\FullSerializerTrait;
+use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockStandaloneResponse;
+use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
+use Bytes\TwitchResponseBundle\Objects\Users\User;
 use ErrorException;
+use Exception;
 use Faker\Factory;
 use Faker\Generator;
+use Faker\Provider\Internet;
+use InvalidArgumentException;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response as Http;
 use Symfony\Component\HttpFoundation\Test\Constraint as ResponseConstraint;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -33,16 +41,21 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 abstract class TestHttpClientCase extends TestCase
 {
-    use TestFullSerializerTrait, TestFullValidatorTrait;
+    use TestFullValidatorTrait, FullSerializerTrait, TestTwitchFakerTrait;
+
+//    /**
+//     * @var SerializerInterface
+//     */
+//    protected $serializer;
 
     /**
-     * @param ResponseInterface|TwitchResponse $response
+     * @param ResponseInterface|ClientResponseInterface $response
      * @param string $message
      * @throws TransportExceptionInterface
      */
-    public static function assertResponseIsSuccessful(ResponseInterface|TwitchResponse $response, string $message = ''): void
+    public static function assertResponseIsSuccessful(ResponseInterface|ClientResponseInterface $response, string $message = ''): void
     {
-        if ($response instanceof TwitchResponse) {
+        if ($response instanceof ClientResponseInterface) {
             $response = $response->getResponse();
         }
         self::assertThat(
@@ -56,33 +69,20 @@ abstract class TestHttpClientCase extends TestCase
     }
 
     /**
-     * @param ResponseInterface|TwitchResponse $response
+     * @param ResponseInterface|ClientResponseInterface $response
      * @param int $expectedCode
      * @param string $message
      */
-    public static function assertResponseStatusCodeSame(ResponseInterface|TwitchResponse $response, int $expectedCode, string $message = ''): void
+    public static function assertResponseStatusCodeSame(ResponseInterface|ClientResponseInterface $response, int $expectedCode, string $message = ''): void
     {
-        if ($response instanceof TwitchResponse) {
+        if ($response instanceof ClientResponseInterface) {
             $response = $response->getResponse();
         }
         self::assertThatForResponse($response, new ResponseStatusCodeSame($expectedCode), $message);
     }
 
     /**
-     * @param ResponseInterface|TwitchResponse $response
-     * @param int $expectedCode
-     * @param string $message
-     */
-    public static function assertResponseStatusCodeNotSame(ResponseInterface|TwitchResponse $response, int $expectedCode, string $message = ''): void
-    {
-        if ($response instanceof TwitchResponse) {
-            $response = $response->getResponse();
-        }
-        self::assertThatForResponse($response, static::logicalNot(new ResponseStatusCodeSame($expectedCode)), $message);
-    }
-
-    /**
-     * @param ResponseInterface|TwitchResponse $response
+     * @param ResponseInterface|ClientResponseInterface $response
      * @param Constraint $constraint
      * @param string $message
      * @throws ClientExceptionInterface
@@ -90,9 +90,9 @@ abstract class TestHttpClientCase extends TestCase
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public static function assertThatForResponse(ResponseInterface|TwitchResponse $response, Constraint $constraint, string $message = ''): void
+    public static function assertThatForResponse(ResponseInterface|ClientResponseInterface $response, Constraint $constraint, string $message = ''): void
     {
-        if ($response instanceof TwitchResponse) {
+        if ($response instanceof ClientResponseInterface) {
             $response = $response->getResponse();
         }
         try {
@@ -112,7 +112,20 @@ abstract class TestHttpClientCase extends TestCase
     }
 
     /**
-     * @param ResponseInterface|TwitchResponse $response
+     * @param ResponseInterface|ClientResponseInterface $response
+     * @param int $expectedCode
+     * @param string $message
+     */
+    public static function assertResponseStatusCodeNotSame(ResponseInterface|ClientResponseInterface $response, int $expectedCode, string $message = ''): void
+    {
+        if ($response instanceof ClientResponseInterface) {
+            $response = $response->getResponse();
+        }
+        self::assertThatForResponse($response, static::logicalNot(new ResponseStatusCodeSame($expectedCode)), $message);
+    }
+
+    /**
+     * @param ResponseInterface|ClientResponseInterface $response
      * @param string $headerName
      * @param string $message
      * @throws ClientExceptionInterface
@@ -120,48 +133,48 @@ abstract class TestHttpClientCase extends TestCase
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public static function assertResponseHasHeader(ResponseInterface|TwitchResponse $response, string $headerName, string $message = ''): void
+    public static function assertResponseHasHeader(ResponseInterface|ClientResponseInterface $response, string $headerName, string $message = ''): void
     {
-        if ($response instanceof TwitchResponse) {
+        if ($response instanceof ClientResponseInterface) {
             $response = $response->getResponse();
         }
         self::assertThatForResponse($response, new ResponseConstraint\ResponseHasHeader($headerName), $message);
     }
 
     /**
-     * @param ResponseInterface|TwitchResponse $response
+     * @param ResponseInterface|ClientResponseInterface $response
      * @param string $message
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public static function assertResponseHasContent(ResponseInterface|TwitchResponse $response, string $message = ''): void
+    public static function assertResponseHasContent(ResponseInterface|ClientResponseInterface $response, string $message = ''): void
     {
-        if ($response instanceof TwitchResponse) {
+        if ($response instanceof ClientResponseInterface) {
             $response = $response->getResponse();
         }
         static::assertThat($response->getContent(false), static::logicalNot(static::isEmpty()), $message);
     }
 
     /**
-     * @param ResponseInterface|TwitchResponse $response
+     * @param ResponseInterface|ClientResponseInterface $response
      * @param string $message
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public static function assertResponseHasNoContent(ResponseInterface|TwitchResponse $response, string $message = ''): void
+    public static function assertResponseHasNoContent(ResponseInterface|ClientResponseInterface $response, string $message = ''): void
     {
-        if ($response instanceof TwitchResponse) {
+        if ($response instanceof ClientResponseInterface) {
             $response = $response->getResponse();
         }
         static::assertThat($response->getContent(false), static::logicalAnd(static::isEmpty()), $message);
     }
 
     /**
-     * @param ResponseInterface|TwitchResponse $response
+     * @param ResponseInterface|ClientResponseInterface $response
      * @param string $content
      * @param string $message
      * @throws ClientExceptionInterface
@@ -169,9 +182,9 @@ abstract class TestHttpClientCase extends TestCase
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public static function assertResponseContentSame(ResponseInterface|TwitchResponse $response, string $content, string $message = ''): void
+    public static function assertResponseContentSame(ResponseInterface|ClientResponseInterface $response, string $content, string $message = ''): void
     {
-        if ($response instanceof TwitchResponse) {
+        if ($response instanceof ClientResponseInterface) {
             $response = $response->getResponse();
         }
         self::assertThatForResponse($response, new ResponseContentSame($content), $message);
@@ -182,28 +195,15 @@ abstract class TestHttpClientCase extends TestCase
      * @param $actual
      * @param string $message
      */
-    public static function assertShouldBeNull($expected, $actual, string $message = ''): void {
-        if($expected === true) {
+    public static function assertShouldBeNull($expected, $actual, string $message = ''): void
+    {
+        if ($expected === true) {
             static::assertNull($actual, $message);
         } elseif ($expected === false) {
             static::assertNotNull($actual, $message);
         } else {
-            throw new \InvalidArgumentException('Expected should be a boolean');
+            throw new InvalidArgumentException('Expected should be a boolean');
         }
-    }
-
-    /**
-     * @param string|null $fixtureFile
-     * @param null $content
-     * @param int $code
-     * @param string $type
-     * @return TwitchResponse
-     */
-    public function setupResponse(?string $fixtureFile = null, $content = null, int $code = Response::HTTP_OK, $type = stdClass::class): TwitchResponse
-    {
-        $response = new MockStandaloneResponse(content: $content, fixtureFile: $fixtureFile, statusCode: $code);
-
-        return TwitchResponse::make($this->serializer)->withResponse($response, $type);
     }
 
     /**
@@ -227,6 +227,20 @@ abstract class TestHttpClientCase extends TestCase
     }
 
     /**
+     * @param string|null $fixtureFile
+     * @param null $content
+     * @param int $code
+     * @param string $type
+     * @return ClientResponseInterface
+     */
+    public function setupResponse(?string $fixtureFile = null, $content = null, int $code = Http::HTTP_OK, $type = stdClass::class): ClientResponseInterface
+    {
+        $response = new MockStandaloneResponse(content: $content, fixtureFile: $fixtureFile, statusCode: $code);
+
+        return TwitchResponse::make($this->serializer)->withResponse($response, $type);
+    }
+
+    /**
      * @return \Generator
      */
     public function provideBooleans()
@@ -244,6 +258,49 @@ abstract class TestHttpClientCase extends TestCase
         yield [false];
         yield [null];
     }
+
+    /**
+     * @param string|null $userId
+     * @param string|null $login
+     * @param string|null $broadcasterType = ['partner', 'affiliate', ''][$any]
+     * @param string|null $description
+     * @param string|null $displayName
+     * @param string|null $email
+     * @param string|null $offlineImageUrl
+     * @param string|null $profileImageUrl
+     * @param string|null $type = ['staff', 'admin', 'global_mod', ''][$any]
+     * @param int|null $viewCount
+     * @return UserInterface
+     * @throws Exception
+     */
+    public function createMockUser(?string $userId = null, ?string $login = null, ?string $broadcasterType = null, ?string $description = null, ?string $displayName = null, ?string $email = null, ?string $offlineImageUrl = null, ?string $profileImageUrl = null, ?string $type = null, ?int $viewCount = null)
+    {
+        if (empty($userId) && empty($login) && empty($broadcasterType) && empty($description) && empty($displayName) && empty($email) && empty($offlineImageUrl) && empty($profileImageUrl) && empty($type) && is_null($viewCount)) {
+            /** @var Generator|Twitch|MiscProvider|Internet $faker */
+            $faker = Factory::create();
+            $faker->addProvider(new Twitch($faker));
+
+            $userId = $faker->id();
+            $login = $this->faker->userName();
+            $broadcasterType = $faker->optional()->randomElement(['partner', 'affiliate', '']);
+            $description = $faker->optional()->paragraph();
+            $displayName = $faker->optional()->passthrough($login);
+            $email = $faker->optional()->email();
+            $offlineImageUrl = $faker->optional()->imageUrl();
+            $profileImageUrl = $faker->optional()->imageUrl();
+            $type = $faker->optional()->randomElement(['staff', 'admin', 'global_mod', '']);
+            $viewCount = $faker->optional()->numberBetween();
+        }
+        return User::make($userId, $login, $broadcasterType, $description, $displayName, $email, $offlineImageUrl, $profileImageUrl, $type, $viewCount);
+    }
+
+//    /**
+//     * @after
+//     */
+//    protected function tearDownSerializer(): void
+//    {
+//        $this->serializer = null;
+//    }
 
     /**
      * @param HttpClientInterface $httpClient

@@ -4,15 +4,15 @@
 namespace Bytes\TwitchClientBundle\Tests\MockHttpClient;
 
 
+use Bytes\Tests\Common\MockHttpClient\MockResponse;
 use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
-use Bytes\TwitchResponseBundle\Enums\JsonErrorCodes;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class MockJsonResponse
  * @package Bytes\TwitchClientBundle\Tests\MockHttpClient
  */
-class MockJsonResponse extends MockTwitchResponse
+class MockJsonResponse extends MockResponse
 {
     /**
      * MockJsonResponse constructor.
@@ -27,7 +27,7 @@ class MockJsonResponse extends MockTwitchResponse
     public function __construct($body = '', int $code = Response::HTTP_OK, array $info = [])
     {
         $info['response_headers']['Content-Type'] = 'application/json';
-        parent::__construct($body, $code, $info);
+        parent::__construct($body, $code, $info, new MockTwitchResponseHeader());
     }
 
     /**
@@ -48,20 +48,5 @@ class MockJsonResponse extends MockTwitchResponse
      */
     public static function make($data, int $code = Response::HTTP_OK, array $info = []) {
         return new static(json_encode($data), $code, $info);
-    }
-
-    /**
-     * @param JsonErrorCodes|int $jsonCode
-     * @param string $message
-     * @param int $code
-     * @return static
-     */
-    public static function makeJsonErrorCode($jsonCode, string $message, int $code = Response::HTTP_BAD_REQUEST) {
-        if($jsonCode instanceof JsonErrorCodes)
-        {
-            $jsonCode = $jsonCode->value;
-        }
-        $body = Fixture::getJsonErrorCodeData($jsonCode, $message, false);
-        return MockJsonResponse::make($body, $code);
     }
 }

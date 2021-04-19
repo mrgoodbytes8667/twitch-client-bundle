@@ -6,9 +6,9 @@ namespace Bytes\TwitchClientBundle\Tests\HttpClient;
 
 use Bytes\Common\Faker\Providers\Twitch;
 use Bytes\Common\Faker\Providers\MiscProvider;
+use Bytes\ResponseBundle\HttpClient\Response\Response;
+use Bytes\Tests\Common\ClientExceptionResponseProviderTrait;
 use Bytes\TwitchClientBundle\HttpClient\TwitchClient;
-use Bytes\TwitchClientBundle\HttpClient\TwitchResponse;
-use Bytes\TwitchClientBundle\Tests\ClientExceptionResponseProviderTrait;
 use Bytes\TwitchClientBundle\Tests\TwitchClientSetupTrait;
 use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Faker\Factory;
@@ -16,7 +16,7 @@ use Generator;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response as Http;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use function Symfony\Component\String\u;
@@ -31,37 +31,37 @@ class TwitchResponseTest extends TestHttpClientCase
         TwitchClientSetupTrait::setupBaseClient as setupClient;
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     */
-    public function testRequestTimeout()
-    {
-        $body = function () {
-            // empty strings are turned into timeouts so that they are easy to test
-            yield '';
-            yield '';
-            yield '';
-            yield '';
-            yield '';
-            yield '';
-            yield '';
-            yield '';
-        };
-
-        $client = $this->setupClient(new MockHttpClient([
-            new MockResponse($body()),
-        ]), [
-            // Matches non-oauth API routes
-            TwitchClient::SCOPE_API => [
-                'headers' => ['User-Agent' => Fixture::USER_AGENT],
-                'timeout' => 2.5,
-            ]
-        ]);
-
-        $this->expectException(TransportExceptionInterface::class);
-
-        $client->getMe()->isSuccess();
-    }
+//    /**
+//     * @throws TransportExceptionInterface
+//     */
+//    public function testRequestTimeout()
+//    {
+//        $body = function () {
+//            // empty strings are turned into timeouts so that they are easy to test
+//            yield '';
+//            yield '';
+//            yield '';
+//            yield '';
+//            yield '';
+//            yield '';
+//            yield '';
+//            yield '';
+//        };
+//
+//        $client = $this->setupClient(new MockHttpClient([
+//            new MockResponse($body()),
+//        ]), [
+//            // Matches non-oauth API routes
+//            TwitchClient::SCOPE_API => [
+//                'headers' => ['User-Agent' => Fixture::USER_AGENT],
+//                'timeout' => 2.5,
+//            ]
+//        ]);
+//
+//        $this->expectException(TransportExceptionInterface::class);
+//
+//        $client->getMe()->isSuccess();
+//    }
 
     /**
      * @throws TransportExceptionInterface
@@ -74,7 +74,7 @@ class TwitchResponseTest extends TestHttpClientCase
         $response->method('getStatusCode')
             ->willThrowException(new TransportException());
 
-        $twitchResponse = TwitchResponse::make($this->serializer)->withResponse($response, null);
+        $twitchResponse = Response::make($this->serializer)->withResponse($response, null);
 
         $this->expectException(TransportException::class);
         $twitchResponse->getStatusCode();
@@ -93,7 +93,7 @@ class TwitchResponseTest extends TestHttpClientCase
         $response->method('getStatusCode')
             ->willReturn($code);
 
-        $twitchResponse = TwitchResponse::make($this->serializer)->withResponse($response, null);
+        $twitchResponse = Response::make($this->serializer)->withResponse($response, null);
 
         $this->assertTrue($twitchResponse->isSuccess());
     }
@@ -114,7 +114,7 @@ class TwitchResponseTest extends TestHttpClientCase
         $response->method('getStatusCode')
             ->willReturn($code);
 
-        $twitchResponse = TwitchResponse::make($this->serializer)->withResponse($response, null);
+        $twitchResponse = Response::make($this->serializer)->withResponse($response, null);
 
         $this->assertFalse($twitchResponse->isSuccess());
     }
@@ -126,8 +126,8 @@ class TwitchResponseTest extends TestHttpClientCase
      */
     public function testPassthroughMethods($response, $headers)
     {
-        // To cover getStatusCode() in TwitchResponse
-        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        // To cover getStatusCode() in Response
+        $this->assertEquals(Http::HTTP_OK, $response->getStatusCode());
 
         $this->assertCount(1, $response->getHeaders());
     }
@@ -139,7 +139,7 @@ class TwitchResponseTest extends TestHttpClientCase
      */
     public function testGetType($response, $headers)
     {
-        // To cover getType() in TwitchResponse
+        // To cover getType() in Response
         $this->assertNull($response->getType());
     }
 
@@ -163,7 +163,7 @@ class TwitchResponseTest extends TestHttpClientCase
             ->getMockBuilder(ResponseInterface::class)
             ->getMock();
         $ri->method('getStatusCode')
-            ->willReturn(Response::HTTP_OK);
+            ->willReturn(Http::HTTP_OK);
         $ri->method('getHeaders')
             ->willReturn([
                 $header => [
@@ -171,7 +171,7 @@ class TwitchResponseTest extends TestHttpClientCase
                 ]
             ]);
 
-        yield ['response' => TwitchResponse::make($this->serializer)->withResponse($ri, null), 'headers' => $headers];
+        yield ['response' => Response::make($this->serializer)->withResponse($ri, null), 'headers' => $headers];
     }
 
     /**

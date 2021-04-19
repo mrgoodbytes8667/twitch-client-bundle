@@ -29,34 +29,29 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
 
         $configuration = $this->getConfiguration($configs, $container);
 
-        /** @var array $config = ['client_id' => '', 'client_secret' => '', 'client_public_key' => '', 'bot_token' => '', 'user' => false, 'redirects' => ['bot' => ['method' => '', 'route_name' => '', 'url' => '']], 'user' => ['method' => '', 'route_name' => '', 'url' => '']], 'slash' => ['method' => '', 'route_name' => '', 'url' => '']], 'login' => ['method' => '', 'route_name' => '', 'url' => '']]] */
+        /** @var array $config = ['client_id' => '', 'client_secret' => '', 'hub_secret' => '', 'user_agent' => ''] */
         $config = $this->processConfiguration($configuration, $configs);
 
-        $definition = $container->getDefinition('bytes_twitch-client.oauth');
-        $definition->replaceArgument(2, $config['client_id']);
-        $definition->replaceArgument(3, $config['endpoints']);
-        $definition->replaceArgument(4, $config['user']);
-
-        $definition = $container->getDefinition('bytes_twitch-client.httpclient.twitch');
-        $definition->replaceArgument(2, $config['client_id']);
-        $definition->replaceArgument(3, $config['client_secret']);
-        $definition->replaceArgument(4, $config['bot_token']);
-        $definition->replaceArgument(5, $config['user_agent']);
-
-        $definition = $container->getDefinition('bytes_twitch-client.httpclient.twitch.bot');
-        $definition->replaceArgument(2, $config['client_id']);
-        $definition->replaceArgument(3, $config['client_secret']);
-        $definition->replaceArgument(4, $config['bot_token']);
-        $definition->replaceArgument(5, $config['user_agent']);
-
-        $definition = $container->getDefinition('bytes_twitch-client.httpclient.twitch.user');
-        $definition->replaceArgument(2, $config['client_id']);
-        $definition->replaceArgument(3, $config['client_secret']);
-        $definition->replaceArgument(4, $config['user_agent']);
-
-        $definition = $container->getDefinition('bytes_twitch-client.httpclient.twitch.token');
-        $definition->replaceArgument(3, $config['client_id']);
-        $definition->replaceArgument(4, $config['client_secret']);
-        $definition->replaceArgument(5, $config['user_agent']);
+//        $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch');
+//        $definition->replaceArgument(2, $config['client_id']);
+//        $definition->replaceArgument(3, $config['client_secret']);
+//        $definition->replaceArgument(4, $config['bot_token']);
+//        $definition->replaceArgument(5, $config['user_agent']);
+//
+//        $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch.bot');
+//        $definition->replaceArgument(2, $config['client_id']);
+//        $definition->replaceArgument(3, $config['client_secret']);
+//        $definition->replaceArgument(4, $config['bot_token']);
+//        $definition->replaceArgument(5, $config['user_agent']);
+//
+//        $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch.user');
+//        $definition->replaceArgument(2, $config['client_id']);
+//        $definition->replaceArgument(3, $config['client_secret']);
+//        $definition->replaceArgument(4, $config['user_agent']);
+//
+//        $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch.token');
+//        $definition->replaceArgument(3, $config['client_id']);
+//        $definition->replaceArgument(4, $config['client_secret']);
+//        $definition->replaceArgument(5, $config['user_agent']);
     }
 }

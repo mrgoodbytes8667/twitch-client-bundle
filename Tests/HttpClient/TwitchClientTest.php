@@ -28,12 +28,10 @@ class TwitchClientTest extends TestHttpClientCase
     }
 
     /**
-     * @group legacy
+     *
      */
     public function testRequest()
     {
-        $this->expectDeprecation('Since fakerphp/faker 1.14: Accessing property "word" is deprecated, use "word()" instead.');
-        $this->expectDeprecation('Since fakerphp/faker 1.14: Accessing property "safeEmailDomain" is deprecated, use "safeEmailDomain()" instead.');
         /** @var Generator|Internet $faker */
         $faker = Factory::create();
         $content = $faker->randomHtml();

@@ -4,15 +4,13 @@
 namespace Bytes\TwitchClientBundle\Tests;
 
 
-use Bytes\TwitchClientBundle\HttpClient\TwitchBotClient;
-use Bytes\TwitchClientBundle\HttpClient\TwitchClient;
-use Bytes\TwitchClientBundle\HttpClient\TwitchResponse;
-use Bytes\TwitchClientBundle\HttpClient\TwitchTokenClient;
-use Bytes\TwitchClientBundle\HttpClient\TwitchUserClient;
-use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
-use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
-use Bytes\Tests\Common\TestFullSerializerTrait;
 use Bytes\Tests\Common\TestFullValidatorTrait;
+use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
+use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
+use Bytes\TwitchClientBundle\HttpClient\TwitchClient;
+use Bytes\TwitchClientBundle\HttpClient\TwitchTokenClient;
+use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -20,69 +18,52 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * Trait TwitchClientSetupTrait
  * @package Bytes\TwitchClientBundle\Tests
  *
+ * @todo
+ *
  * @property UrlGeneratorInterface $urlGenerator
  */
 trait TwitchClientSetupTrait
 {
-    use TestFullValidatorTrait, TestFullSerializerTrait;
+    use TestFullValidatorTrait, FullSerializerTrait, TestUrlGeneratorTrait;
 
     /**
      * @param HttpClientInterface $httpClient
+     * @param EventDispatcher|null $dispatcher
      * @param array $defaultOptionsByRegexp
      * @param string|null $defaultRegexp
      * @return TwitchClient
      */
-    protected function setupBaseClient(HttpClientInterface $httpClient, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
+    protected function setupBaseClient(HttpClientInterface $httpClient, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
-        $client = new TwitchClient($httpClient, new TwitchRetryStrategy(), Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::BOT_TOKEN, Fixture::USER_AGENT, $defaultOptionsByRegexp, $defaultRegexp);
-        return $this->postClientSetup($client);
+        $client = new TwitchClient($httpClient, new TwitchRetryStrategy(), $dispatcher ?? new EventDispatcher(), $this->urlGenerator, Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::HUB_SECRET, Fixture::USER_AGENT, '', $defaultOptionsByRegexp, $defaultRegexp);
+        return $this->postClientSetup($client, $dispatcher);
     }
 
     /**
-     * @param HttpClientInterface $httpClient
-     * @param array $defaultOptionsByRegexp
-     * @param string|null $defaultRegexp
-     * @return TwitchBotClient
+     * @param TwitchClient|TwitchTokenClient $client
+     * @return TwitchClient|TwitchTokenClient
      */
-    protected function setupBotClient(HttpClientInterface $httpClient, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
+    private function postClientSetup($client, ?EventDispatcher $dispatcher = null)
     {
-        $client = new TwitchBotClient($httpClient, new TwitchRetryStrategy(), Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::BOT_TOKEN, Fixture::USER_AGENT, $defaultOptionsByRegexp, $defaultRegexp);
-        return $this->postClientSetup($client);
+        $client->setSerializer($this->serializer);
+        $client->setValidator($this->validator);
+
+        $response = TwitchResponse::make($this->serializer);
+        $response->setDispatcher($dispatcher ?? new EventDispatcher());
+        $client->setResponse($response);
+        return $client;
     }
 
     /**
      * @param HttpClientInterface $httpClient
-     * @param array $defaultOptionsByRegexp
-     * @param string|null $defaultRegexp
-     * @return TwitchUserClient
-     */
-    protected function setupUserClient(HttpClientInterface $httpClient, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
-    {
-        $client = new TwitchUserClient($httpClient, new TwitchRetryStrategy(), Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::USER_AGENT, $defaultOptionsByRegexp, $defaultRegexp);
-        return $this->postClientSetup($client);
-    }
-
-    /**
-     * @param HttpClientInterface $httpClient
+     * @param EventDispatcher|null $dispatcher
      * @param array $defaultOptionsByRegexp
      * @param string|null $defaultRegexp
      * @return TwitchTokenClient
      */
-    protected function setupTokenClient(HttpClientInterface $httpClient, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
+    protected function setupTokenClient(HttpClientInterface $httpClient, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
-        $client = new TwitchTokenClient($httpClient, new TwitchRetryStrategy(), $this->urlGenerator, Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::USER_AGENT, $defaultOptionsByRegexp, $defaultRegexp);
-        return $this->postClientSetup($client);
-    }
-
-    /**
-     * @param TwitchClient|TwitchBotClient|TwitchUserClient|TwitchTokenClient $client
-     * @return TwitchClient|TwitchBotClient|TwitchUserClient|TwitchTokenClient
-     */
-    private function postClientSetup($client)
-    {
-        $client->setSerializer($this->serializer);
-        $client->setValidator($this->validator);
-        $client->setResponse(TwitchResponse::make($this->serializer));
-        return $client;
+        $client = new TwitchTokenClient($httpClient, new TwitchRetryStrategy(), $dispatcher ?? new EventDispatcher(), $this->urlGenerator, Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::HUB_SECRET, Fixture::USER_AGENT, '', $defaultOptionsByRegexp, $defaultRegexp);
+        return $this->postClientSetup($client, $dispatcher);
     }
 }

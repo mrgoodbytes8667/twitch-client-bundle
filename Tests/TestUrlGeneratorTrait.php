@@ -9,6 +9,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Trait TestUrlGeneratorTrait
  * @package Bytes\TwitchClientBundle\Tests
  *
+ * @deprecated Unsure if this is needed in the Twitch variant
+ *
  * @method MockBuilder getMockBuilder(string $className)
  */
 trait TestUrlGeneratorTrait

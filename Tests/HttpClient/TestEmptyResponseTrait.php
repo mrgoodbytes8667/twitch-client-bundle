@@ -4,17 +4,17 @@
 namespace Bytes\TwitchClientBundle\Tests\HttpClient;
 
 
-use Bytes\TwitchClientBundle\HttpClient\TwitchResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Bytes\ResponseBundle\HttpClient\Response\Response;
+use Symfony\Component\HttpFoundation\Response as Http;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Trait TestEmptyResponseTrait
  * @package Bytes\TwitchClientBundle\Tests\HttpClient
  *
- * @method TwitchResponse setupResponse(?string $fixtureFile = null, $content = null, int $code = Response::HTTP_OK, $type = \stdClass::class, ?string $exception = null)
+ * @method Response setupResponse(?string $fixtureFile = null, $content = null, int $code = Http::HTTP_OK, $type = \stdClass::class, ?string $exception = null)
  * @method assertTrue($condition, string $message = '')
- * @method assertResponseStatusCodeNotSame(ResponseInterface|TwitchResponse $response, int $expectedCode, string $message = '')
+ * @method assertResponseStatusCodeNotSame(ResponseInterface|Response $response, int $expectedCode, string $message = '')
  */
 trait TestEmptyResponseTrait
 {
@@ -24,7 +24,7 @@ trait TestEmptyResponseTrait
     public function testSuccess()
     {
         $this->assertTrue($this
-            ->setupResponse(code: Response::HTTP_NO_CONTENT)
+            ->setupResponse(code: Http::HTTP_NO_CONTENT)
             ->isSuccess());
     }
 
@@ -36,6 +36,6 @@ trait TestEmptyResponseTrait
         $response = $this
             ->setupResponse();
         $this->assertTrue($response->isSuccess());
-        $this->assertResponseStatusCodeNotSame($response, Response::HTTP_NO_CONTENT);
+        $this->assertResponseStatusCodeNotSame($response, Http::HTTP_NO_CONTENT);
     }
 }

@@ -4,8 +4,6 @@
 namespace Bytes\TwitchClientBundle\Tests\Fixtures;
 
 
-use Bytes\TwitchResponseBundle\Enums\JsonErrorCodes;
-
 /**
  * Class Fixture
  * @package Bytes\TwitchClientBundle\Tests\Fixtures
@@ -25,7 +23,7 @@ class Fixture
     /**
      * A randomly generated client public key
      */
-    const CLIENT_PUBLIC_KEY = '3c0550fa220b400914edabf283ac1174bf4f99d55781d1ff8ff0e96b02583aec';
+    const HUB_SECRET = '3c0550fa220b400914edabf283ac1174bf4f99d55781d1ff8ff0e96b02583aec';
 
     /**
      * A randomly generated bot token
@@ -57,23 +55,5 @@ class Fixture
             return null;
         }
         return file_get_contents(self::getFixturesFile($file));
-    }
-
-    /**
-     * @param JsonErrorCodes|int $jsonCode
-     * @param string $message
-     * @param bool $encoded
-     * @return array|string
-     */
-    public static function getJsonErrorCodeData($jsonCode, string $message, bool $encoded = true) {
-        if($jsonCode instanceof JsonErrorCodes)
-        {
-            $jsonCode = $jsonCode->value;
-        }
-        if($encoded) {
-            return json_encode(['message' => $message, 'code' => $jsonCode]);
-        } else {
-            return ['message' => $message, 'code' => $jsonCode];
-        }
     }
 }
