@@ -19,7 +19,7 @@ return static function (ContainerConfigurator $container) {
     $services->set('bytes_twitch_client.httpclient.twitch', TwitchClient::class)
         ->args([
             service('http_client'), // Symfony\Contracts\HttpClient\HttpClientInterface
-            null, // Symfony\Component\HttpClient\Retry\RetryStrategyInterface
+            service('bytes_twitch_client.httpclient.retry_strategy.twitch'), // Symfony\Component\HttpClient\Retry\RetryStrategyInterface
             service('event_dispatcher'),  // Symfony\Contracts\EventDispatcher\EventDispatcherInterface
             service('router.default'), // Symfony\Component\Routing\Generator\UrlGeneratorInterface
             '', // $config['client_id']
