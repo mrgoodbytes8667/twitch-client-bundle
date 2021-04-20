@@ -253,4 +253,24 @@ class GetUsersTest extends TestTwitchClientCase
             $this->assertEquals($email, $user->getEmail());
         }
     }
+
+    public function testGetUserResponse()
+    {
+        $client = $this->setupClient(MockClient::requests(
+            MockJsonResponse::makeFixture('HttpClient/get-users-success.json')));
+
+        /** @var User $users */
+        $user = $client->getUser(id: '222516945777')->deserialize();
+
+        $this->validateUser($user, "",
+            new DateTime('2012-11-26T14:49:18.000Z'),
+            "Aliquam amet tenetur odio quo incidunt voluptas iure. Iste minima aut minima suscipit numquam autem quia nostrum. Voluptatibus sed qui aut quasi quos. Distinctio ut odit omnis.",
+            "Morgan.oberbrunner",
+            null, "222516945777",
+            "morgan.oberbrunner",
+            "https://via.placeholder.com/1920x1080.png/00aa22?text=Offline+morgan.oberbrunner",
+            "https://via.placeholder.com/300x300.png/00ddff?text=Profile+morgan.oberbrunner",
+            "",
+            306068376);
+    }
 }

@@ -8,18 +8,20 @@ use Bytes\ResponseBundle\Enums\HttpMethods;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Interfaces\IdInterface;
 use Bytes\ResponseBundle\Objects\IdNormalizer;
+use Bytes\ResponseBundle\Objects\Push;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePostRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePreRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionDeleteEvent;
-use Bytes\TwitchClientBundle\HttpClient\Response\EventSubDeleteResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchFollowersResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
+use Bytes\TwitchClientBundle\HttpClient\Response\TwitchUserResponse;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Condition;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Create;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions;
 use Bytes\TwitchResponseBundle\Objects\Follows\FollowersResponse;
 use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -128,7 +130,7 @@ class TwitchClient extends AbstractTwitchClient
      * @throws TransportExceptionInterface
      * @link https://dev.twitch.tv/docs/api/reference#get-users
      */
-    public function getUsers(array $ids = [], array $logins = [], bool $throw = true): ClientResponseInterface
+    public function getUsers(array $ids = [], array $logins = [], bool $throw = true, ClientResponseInterface|string|null $responseClass = null): ClientResponseInterface
     {
         if ($throw) {
             if (count($ids) + count($logins) > 100) {
@@ -160,7 +162,19 @@ class TwitchClient extends AbstractTwitchClient
         $url = $url->beforeLast('&')->toString();
         return $this->request(url: $url,
             type: '\Bytes\TwitchResponseBundle\Objects\Users\User[]',
-            context: [UnwrappingDenormalizer::UNWRAP_PATH => '[data]']);
+            responseClass: $responseClass, context: [UnwrappingDenormalizer::UNWRAP_PATH => '[data]']);
+    }
+
+    /**
+     * Helper wrapper around getUsers that will deserialize into a single User
+     * @param string|null $id
+     * @param string|null $login
+     * @return ClientResponseInterface
+     * @throws TransportExceptionInterface
+     */
+    public function getUser(?string $id = null, ?string $login = null)
+    {
+        return $this->getUsers(ids: [$id], logins: [$login], throw: false, responseClass: TwitchUserResponse::class);
     }
 
     /**
@@ -177,6 +191,8 @@ class TwitchClient extends AbstractTwitchClient
      * @param bool $followPagination
      * @return ClientResponseInterface
      * @throws TransportExceptionInterface
+     *
+     * @link https://dev.twitch.tv/docs/api/reference#get-users-follows
      */
     public function getFollows(?string $fromId = null, ?string $toId = null, ?string $after = null, int $limit = 100, bool $followPagination = false): ClientResponseInterface
     {
@@ -185,50 +201,20 @@ class TwitchClient extends AbstractTwitchClient
             throw new InvalidArgumentException('Either "fromId" or "toId" must be provided.');
         }
 
-        $query = [];
-        $query = self::push($query, $fromId, 'from_id');
+        $query = Push::createPush(value: $fromId, key: 'from_id')
+            ->push($after, 'after')
+            ->push($limit, 'first');
+
         if (empty($fromId)) {
-            $query = self::push($query, $toId, 'to_id');
+            $query = $query->push($toId, 'to_id');
         }
-        $query = self::push($query, $after, 'after');
-        $query = self::push($query, $limit, 'first');
+
+        $query = $query->value();
 
         return $this->request(url: 'https://api.twitch.tv/helix/users/follows', type: FollowersResponse::class,
             options: ['query' => $query], responseClass: TwitchFollowersResponse::class,
             params: ['followPagination' => $followPagination, 'client' => $this, 'fromId' => $fromId,
                 'toId' => $toId, 'limit' => $limit]);
-    }
-
-    /**
-     * Push if value is not null/empty
-     * @param array $array
-     * @param mixed|null $value
-     * @param int|string|null $key
-     * @param bool $empty
-     * @return array
-     */
-    protected static function push(array $array = [], $value = null, int|string|null $key = null, bool $empty = true): array
-    {
-        $array = $array ?? [];
-        if ($empty) {
-            if (!empty($value)) {
-                if (!is_null($key)) {
-                    $array[$key] = $value;
-                } else {
-                    $array[] = $value;
-                }
-            }
-        } else {
-            if (!is_null($value)) {
-                if (!is_null($key)) {
-                    $array[$key] = $value;
-                } else {
-                    $array[] = $value;
-                }
-            }
-        }
-
-        return $array;
     }
 
     /**
