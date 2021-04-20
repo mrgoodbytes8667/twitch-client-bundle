@@ -1,0 +1,53 @@
+{
+    "total": 5,
+    "data": [
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "523317476930",
+            "to_login": "rowan00",
+            "to_name": "rowan00",
+            "followed_at": "2019-11-26T17:54:39.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "632829334464",
+            "to_login": "lamar18",
+            "to_name": "lamar18",
+            "followed_at": "2021-01-04T13:33:40.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "261884796496",
+            "to_login": "losinski",
+            "to_name": "losinski",
+            "followed_at": "2020-03-09T16:03:23.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "800828688468",
+            "to_login": "kristy90",
+            "to_name": "Kristy90",
+            "followed_at": "2011-11-10T17:49:46.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "177039239888",
+            "to_login": "melvin.schimmel",
+            "to_name": "melvin.schimmel",
+            "followed_at": "2012-03-23T03:37:22.000+00:00"
+        }
+    ],
+    "pagination": {
+        "cursor": "f40697ae-1f8a-35b7-858e-35ed97691d24"
+    }
+}

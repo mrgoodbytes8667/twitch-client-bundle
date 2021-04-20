@@ -1,0 +1,71 @@
+{
+    "total": 7,
+    "data": [
+        {
+            "from_id": "429245910435",
+            "from_login": "lesch.jalyn",
+            "from_name": "lesch.jalyn",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2019-02-14T10:40:38.000+00:00"
+        },
+        {
+            "from_id": "14573967454",
+            "from_login": "neal.parker",
+            "from_name": "neal.parker",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2017-10-07T11:04:37.000+00:00"
+        },
+        {
+            "from_id": "506994461815",
+            "from_login": "tyson.quigley",
+            "from_name": "Tyson.quigley",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2018-08-10T07:03:17.000+00:00"
+        },
+        {
+            "from_id": "103563185676",
+            "from_login": "nabbott",
+            "from_name": "nabbott",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2018-06-30T01:44:30.000+00:00"
+        },
+        {
+            "from_id": "217821973230",
+            "from_login": "agnes79",
+            "from_name": "agnes79",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2020-09-09T01:37:53.000+00:00"
+        },
+        {
+            "from_id": "111073601792",
+            "from_login": "brody.weimann",
+            "from_name": "Brody.weimann",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2020-08-03T03:29:36.000+00:00"
+        },
+        {
+            "from_id": "772442212325",
+            "from_login": "eauer",
+            "from_name": "eauer",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2014-04-03T18:23:06.000+00:00"
+        }
+    ],
+    "pagination": {
+        "cursor": "fa696bfa-ee01-370f-8c81-5631eae5a18a"
+    }
+}

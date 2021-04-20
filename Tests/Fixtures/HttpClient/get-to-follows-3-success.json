@@ -1,0 +1,89 @@
+{
+    "total": 9,
+    "data": [
+        {
+            "from_id": "851189259386",
+            "from_login": "waelchi.josefina",
+            "from_name": "Waelchi.josefina",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2014-02-11T15:51:05.000+00:00"
+        },
+        {
+            "from_id": "803515833820",
+            "from_login": "gcormier",
+            "from_name": "Gcormier",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2018-10-27T09:17:13.000+00:00"
+        },
+        {
+            "from_id": "687419815078",
+            "from_login": "buddy35",
+            "from_name": "Buddy35",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2017-10-08T04:10:42.000+00:00"
+        },
+        {
+            "from_id": "912207886341",
+            "from_login": "okey.torp",
+            "from_name": "okey.torp",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2018-03-27T01:53:53.000+00:00"
+        },
+        {
+            "from_id": "528434700196",
+            "from_login": "rschmidt",
+            "from_name": "rschmidt",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2020-08-19T18:17:27.000+00:00"
+        },
+        {
+            "from_id": "132144985127",
+            "from_login": "ena.ondricka",
+            "from_name": "ena.ondricka",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2015-01-10T18:59:17.000+00:00"
+        },
+        {
+            "from_id": "271123925830",
+            "from_login": "njohnson",
+            "from_name": "njohnson",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2015-03-27T09:56:22.000+00:00"
+        },
+        {
+            "from_id": "648824134091",
+            "from_login": "meggie36",
+            "from_name": "Meggie36",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2018-02-21T19:19:55.000+00:00"
+        },
+        {
+            "from_id": "29802835951",
+            "from_login": "pherzog",
+            "from_name": "pherzog",
+            "to_id": "836628139089",
+            "to_login": "murphy93",
+            "to_name": "Murphy93",
+            "followed_at": "2014-03-06T08:33:06.000+00:00"
+        }
+    ],
+    "pagination": {
+        "cursor": "52d6270d-b4c6-374a-bbf8-9cdba793c62c"
+    }
+}

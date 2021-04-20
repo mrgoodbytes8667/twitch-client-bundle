@@ -1,0 +1,44 @@
+{
+    "total": 4,
+    "data": [
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "854337159394",
+            "to_login": "mschinner",
+            "to_name": "mschinner",
+            "followed_at": "2012-06-11T10:20:34.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "282018222762",
+            "to_login": "manley94",
+            "to_name": "Manley94",
+            "followed_at": "2021-02-10T21:45:26.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "954980333259",
+            "to_login": "gianni.bergnaum",
+            "to_name": "gianni.bergnaum",
+            "followed_at": "2014-06-10T05:33:45.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "833969425230",
+            "to_login": "grady.melba",
+            "to_name": "Grady.melba",
+            "followed_at": "2020-02-10T08:40:58.000+00:00"
+        }
+    ],
+    "pagination": {
+        "cursor": "36acf660-8300-38d5-86b2-7ff002281cf7"
+    }
+}

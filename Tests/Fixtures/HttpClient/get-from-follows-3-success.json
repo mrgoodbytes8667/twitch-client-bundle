@@ -1,0 +1,87 @@
+{
+    "total": 9,
+    "data": [
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "72047217758",
+            "to_login": "roob.norris",
+            "to_name": "roob.norris",
+            "followed_at": "2015-12-29T18:41:48.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "38587588378",
+            "to_login": "zolson",
+            "to_name": "zolson",
+            "followed_at": "2017-04-02T09:39:59.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "625391338967",
+            "to_login": "maximillia31",
+            "to_name": "Maximillia31",
+            "followed_at": "2012-11-14T09:20:02.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "607225433857",
+            "to_login": "jerrold95",
+            "to_name": "jerrold95",
+            "followed_at": "2018-10-13T06:16:34.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "947452502314",
+            "to_login": "skeeling",
+            "to_name": "Skeeling",
+            "followed_at": "2014-01-24T14:38:45.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "644904713011",
+            "to_login": "omante",
+            "to_name": "omante",
+            "followed_at": "2013-01-06T09:10:31.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "821007307991",
+            "to_login": "zmurphy",
+            "to_name": "Zmurphy",
+            "followed_at": "2018-03-14T16:19:11.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "342283343975",
+            "to_login": "usanford",
+            "to_name": "usanford",
+            "followed_at": "2016-09-17T14:31:21.000+00:00"
+        },
+        {
+            "from_id": "411425919702",
+            "from_login": "kpaucek",
+            "from_name": "kpaucek",
+            "to_id": "922769972132",
+            "to_login": "alexandrine.mante",
+            "to_name": "Alexandrine.mante",
+            "followed_at": "2015-07-25T09:07:51.000+00:00"
+        }
+    ],
+    "pagination": {}
+}

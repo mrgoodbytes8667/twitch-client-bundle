@@ -5,16 +5,15 @@ namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient;
 
 
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
-use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
-use Bytes\Tests\Common\MockHttpClient\MockClient;
-use Bytes\Tests\Common\MockHttpClient\MockEmptyResponse;
-use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockJsonResponse;
-use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
-use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions;
+use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Response as Http;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
+/**
+ * Class EventSubDeleteTest
+ * @package Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient
+ */
 class EventSubDeleteTest extends TestTwitchClientCase
 {
     use TestTwitchFakerTrait;

@@ -33,27 +33,24 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
         /** @var array $config = ['twitch' => ['client_id' => '', 'client_secret' => '', 'hub_secret' => '', 'user_agent' => '', 'eventsub_subscribe_callback_route_name' => '']] */
         $config = $this->processConfiguration($configuration, $configs);
 
-//        $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch');
-//        $definition->replaceArgument(2, $config['twitch']['client_id']);
-//        $definition->replaceArgument(3, $config['twitch']['client_secret']);
-//        $definition->replaceArgument(4, $config['twitch']['bot_token']);
-//        $definition->replaceArgument(5, $config['twitch']['user_agent']);
-//
-//        $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch.bot');
-//        $definition->replaceArgument(2, $config['twitch']['client_id']);
-//        $definition->replaceArgument(3, $config['twitch']['client_secret']);
-//        $definition->replaceArgument(4, $config['twitch']['bot_token']);
-//        $definition->replaceArgument(5, $config['twitch']['user_agent']);
-//
-//        $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch.user');
-//        $definition->replaceArgument(2, $config['twitch']['client_id']);
-//        $definition->replaceArgument(3, $config['twitch']['client_secret']);
-//        $definition->replaceArgument(4, $config['twitch']['user_agent']);
-//
+        foreach (['bytes_twitch_client.httpclient.twitch', 'bytes_twitch_client.httpclient.twitch.token'] as $value) {
+            //$definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch');
+            $definition = $container->getDefinition($value);
+            $definition->replaceArgument(4, $config['twitch']['client_id']);
+            $definition->replaceArgument(5, $config['twitch']['client_secret']);
+            $definition->replaceArgument(6, $config['twitch']['hub_secret']);
+            $definition->replaceArgument(7, $config['twitch']['user_agent']);
+            $definition->replaceArgument(8, $config['twitch']['eventsub_subscribe_callback_route_name']);
+        }
+
+        // Token client will *likely* change args in the future, leaving it commented for now
+
 //        $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch.token');
-//        $definition->replaceArgument(3, $config['twitch']['client_id']);
-//        $definition->replaceArgument(4, $config['twitch']['client_secret']);
-//        $definition->replaceArgument(5, $config['twitch']['user_agent']);
+//        $definition->replaceArgument(4, $config['twitch']['client_id']);
+//        $definition->replaceArgument(5, $config['twitch']['client_secret']);
+//        $definition->replaceArgument(6, $config['twitch']['hub_secret']);
+//        $definition->replaceArgument(7, $config['twitch']['user_agent']);
+//        $definition->replaceArgument(8, $config['twitch']['eventsub_subscribe_callback_route_name']);
     }
 
     /**

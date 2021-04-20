@@ -6,14 +6,19 @@ namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient;
 
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
-use Bytes\Tests\Common\MockHttpClient\MockClient;
+use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockJsonResponse;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions;
+use Generator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
+/**
+ * Class EventSubSubscribeTest
+ * @package Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient
+ */
 class EventSubSubscribeTest extends TestTwitchClientCase
 {
     use TestTwitchFakerTrait;
@@ -44,13 +49,16 @@ class EventSubSubscribeTest extends TestTwitchClientCase
         return $cmd;
     }
 
+    /**
+     * @return Generator
+     */
     public function provideEventSubSubscribes()
     {
         $this->setupFaker();
 
         yield ['type' => null, 'user' => null, 'callback' => $this->faker->url(), 'extraConditions' => []];
         yield ['type' => null, 'user' => null, 'callback' => null, 'extraConditions' => []];
-        yield ['type' => null, 'user' => null, 'callback' => function($a, $b) {
+        yield ['type' => null, 'user' => null, 'callback' => function ($a, $b) {
             return $this->faker->url();
         }, 'extraConditions' => []];
     }
