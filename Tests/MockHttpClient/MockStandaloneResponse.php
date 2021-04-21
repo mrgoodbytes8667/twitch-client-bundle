@@ -4,8 +4,8 @@
 namespace Bytes\TwitchClientBundle\Tests\MockHttpClient;
 
 
-use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Bytes\Tests\Common\MockHttpClient\MockStandaloneResponse as MockResponse;
+use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Symfony\Component\HttpFoundation\Response;
 
 /**

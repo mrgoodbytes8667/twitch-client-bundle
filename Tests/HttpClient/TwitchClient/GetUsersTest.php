@@ -9,6 +9,7 @@ use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockExceededRateLimitResponse;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockJsonResponse;
+use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockStandaloneResponse;
 use Bytes\TwitchResponseBundle\Objects\Users\User;
 use DateTime;
 use DateTimeInterface;
@@ -311,7 +312,7 @@ class GetUsersTest extends TestTwitchClientCase
     /**
      * @throws TransportExceptionInterface
      */
-    public function testGetUserClientFailureTooManyRetries()
+    public function testGetUserClientFailureRateLimitTooManyRetries()
     {
         $client = $this->setupClient(MockClient::rateLimit());
 
@@ -319,5 +320,21 @@ class GetUsersTest extends TestTwitchClientCase
         $this->expectExceptionMessage('HTTP 429 returned for');
 
         $client->getUser(id: '222516945777');
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     */
+    public function testGetUserClientFailureServiceUnavailableTooManyRetries()
+    {
+        // 503 should only be retried once, so the success should not be reached
+        $client = $this->setupClient(MockClient::requests(
+            new MockStandaloneResponse(statusCode: Response::HTTP_SERVICE_UNAVAILABLE),
+            new MockStandaloneResponse(statusCode: Response::HTTP_SERVICE_UNAVAILABLE),
+            MockJsonResponse::makeFixture('HttpClient/get-users-success.json')));
+
+        $response = $client->getUser(id: '222516945777');
+
+        $this->assertResponseStatusCodeSame($response, Response::HTTP_SERVICE_UNAVAILABLE);
     }
 }

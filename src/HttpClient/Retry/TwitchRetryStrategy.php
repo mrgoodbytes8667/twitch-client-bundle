@@ -9,6 +9,7 @@ use Exception;
 use InvalidArgumentException;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
@@ -21,6 +22,23 @@ class TwitchRetryStrategy extends APIRetryStrategy implements RetryStrategyInter
      *
      */
     const RATELIMITHEADER = 'ratelimit-reset';
+
+    /**
+     * Only retry once for a 503
+     * @param AsyncContext $context
+     * @param string|null $responseContent
+     * @param TransportExceptionInterface|null $exception
+     * @return bool|null
+     * @link https://dev.twitch.tv/docs/api/guide#service-unavailable-error
+     */
+    public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
+    {
+        if ($context->getStatusCode() == Response::HTTP_SERVICE_UNAVAILABLE && ($context->getInfo('retry_count') ?? 0) > 0) {
+            return false;
+        }
+        return parent::shouldRetry($context, $responseContent, $exception);
+    }
+
 
     /**
      * @param AsyncContext $context
