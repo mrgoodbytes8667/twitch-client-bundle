@@ -6,7 +6,7 @@ namespace Bytes\TwitchClientBundle\HttpClient;
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
 use Bytes\ResponseBundle\Enums\OAuthGrantTypes;
-use Bytes\ResponseBundle\HttpClient\AbstractClient;
+use Bytes\ResponseBundle\HttpClient\AbstractApiClient;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Validator\ValidatorTrait;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
@@ -37,7 +37,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * https://api.twitch.tv/helix/eventsub/subscriptions - create sub, headers: Client-ID, Authorization: Bearer token
  */
-abstract class AbstractTwitchClient extends AbstractClient implements SerializerAwareInterface
+abstract class AbstractTwitchClient extends AbstractApiClient implements SerializerAwareInterface
 {
     use SerializerAwareTrait, ValidatorTrait;
 
@@ -108,58 +108,5 @@ abstract class AbstractTwitchClient extends AbstractClient implements Serializer
                 'headers' => $headers,
             ],
         ], $defaultOptionsByRegexp), $defaultRegexp);
-    }
-
-    /**
-     * @param string $code
-     * @param string $redirect
-     * @param array $scopes
-     * @param OAuthGrantTypes|null $grantType
-     * @return Token|null
-     *
-     * @throws ClientExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     */
-    public function tokenExchange(string $code, string $redirect, array $scopes = [], OAuthGrantTypes $grantType = null)
-    {
-        if (empty($scopes)) {
-            $scopes = OAuthScopes::getBotScopes();
-        }
-        if (empty($grantType)) {
-            $grantType = OAuthGrantTypes::authorizationCode();
-        }
-        $body = [
-            'grant_type' => $grantType->value,
-            'redirect_uri' => $redirect,
-            'scope' => OAuthScopes::buildOAuthString($scopes),
-        ];
-        switch ($grantType) {
-            case OAuthGrantTypes::authorizationCode():
-                $body['code'] = $code;
-                break;
-            case OAuthGrantTypes::refreshToken():
-                $body['refresh_token'] = $code;
-                break;
-        }
-
-        return $this->request($this->buildURL('oauth2/token'),
-            Token::class,
-            [
-                'headers' => [
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                ],
-                'body' => $body,
-            ], HttpMethods::post())
-            ->deserialize();
-    }
-
-    /**
-     * @return array
-     */
-    protected function getAuthenticationOption()
-    {
-        return [];
     }
 }
