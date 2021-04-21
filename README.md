@@ -48,6 +48,9 @@ return [
 ];
 ```
 
+### Setup
+Note: do not add any retry options to framework's http_client, it will override the bundle's Twitch-centric retry strategy.
+
 ## License
 [![License](https://i.creativecommons.org/l/by-nc/4.0/88x31.png)]("http://creativecommons.org/licenses/by-nc/4.0/)  
 twitch-client-bundle by [MrGoodBytes](https://www.goodbytes.live) is licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/).  

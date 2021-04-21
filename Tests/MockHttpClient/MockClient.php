@@ -27,10 +27,9 @@ class MockClient extends BaseMockClient
     /**
      * @return MockHttpClient
      * @throws Exception
-     * @todo
      */
     public static function rateLimit(float $retryAfter = 0.123)
     {
-        //return static::client(MockTooManyRequestsCallback::getResponses($retryAfter));
+        return static::client(MockTooManyRequestsCallback::getResponses($retryAfter));
     }
 }
