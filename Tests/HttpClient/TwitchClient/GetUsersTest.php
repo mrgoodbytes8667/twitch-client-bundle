@@ -255,6 +255,12 @@ class GetUsersTest extends TestTwitchClientCase
         }
     }
 
+    /**
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
     public function testGetUserResponse()
     {
         $client = $this->setupClient(MockClient::requests(
@@ -275,6 +281,12 @@ class GetUsersTest extends TestTwitchClientCase
             306068376);
     }
 
+    /**
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
     public function testGetUserResponseWithRetry()
     {
         $client = $this->setupClient(MockClient::requests(
@@ -294,5 +306,18 @@ class GetUsersTest extends TestTwitchClientCase
             "https://via.placeholder.com/300x300.png/00ddff?text=Profile+morgan.oberbrunner",
             "",
             306068376);
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     */
+    public function testGetUserClientFailureTooManyRetries()
+    {
+        $client = $this->setupClient(MockClient::rateLimit());
+
+        $this->expectException(ClientExceptionInterface::class);
+        $this->expectExceptionMessage('HTTP 429 returned for');
+
+        $client->getUser(id: '222516945777');
     }
 }

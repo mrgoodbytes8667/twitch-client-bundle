@@ -5,10 +5,8 @@ namespace Bytes\TwitchClientBundle\Tests\MockHttpClient;
 
 
 use Bytes\Tests\Common\MockHttpClient\MockClient as BaseMockClient;
-use Bytes\Tests\Common\MockHttpClient\MockEmptyResponse;
 use Exception;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class MockClient
