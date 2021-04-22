@@ -10,6 +10,13 @@ use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Objects\Push;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\ResponseBundle\Token\Interfaces\TokenRevokeInterface;
+use Bytes\ResponseBundle\Token\Interfaces\TokenValidateInterface;
+use Bytes\ResponseBundle\Token\Interfaces\TokenValidationResponseInterface;
+use Bytes\TwitchResponseBundle\Objects\OAuth2\Validate;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use function Symfony\Component\String\u;
 
@@ -17,7 +24,7 @@ use function Symfony\Component\String\u;
  * Class TwitchTokenClient
  * @package Bytes\TwitchClientBundle\HttpClient
  */
-abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements TokenRevokeInterface
+abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements TokenRevokeInterface, TokenValidateInterface
 {
     /**
      * TwitchTokenClient constructor.
@@ -88,5 +95,25 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
         return $this->request($this->buildURL('oauth2/revoke'), options: ['query' => [
             'token' => $token
         ]], method: HttpMethods::post());
+    }
+
+    /**
+     * Validates the provided access token
+     * @param AccessTokenInterface|string $token
+     * @return TokenValidationResponseInterface|null
+     */
+    public function validateToken(AccessTokenInterface|string $token): ?TokenValidationResponseInterface
+    {
+        $token = static::normalizeAccessToken($token, false, 'The $token argument is required and cannot be empty.');
+
+        try {
+            return $this->request($this->buildURL('oauth2/validate'), type: Validate::class, options: [
+                'headers' => [
+                    'Authorization' => 'OAuth ' . $token
+                ]
+            ], method: HttpMethods::get())->deserialize();
+        } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $exception) {
+            return null;
+        }
     }
 }

@@ -41,26 +41,4 @@ class TwitchUserTokenClient extends AbstractTwitchTokenClient implements UserTok
         }
         return $this->tokenExchange($token, route: '', scopes: OAuthScopes::getUserScopes(), grantType: OAuthGrantTypes::refreshToken());
     }
-
-    /**
-     * Validates the provided access token
-     * @param AccessTokenInterface|string $token
-     * @return Validate|null
-     *
-     * @throws UnexpectedValueException
-     */
-    public function validateToken(AccessTokenInterface|string $token)
-    {
-        $token = static::normalizeAccessToken($token, false, 'The $token argument is required and cannot be empty.');
-
-        try {
-            return $this->request($this->buildURL('oauth2/validate'), type: Validate::class, options: [
-                'headers' => [
-                    'Authorization' => 'OAuth ' . $token
-                ]
-            ], method: HttpMethods::get())->deserialize();
-        } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $exception) {
-            return null;
-        }
-    }
 }
