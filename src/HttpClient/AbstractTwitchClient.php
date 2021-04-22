@@ -8,6 +8,7 @@ use Bytes\ResponseBundle\Enums\HttpMethods;
 use Bytes\ResponseBundle\Enums\OAuthGrantTypes;
 use Bytes\ResponseBundle\HttpClient\AbstractApiClient;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
+use Bytes\ResponseBundle\Objects\Push;
 use Bytes\ResponseBundle\Validator\ValidatorTrait;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchResponseBundle\Enums\OAuthScopes;
@@ -42,26 +43,6 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
     use SerializerAwareTrait, ValidatorTrait;
 
     /**
-     * Matches OAuth API token revoke route
-     */
-    const SCOPE_OAUTH_TOKEN_REVOKE = 'https://id\.twitch\.tv/oauth2/revoke';
-
-    /**
-     * Matches remaining OAuth API routes
-     */
-    const SCOPE_OAUTH = 'https://id\.twitch\.tv/oauth2';
-
-    /**
-     * Matches Kraken API routes
-     */
-    const SCOPE_KRAKEN = 'https://api\.twitch\.tv/kraken';
-
-    /**
-     * Matches Helix API routes
-     */
-    const SCOPE_HELIX = 'https://api\.twitch\.tv/helix';
-
-    /**
      * TwitchClient constructor.
      * @param HttpClientInterface $httpClient
      * @param RetryStrategyInterface|null $strategy
@@ -73,39 +54,31 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
      */
     public function __construct(HttpClientInterface $httpClient, ?RetryStrategyInterface $strategy, string $clientId, string $clientSecret, ?string $userAgent, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
-        $headers = [];
-        if (!empty($userAgent)) {
-            $headers['User-Agent'] = $userAgent;
-        }
+        $headers = Push::createPush(value($userAgent, 'User-Agent'));
         parent::__construct($httpClient, $strategy, $clientId, $userAgent, array_merge_recursive([
             // the options defined as values apply only to the URLs matching
             // the regular expressions defined as keys
 
             // Matches Kraken API routes - Authorization: OAuth <token>
-            self::SCOPE_KRAKEN => [
+            TwitchClientEndpoints::SCOPE_KRAKEN => [
                 'headers' => array_merge($headers, [
                     'Client-Id' => $clientId,
                 ]),
             ],
 
             // Matches Helix API routes - auth_bearer
-            self::SCOPE_HELIX => [
+            TwitchClientEndpoints::SCOPE_HELIX => [
                 'headers' => array_merge($headers, [
                     'Client-Id' => $clientId,
                 ]),
             ],
 
             // Matches OAuth token revoke API routes
-            self::SCOPE_OAUTH_TOKEN_REVOKE => [
+            TwitchClientEndpoints::SCOPE_OAUTH_TOKEN_REVOKE => [
                 'headers' => $headers,
                 'query' => [
                     'client_id' => $clientId,
                 ]
-            ],
-
-            // Matches OAuth API routes
-            self::SCOPE_OAUTH => [
-                'headers' => $headers,
             ],
         ], $defaultOptionsByRegexp), $defaultRegexp);
     }
