@@ -4,18 +4,14 @@
 namespace Bytes\TwitchClientBundle\Tests\HttpClient;
 
 
-use Bytes\Common\Faker\Providers\Twitch;
 use Bytes\Common\Faker\Providers\MiscProvider;
+use Bytes\Common\Faker\Providers\Twitch;
 use Bytes\ResponseBundle\HttpClient\Response\Response;
 use Bytes\Tests\Common\ClientExceptionResponseProviderTrait;
-use Bytes\TwitchClientBundle\HttpClient\TwitchClient;
 use Bytes\TwitchClientBundle\Tests\TwitchClientSetupTrait;
-use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Faker\Factory;
 use Generator;
 use Symfony\Component\HttpClient\Exception\TransportException;
-use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Response as Http;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;

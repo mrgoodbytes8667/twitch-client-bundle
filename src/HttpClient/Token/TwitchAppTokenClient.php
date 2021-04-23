@@ -1,14 +1,14 @@
 <?php
 
 
-namespace Bytes\TwitchClientBundle\HttpClient;
+namespace Bytes\TwitchClientBundle\HttpClient\Token;
 
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
 use Bytes\ResponseBundle\Event\TokenChangedEvent;
+use Bytes\ResponseBundle\HttpClient\Token\AppTokenClientInterface;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
-use Bytes\ResponseBundle\Token\Interfaces\AppTokenClientInterface;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -17,16 +17,16 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * Class TwitchAppTokenClient
- * @package Bytes\TwitchClientBundle\HttpClient
+ * @package Bytes\TwitchClientBundle\HttpClient\Token
  */
 class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppTokenClientInterface
 {
     /**
      * Refreshes the provided access token
-     * @param AccessTokenInterface|string|null $token
+     * @param AccessTokenInterface|null $token
      * @return AccessTokenInterface|null
      */
-    public function refreshToken(AccessTokenInterface|string $token = null): ?AccessTokenInterface
+    public function refreshToken(AccessTokenInterface $token = null): ?AccessTokenInterface
     {
         return $this->getToken();
         // @todo

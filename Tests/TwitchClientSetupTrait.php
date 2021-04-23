@@ -5,12 +5,12 @@ namespace Bytes\TwitchClientBundle\Tests;
 
 
 use Bytes\Tests\Common\TestFullValidatorTrait;
+use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
-use Bytes\TwitchClientBundle\HttpClient\TwitchAppTokenClient;
-use Bytes\TwitchClientBundle\HttpClient\TwitchClient;
-use Bytes\TwitchClientBundle\HttpClient\AbstractTwitchTokenClient;
-use Bytes\TwitchClientBundle\HttpClient\TwitchUserTokenClient;
+use Bytes\TwitchClientBundle\HttpClient\Token\AbstractTwitchTokenClient;
+use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
+use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
 use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -42,8 +42,8 @@ trait TwitchClientSetupTrait
     }
 
     /**
-     * @param TwitchClient|AbstractTwitchTokenClient|TwitchAppTokenClient|TwitchUserTokenClient $client
-     * @return TwitchClient|AbstractTwitchTokenClient|TwitchAppTokenClient|TwitchUserTokenClient
+     * @param \Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient|AbstractTwitchTokenClient|TwitchAppTokenClient|\Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient $client
+     * @return \Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient|AbstractTwitchTokenClient|TwitchAppTokenClient|TwitchUserTokenClient
      */
     private function postClientSetup($client, ?EventDispatcher $dispatcher = null)
     {
@@ -77,7 +77,7 @@ trait TwitchClientSetupTrait
      * @param EventDispatcher|null $dispatcher
      * @param array $defaultOptionsByRegexp
      * @param string|null $defaultRegexp
-     * @return TwitchUserTokenClient
+     * @return \Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient
      */
     protected function setupUserTokenClient(HttpClientInterface $httpClient, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
@@ -90,7 +90,7 @@ trait TwitchClientSetupTrait
      * @param EventDispatcher|null $dispatcher
      * @param array $defaultOptionsByRegexp
      * @param string|null $defaultRegexp
-     * @return TwitchAppTokenClient|TwitchUserTokenClient
+     * @return TwitchAppTokenClient|\Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient
      */
     private function setupTokenClient($class, HttpClientInterface $httpClient, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {

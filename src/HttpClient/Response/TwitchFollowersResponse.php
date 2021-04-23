@@ -4,7 +4,7 @@
 namespace Bytes\TwitchClientBundle\HttpClient\Response;
 
 
-use Bytes\TwitchClientBundle\HttpClient\TwitchClient;
+use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchResponseBundle\Objects\Follows\FollowersResponse;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -59,7 +59,7 @@ class TwitchFollowersResponse extends TwitchResponse
     }
 
     /**
-     * @return TwitchClient|null
+     * @return \Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient|null
      */
     protected function getClient()
     {

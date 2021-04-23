@@ -1,19 +1,20 @@
 <?php
 
 
-namespace Bytes\TwitchClientBundle\HttpClient;
+namespace Bytes\TwitchClientBundle\HttpClient\Token;
 
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
 use Bytes\ResponseBundle\Event\EventDispatcherTrait;
 use Bytes\ResponseBundle\Event\TokenRevokedEvent;
-use Bytes\ResponseBundle\HttpClient\AbstractTokenClient;
+use Bytes\ResponseBundle\HttpClient\Token\AbstractTokenClient;
+use Bytes\ResponseBundle\HttpClient\Token\TokenRevokeInterface;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Objects\Push;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
-use Bytes\ResponseBundle\Token\Interfaces\TokenRevokeInterface;
 use Bytes\ResponseBundle\Token\Interfaces\TokenValidateInterface;
 use Bytes\ResponseBundle\Token\Interfaces\TokenValidationResponseInterface;
+use Bytes\TwitchClientBundle\HttpClient\TwitchClientEndpoints;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Validate;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -25,7 +26,7 @@ use function Symfony\Component\String\u;
 
 /**
  * Class TwitchTokenClient
- * @package Bytes\TwitchClientBundle\HttpClient
+ * @package Bytes\TwitchClientBundle\HttpClient\Token
  */
 abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements TokenRevokeInterface, TokenValidateInterface
 {
@@ -88,12 +89,12 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
 
     /**
      * Revokes the provided access token
-     * @param AccessTokenInterface|string $token
+     * @param AccessTokenInterface $token
      * @return ClientResponseInterface
      *
-     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     * @throws TransportExceptionInterface
      */
-    public function revokeToken(AccessTokenInterface|string $token): ClientResponseInterface
+    public function revokeToken(AccessTokenInterface $token): ClientResponseInterface
     {
         $token = static::normalizeAccessToken($token, false, 'The $token argument is required and cannot be empty.');
 
@@ -115,10 +116,10 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
 
     /**
      * Validates the provided access token
-     * @param AccessTokenInterface|string $token
+     * @param AccessTokenInterface $token
      * @return TokenValidationResponseInterface|null
      */
-    public function validateToken(AccessTokenInterface|string $token): ?TokenValidationResponseInterface
+    public function validateToken(AccessTokenInterface $token): ?TokenValidationResponseInterface
     {
         $token = static::normalizeAccessToken($token, false, 'The $token argument is required and cannot be empty.');
 

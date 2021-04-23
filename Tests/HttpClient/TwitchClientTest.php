@@ -2,10 +2,7 @@
 
 namespace Bytes\TwitchClientBundle\Tests\HttpClient;
 
-use Bytes\TwitchClientBundle\HttpClient\TwitchClient;
-use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
 use Bytes\TwitchClientBundle\Tests\TwitchClientSetupTrait;
-use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use DateTime;
 use Faker\Factory;
 use Faker\Generator;
@@ -15,7 +12,6 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * Class TwitchClientTest

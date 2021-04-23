@@ -1,30 +1,23 @@
 <?php
 
 
-namespace Bytes\TwitchClientBundle\HttpClient;
+namespace Bytes\TwitchClientBundle\HttpClient\Api;
 
 
-use Bytes\ResponseBundle\Enums\HttpMethods;
-use Bytes\ResponseBundle\Enums\OAuthGrantTypes;
-use Bytes\ResponseBundle\HttpClient\AbstractApiClient;
+use Bytes\ResponseBundle\HttpClient\Api\AbstractApiClient;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Objects\Push;
 use Bytes\ResponseBundle\Validator\ValidatorTrait;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
-use Bytes\TwitchResponseBundle\Enums\OAuthScopes;
-use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
+use Bytes\TwitchClientBundle\HttpClient\TwitchClientEndpoints;
 use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Class AbstractTwitchClient
- * @package Bytes\TwitchClientBundle\HttpClient
+ * @package Bytes\TwitchClientBundle\HttpClient\Api
  *
  * @var TwitchResponse|ClientResponseInterface $response
  *

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Bytes\TwitchClientBundle\HttpClient;
+namespace Bytes\TwitchClientBundle\HttpClient\Api;
 
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
@@ -33,7 +33,7 @@ use function Symfony\Component\String\u;
 
 /**
  * Class TwitchClient
- * @package Bytes\TwitchClientBundle\HttpClient
+ * @package Bytes\TwitchClientBundle\HttpClient\Api
  *
  */
 class TwitchClient extends AbstractTwitchClient

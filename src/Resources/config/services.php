@@ -3,11 +3,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
-use Bytes\TwitchClientBundle\HttpClient\TwitchAppTokenClient;
-use Bytes\TwitchClientBundle\HttpClient\TwitchClient;
-use Bytes\TwitchClientBundle\HttpClient\TwitchUserTokenClient;
+use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
+use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
 
 /**
  * @param ContainerConfigurator $container
