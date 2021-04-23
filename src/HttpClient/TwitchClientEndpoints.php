@@ -19,6 +19,7 @@ interface TwitchClientEndpoints
      * Matches OAuth API token revoke route
      */
     const SCOPE_OAUTH_TOKEN_REVOKE = 'https://id\.twitch\.tv/oauth2/revoke';
+
     /**
      * Matches OAuth API token revoke route
      */

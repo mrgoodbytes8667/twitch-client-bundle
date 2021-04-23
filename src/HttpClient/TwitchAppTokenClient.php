@@ -5,6 +5,8 @@ namespace Bytes\TwitchClientBundle\HttpClient;
 
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
+use Bytes\ResponseBundle\Event\TokenChangedEvent;
+use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\ResponseBundle\Token\Interfaces\AppTokenClientInterface;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
@@ -40,7 +42,11 @@ class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppToken
         try {
             return $this->request($this->buildURL('oauth2/token'), type: Token::class, options: ['query' => [
                 'grant_type' => 'client_credentials'
-            ]], method: HttpMethods::post())->deserialize();
+            ]], method: HttpMethods::post(), onSuccessCallable: function ($self, $results) {
+                /** @var ClientResponseInterface $self */
+                /** @var AccessTokenInterface|null $results */
+                $this->dispatcher->dispatch(TokenChangedEvent::new($results));
+            })->deserialize();
         } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $exception) {
             return null;
         }

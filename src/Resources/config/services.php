@@ -21,7 +21,6 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('http_client'), // Symfony\Contracts\HttpClient\HttpClientInterface
             service('bytes_twitch_client.httpclient.retry_strategy.twitch'), // Symfony\Component\HttpClient\Retry\RetryStrategyInterface
-            service('event_dispatcher'),  // Symfony\Contracts\EventDispatcher\EventDispatcherInterface
             service('router.default'), // Symfony\Component\Routing\Generator\UrlGeneratorInterface
             '', // $config['client_id']
             '', // $config['client_secret']
@@ -31,6 +30,7 @@ return static function (ContainerConfigurator $container) {
         ])
         ->call('setSerializer', [service('serializer')])
         ->call('setValidator', [service('validator')])
+        ->call('setDispatcher', [service('event_dispatcher')])
         ->call('setResponse', [service('bytes_twitch_client.httpclient.twitch.response')])
         ->lazy()
         ->alias(TwitchClient::class, 'bytes_twitch_client.httpclient.twitch')
@@ -45,6 +45,7 @@ return static function (ContainerConfigurator $container) {
         ])
         ->call('setSerializer', [service('serializer')])
         ->call('setValidator', [service('validator')])
+        ->call('setDispatcher', [service('event_dispatcher')])
         ->call('setResponse', [service('bytes_twitch_client.httpclient.twitch.response')])
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->lazy()
@@ -60,6 +61,7 @@ return static function (ContainerConfigurator $container) {
         ])
         ->call('setSerializer', [service('serializer')])
         ->call('setValidator', [service('validator')])
+        ->call('setDispatcher', [service('event_dispatcher')])
         ->call('setResponse', [service('bytes_twitch_client.httpclient.twitch.response')])
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->lazy()

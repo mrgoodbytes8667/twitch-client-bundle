@@ -6,14 +6,12 @@ use Bytes\TwitchClientBundle\Tests\TwitchClientSetupTrait;
 use Bytes\TwitchClientBundle\Tests\TestUrlGeneratorTrait;
 
 /**
- * Class TwitchTokenClientTest
+ * Class TwitchAppTokenClientTest
  * @package Bytes\TwitchClientBundle\Tests\HttpClient
- *
- * @requires PHPUnit >= 9
  */
-class TwitchTokenClientTest extends TestHttpClientCase
+class TwitchAppTokenClientTest extends TestHttpClientCase
 {
     use TestTwitchClientTrait, TestUrlGeneratorTrait, TwitchClientSetupTrait {
-        TwitchClientSetupTrait::setupTokenClient as setupClient;
+        TwitchClientSetupTrait::setupAppTokenClient as setupClient;
     }
 }

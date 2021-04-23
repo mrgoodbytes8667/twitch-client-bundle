@@ -5,6 +5,8 @@ namespace Bytes\TwitchClientBundle\HttpClient;
 
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
+use Bytes\ResponseBundle\Event\EventDispatcherTrait;
+use Bytes\ResponseBundle\Event\TokenRevokedEvent;
 use Bytes\ResponseBundle\HttpClient\AbstractTokenClient;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Objects\Push;
@@ -12,6 +14,7 @@ use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\ResponseBundle\Token\Interfaces\TokenRevokeInterface;
 use Bytes\ResponseBundle\Token\Interfaces\TokenValidateInterface;
 use Bytes\ResponseBundle\Token\Interfaces\TokenValidationResponseInterface;
+use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Validate;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -26,6 +29,8 @@ use function Symfony\Component\String\u;
  */
 abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements TokenRevokeInterface, TokenValidateInterface
 {
+    use EventDispatcherTrait;
+
     /**
      * TwitchTokenClient constructor.
      * @param HttpClientInterface $httpClient
@@ -40,7 +45,7 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
             // the options defined as values apply only to the URLs matching
             // the regular expressions defined as keys
 
-            // Matches OAuth API routes
+            // Matches OAuth Token Get/Refresh API routes
             TwitchClientEndpoints::SCOPE_OAUTH_TOKEN => [
                 'headers' => $headers,
                 'query' => [
@@ -49,12 +54,12 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
                 ]
             ],
 
-//            // Matches OAuth API routes
-//            TwitchClientEndpoints::SCOPE_OAUTH_VALIDATE => [
-//                'headers' => $headers,
-//            ],
+            // Matches OAuth Token Validation API routes
+            TwitchClientEndpoints::SCOPE_OAUTH_VALIDATE => [
+                'headers' => $headers,
+            ],
 
-            // Matches OAuth API routes
+            // Matches OAuth API routes (remaining)
             TwitchClientEndpoints::SCOPE_OAUTH => [
                 'headers' => $headers,
                 'query' => [
@@ -94,7 +99,18 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
 
         return $this->request($this->buildURL('oauth2/revoke'), options: ['query' => [
             'token' => $token
-        ]], method: HttpMethods::post());
+        ]], method: HttpMethods::post(), onSuccessCallable: function ($self, $results) {
+            /** @var ClientResponseInterface $self */
+            if (array_key_exists('token', $self->getExtraParams())) {
+                $token = $self->getExtraParams()['token'];
+                if(!empty($token) && is_string($token)) {
+                    $token = Token::createFromAccessToken($token);
+                }
+                if(!empty($token) && $token instanceof AccessTokenInterface) {
+                    $this->dispatcher->dispatch(TokenRevokedEvent::new($token), TokenRevokedEvent::NAME);
+                }
+            }
+        }, params: ['token' => Token::createFromAccessToken($token)]);
     }
 
     /**
@@ -111,7 +127,7 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
                 'headers' => [
                     'Authorization' => 'OAuth ' . $token
                 ]
-            ], method: HttpMethods::get())->deserialize();
+            ], method: HttpMethods::get())->deserialize(false);
         } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $exception) {
             return null;
         }

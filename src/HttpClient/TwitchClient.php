@@ -5,6 +5,7 @@ namespace Bytes\TwitchClientBundle\HttpClient;
 
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
+use Bytes\ResponseBundle\Event\EventDispatcherTrait;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Interfaces\IdInterface;
 use Bytes\ResponseBundle\Objects\IdNormalizer;
@@ -21,13 +22,11 @@ use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Create;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions;
 use Bytes\TwitchResponseBundle\Objects\Follows\FollowersResponse;
 use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use function Symfony\Component\String\u;
@@ -39,7 +38,22 @@ use function Symfony\Component\String\u;
  */
 class TwitchClient extends AbstractTwitchClient
 {
-    public function __construct(HttpClientInterface $httpClient, ?RetryStrategyInterface $strategy, protected EventDispatcherInterface $dispatcher, protected UrlGeneratorInterface $urlGenerator, string $clientId, string $clientSecret, protected string $hubSecret, ?string $userAgent, protected ?string $callbackName = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
+    use EventDispatcherTrait;
+
+    /**
+     * TwitchClient constructor.
+     * @param HttpClientInterface $httpClient
+     * @param RetryStrategyInterface|null $strategy
+     * @param UrlGeneratorInterface $urlGenerator
+     * @param string $clientId
+     * @param string $clientSecret
+     * @param string $hubSecret
+     * @param string|null $userAgent
+     * @param string|null $callbackName
+     * @param array $defaultOptionsByRegexp
+     * @param string|null $defaultRegexp
+     */
+    public function __construct(HttpClientInterface $httpClient, ?RetryStrategyInterface $strategy, protected UrlGeneratorInterface $urlGenerator, string $clientId, string $clientSecret, protected string $hubSecret, ?string $userAgent, protected ?string $callbackName = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
         parent::__construct($httpClient, $strategy, $clientId, $clientSecret, $userAgent, $defaultOptionsByRegexp, $defaultRegexp);
     }
