@@ -3,11 +3,14 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Bytes\ResponseBundle\Services\OAuthInterface;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
+use Bytes\TwitchClientBundle\Services\TwitchBotOAuth;
+use Bytes\TwitchClientBundle\Services\TwitchUserOAuth;
 
 /**
  * @param ContainerConfigurator $container
@@ -83,5 +86,34 @@ return static function (ContainerConfigurator $container) {
     $services->set('bytes_twitch_client.httpclient.retry_strategy.twitch', TwitchRetryStrategy::class)
         ->alias(TwitchRetryStrategy::class, 'bytes_twitch_client.httpclient.retry_strategy.twitch')
         ->public();
+    //endregion
+
+    //region OAuth
+    $services->set('bytes_twitch_client.oauth.bot', TwitchBotOAuth::class)
+        ->args([
+            service('security.helper'), // Symfony\Component\Security\Core\Security
+            '', // $config['client_id']
+            [],
+            '', // $config['user']
+            [] // $config['options']
+        ])
+        ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
+        ->alias(TwitchBotOAuth::class, 'bytes_twitch_client.oauth.bot')
+        ->public();
+
+    $services->set('bytes_twitch_client.oauth.user', TwitchUserOAuth::class)
+        ->args([
+            service('security.helper'), // Symfony\Component\Security\Core\Security
+            '', // $config['client_id']
+            [],
+            '', // $config['user']
+            [] // $config['options']
+        ])
+        ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
+        ->alias(TwitchUserOAuth::class, 'bytes_twitch_client.oauth.user')
+        ->public();
+
+    $services->alias(OAuthInterface::class.' $userOAuth', TwitchUserOAuth::class);
+    $services->alias(OAuthInterface::class.' $botOAuth', TwitchBotOAuth::class);
     //endregion
 };
