@@ -48,6 +48,14 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
             $definition->replaceArgument(2, $config['client_secret']);
             $definition->replaceArgument(3, $config['user_agent']);
         }
+
+        foreach (['bytes_twitch_client.oauth.bot', 'bytes_twitch_client.oauth.user'] as $value)
+        {
+            $definition = $container->getDefinition($value);
+            $definition->replaceArgument(1, $config['client_id']);
+            $definition->replaceArgument(2, $config['endpoints']);
+            $definition->replaceArgument(3, $config['user']);
+        }
     }
 
     /**
