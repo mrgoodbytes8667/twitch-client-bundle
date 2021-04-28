@@ -4,6 +4,7 @@
 namespace Bytes\TwitchClientBundle\DependencyInjection;
 
 
+use Bytes\ResponseBundle\Objects\ConfigNormalizer;
 use Exception;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -32,7 +33,7 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
 
         $config = $this->processConfiguration($configuration, $configs);
 
-        $config = $this->normalizeEndpoints($config);
+        $config = ConfigNormalizer::normalizeEndpoints($config, ['eventsub_subscribe', 'app', 'user']);
 
         $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch');
         $definition->replaceArgument(3, $config['client_id']);
@@ -47,52 +48,6 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
             $definition->replaceArgument(2, $config['client_secret']);
             $definition->replaceArgument(3, $config['user_agent']);
         }
-    }
-
-    /**
-     * @param array $config
-     * @return array
-     */
-    private function normalizeEndpoints(array $config)
-    {
-        foreach($config['endpoints'] as $index => $endpoint) {
-            if(!in_array($index, ['eventsub_subscribe', 'app', 'user'])) {
-                unset($config['endpoints'][$index]);
-            }
-        }
-        foreach (['eventsub_subscribe', 'app', 'user'] as $index) {
-            if(!isset($config['endpoints'][$index]))
-            {
-                $config['endpoints'][$index] = [];
-            }
-
-            if(!isset($config['endpoints'][$index]['redirects']))
-            {
-                $config['endpoints'][$index]['redirects'] = [];
-            }
-            if(!isset($config['endpoints'][$index]['redirects']['method']))
-            {
-                $config['endpoints'][$index]['redirects']['method'] = 'route_name';
-            }
-            foreach(['route_name', 'url'] as $redirects) {
-                if (!isset($config['endpoints'][$index]['redirects'][$redirects])) {
-                    $config['endpoints'][$index]['redirects'][$redirects] = '';
-                }
-            }
-
-            foreach(['permissions', 'scopes'] as $subIndex) {
-                if(!isset($config['endpoints'][$index][$subIndex])) {
-                    $config['endpoints'][$index][$subIndex] = [];
-                }
-                foreach(['add', 'remove'] as $addRemove) {
-                    if(!isset($config['endpoints'][$index][$subIndex][$addRemove])) {
-                        $config['endpoints'][$index][$subIndex][$addRemove] = [];
-                    }
-                }
-            }
-        }
-
-        return $config;
     }
 
     /**
