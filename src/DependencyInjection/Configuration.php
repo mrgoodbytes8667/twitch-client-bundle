@@ -22,6 +22,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('bytes_twitch_client');
 
         $treeBuilder->getRootNode()
+            ->ignoreExtraKeys()
             ->children()
                 ->scalarNode('client_id')
                     ->isRequired()
