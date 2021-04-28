@@ -113,7 +113,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(TwitchUserOAuth::class, 'bytes_twitch_client.oauth.user')
         ->public();
 
-    $services->alias(OAuthInterface::class.' $userOAuth', TwitchUserOAuth::class);
-    $services->alias(OAuthInterface::class.' $botOAuth', TwitchBotOAuth::class);
+    $services->alias(OAuthInterface::class.' $twitchUserOAuth', TwitchUserOAuth::class);
+    $services->alias(OAuthInterface::class.' $twitchBotOAuth', TwitchBotOAuth::class);
     //endregion
 };
