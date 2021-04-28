@@ -30,21 +30,20 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
 
         $configuration = $this->getConfiguration($configs, $container);
 
-        /** @var array $config = ['twitch' => ['client_id' => '', 'client_secret' => '', 'hub_secret' => '', 'user_agent' => '', 'eventsub_subscribe_callback_route_name' => '']] */
         $config = $this->processConfiguration($configuration, $configs);
 
         $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch');
-        $definition->replaceArgument(3, $config['twitch']['client_id']);
-        $definition->replaceArgument(4, $config['twitch']['client_secret']);
-        $definition->replaceArgument(5, $config['twitch']['hub_secret']);
-        $definition->replaceArgument(6, $config['twitch']['user_agent']);
-        $definition->replaceArgument(7, $config['twitch']['eventsub_subscribe_callback_route_name']);
+        $definition->replaceArgument(3, $config['client_id']);
+        $definition->replaceArgument(4, $config['client_secret']);
+        $definition->replaceArgument(5, $config['hub_secret']);
+        $definition->replaceArgument(6, $config['user_agent']);
+        $definition->replaceArgument(7, $config['eventsub_subscribe_callback_route_name']);
 
         foreach (['bytes_twitch_client.httpclient.twitch.token.user', 'bytes_twitch_client.httpclient.twitch.token.app'] as $value) {
             $definition = $container->getDefinition($value);
-            $definition->replaceArgument(1, $config['twitch']['client_id']);
-            $definition->replaceArgument(2, $config['twitch']['client_secret']);
-            $definition->replaceArgument(3, $config['twitch']['user_agent']);
+            $definition->replaceArgument(1, $config['client_id']);
+            $definition->replaceArgument(2, $config['client_secret']);
+            $definition->replaceArgument(3, $config['user_agent']);
         }
     }
 
@@ -64,8 +63,8 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
         /** @var array $config = ['twitch' => ['client_id' => '', 'client_secret' => '', 'hub_secret' => '', 'user_agent' => '', 'eventsub_subscribe_callback_route_name' => '']] */
         $config = $this->processConfiguration(new Configuration(), $configs);
 
-        if (isset($config['twitch']) && isset($config['twitch']['hub_secret'])) {
-            $config['twitch'] = ['hub_secret' => $config['twitch']['hub_secret']];
+        if (isset($config) && isset($config['hub_secret'])) {
+            $config = ['hub_secret' => $config['hub_secret']];
             $container->prependExtensionConfig('bytes_twitch_response', $config);
         }
     }
