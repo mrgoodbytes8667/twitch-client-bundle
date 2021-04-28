@@ -98,6 +98,7 @@ return static function (ContainerConfigurator $container) {
             '', // $config['user']
             [] // $config['options']
         ])
+        ->call('setValidator', [service('validator')])
         ->alias(TwitchBotOAuth::class, 'bytes_twitch_client.oauth.bot')
         ->public();
 
@@ -110,6 +111,7 @@ return static function (ContainerConfigurator $container) {
             '', // $config['user']
             [] // $config['options']
         ])
+        ->call('setValidator', [service('validator')])
         ->alias(TwitchUserOAuth::class, 'bytes_twitch_client.oauth.user')
         ->public();
 
