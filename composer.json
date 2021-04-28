@@ -9,7 +9,7 @@
         "doctrine/annotations": "^1.12",
         "doctrine/collections": "^1.6",
         "mrgoodbytes8667/command-bundle": "^1.0",
-        "mrgoodbytes8667/response-bundle": "dev-main as 2.0.0-BETA9",
+        "mrgoodbytes8667/response-bundle": "dev-main",
         "mrgoodbytes8667/twitch-response-bundle": "dev-main as 0.3.0-BETA3",
         "mrgoodbytes8667/http-client-common": "^0.2.1",
         "sensio/framework-extra-bundle": "^5.1",
