@@ -92,24 +92,24 @@ return static function (ContainerConfigurator $container) {
     $services->set('bytes_twitch_client.oauth.bot', TwitchBotOAuth::class)
         ->args([
             service('security.helper'), // Symfony\Component\Security\Core\Security
+            service('router.default'), // Symfony\Component\Routing\Generator\UrlGeneratorInterface
             '', // $config['client_id']
             [],
             '', // $config['user']
             [] // $config['options']
         ])
-        ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->alias(TwitchBotOAuth::class, 'bytes_twitch_client.oauth.bot')
         ->public();
 
     $services->set('bytes_twitch_client.oauth.user', TwitchUserOAuth::class)
         ->args([
             service('security.helper'), // Symfony\Component\Security\Core\Security
+            service('router.default'), // Symfony\Component\Routing\Generator\UrlGeneratorInterface
             '', // $config['client_id']
             [],
             '', // $config['user']
             [] // $config['options']
         ])
-        ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->alias(TwitchUserOAuth::class, 'bytes_twitch_client.oauth.user')
         ->public();
 
