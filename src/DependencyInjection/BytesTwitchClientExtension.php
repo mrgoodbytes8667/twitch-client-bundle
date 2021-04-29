@@ -4,6 +4,7 @@
 namespace Bytes\TwitchClientBundle\DependencyInjection;
 
 
+use Bytes\ResponseBundle\DependencyInjection\ResponseExtensionInterface;
 use Bytes\ResponseBundle\Objects\ConfigNormalizer;
 use Exception;
 use Symfony\Component\Config\FileLocator;
@@ -17,8 +18,34 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
  * Class BytesTwitchClientExtension
  * @package Bytes\TwitchClientBundle\DependencyInjection
  */
-class BytesTwitchClientExtension extends Extension implements ExtensionInterface, PrependExtensionInterface
+class BytesTwitchClientExtension extends Extension implements ExtensionInterface, PrependExtensionInterface, ResponseExtensionInterface
 {
+    /**
+     * @var string[]
+     */
+    public static $endpoints = ['eventsub_subscribe', 'app', 'user'];
+
+    /**
+     * @var string[]
+     */
+    public static $addRemoveParents = ['scopes'];
+
+    /**
+     * @return string[]
+     */
+    public static function getEndpoints(): array
+    {
+        return self::$endpoints;
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getAddRemoveParents(): array
+    {
+        return self::$addRemoveParents;
+    }
+
     /**
      * @param array $configs
      * @param ContainerBuilder $container
@@ -33,7 +60,7 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
 
         $config = $this->processConfiguration($configuration, $configs);
 
-        $config = ConfigNormalizer::normalizeEndpoints($config, ['eventsub_subscribe', 'app', 'user'], ['scopes']);
+        $config = ConfigNormalizer::normalizeEndpoints($config, static::$endpoints, static::$addRemoveParents);
 
         $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch');
         $definition->replaceArgument(3, $config['client_id']);
@@ -49,8 +76,7 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
             $definition->replaceArgument(3, $config['user_agent']);
         }
 
-        foreach (['bytes_twitch_client.oauth.bot', 'bytes_twitch_client.oauth.user'] as $value)
-        {
+        foreach (['bytes_twitch_client.oauth.bot', 'bytes_twitch_client.oauth.user'] as $value) {
             $definition = $container->getDefinition($value);
             $definition->replaceArgument(1, $config['client_id']);
             $definition->replaceArgument(2, $config['endpoints']);

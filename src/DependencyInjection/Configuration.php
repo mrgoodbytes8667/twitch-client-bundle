@@ -3,6 +3,7 @@
 
 namespace Bytes\TwitchClientBundle\DependencyInjection;
 
+use Bytes\TwitchResponseBundle\Enums\OAuthScopes;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -64,7 +65,7 @@ class Configuration implements ConfigurationInterface
                                         ->scalarNode('url')->defaultValue('')->end()
                                     ->end()
                                 ->end()
-                                ->arrayNode('permissions')
+/*                                ->arrayNode('permissions')
                                     ->addDefaultsIfNotSet()
                                     ->info('String constants from the Permissions enum class')
                                     ->children()
@@ -85,25 +86,25 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                         ->end()
                                     ->end()
-                                ->end()
+                                ->end()*/
                                 ->arrayNode('scopes')
                                     ->addDefaultsIfNotSet()
                                     ->info('String constants from the OAuthScopes enum class')
                                     ->children()
                                         ->arrayNode('add')
                                             ->scalarPrototype()
-                                                //->beforeNormalization()
-                                                //    ->always()
-                                                //    ->then(function ($v) { return (new OAuthScopes($v))->value; })
-                                                //->end()
+                                                ->beforeNormalization()
+                                                    ->always()
+                                                    ->then(function ($v) { return (new OAuthScopes($v))->value; })
+                                                ->end()
                                             ->end()
                                         ->end()
                                         ->arrayNode('remove')
                                             ->scalarPrototype()
-                                                //->beforeNormalization()
-                                                //    ->always()
-                                                //    ->then(function ($v) { return (new OAuthScopes($v))->value; })
-                                                //->end()
+                                                ->beforeNormalization()
+                                                    ->always()
+                                                    ->then(function ($v) { return (new OAuthScopes($v))->value; })
+                                                ->end()
                                             ->end()
                                         ->end()
                                     ->end()
