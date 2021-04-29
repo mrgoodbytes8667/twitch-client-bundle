@@ -5,13 +5,13 @@ namespace Bytes\TwitchClientBundle\Routing;
 
 
 /**
- * Class TwitchBotOAuth
+ * Class TwitchAppOAuth
  * @package Bytes\TwitchClientBundle\Routing
  */
-class TwitchBotOAuth extends AbstractTwitchOAuth
+class TwitchAppOAuth extends AbstractTwitchOAuth
 {
     /**
      * @var string
      */
-    protected static $endpoint = 'bot';
+    protected static $endpoint = 'app';
 }

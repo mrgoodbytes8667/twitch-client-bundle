@@ -9,7 +9,7 @@ use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
-use Bytes\TwitchClientBundle\Routing\TwitchBotOAuth;
+use Bytes\TwitchClientBundle\Routing\TwitchAppOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchUserOAuth;
 
 /**
@@ -89,7 +89,7 @@ return static function (ContainerConfigurator $container) {
     //endregion
 
     //region OAuth
-    $services->set('bytes_twitch_client.oauth.bot', TwitchBotOAuth::class)
+    $services->set('bytes_twitch_client.oauth.app', TwitchAppOAuth::class)
         ->args([
             '', // $config['client_id']
             [],
@@ -99,7 +99,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setValidator', [service('validator')])
         ->call('setSecurity', [service('security.helper')->ignoreOnInvalid()]) // Symfony\Component\Security\Core\Security
         ->lazy()
-        ->alias(TwitchBotOAuth::class, 'bytes_twitch_client.oauth.bot')
+        ->alias(TwitchAppOAuth::class, 'bytes_twitch_client.oauth.app')
         ->public();
 
     $services->set('bytes_twitch_client.oauth.user', TwitchUserOAuth::class)
@@ -115,7 +115,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(TwitchUserOAuth::class, 'bytes_twitch_client.oauth.user')
         ->public();
 
+    $services->alias(OAuthInterface::class.' $twitchAppOAuth', TwitchAppOAuth::class);
     $services->alias(OAuthInterface::class.' $twitchUserOAuth', TwitchUserOAuth::class);
-    $services->alias(OAuthInterface::class.' $twitchBotOAuth', TwitchBotOAuth::class);
     //endregion
 };
