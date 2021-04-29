@@ -5,8 +5,8 @@ namespace Bytes\TwitchClientBundle\Services;
 
 
 use BadMethodCallException;
-use Bytes\ResponseBundle\Services\AbstractOAuth;
-use Bytes\ResponseBundle\Services\OAuthPromptInterface;
+use Bytes\ResponseBundle\Routing\AbstractOAuth;
+use Bytes\ResponseBundle\Routing\OAuthPromptInterface;
 use Bytes\TwitchClientBundle\HttpClient\TwitchClientEndpoints;
 use Bytes\TwitchResponseBundle\Enums\OAuthForceVerify;
 use Bytes\TwitchResponseBundle\Enums\OAuthScopes;
