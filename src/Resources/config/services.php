@@ -91,28 +91,26 @@ return static function (ContainerConfigurator $container) {
     //region OAuth
     $services->set('bytes_twitch_client.oauth.bot', TwitchBotOAuth::class)
         ->args([
-            service('security.helper'), // Symfony\Component\Security\Core\Security
             '', // $config['client_id']
             [],
-            '', // $config['user']
             [] // $config['options']
         ])
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->call('setValidator', [service('validator')])
+        ->call('setSecurity', [service('security.helper')->ignoreOnInvalid()]) // Symfony\Component\Security\Core\Security
         ->lazy()
         ->alias(TwitchBotOAuth::class, 'bytes_twitch_client.oauth.bot')
         ->public();
 
     $services->set('bytes_twitch_client.oauth.user', TwitchUserOAuth::class)
         ->args([
-            service('security.helper'), // Symfony\Component\Security\Core\Security
             '', // $config['client_id']
             [],
-            '', // $config['user']
             [] // $config['options']
         ])
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->call('setValidator', [service('validator')])
+        ->call('setSecurity', [service('security.helper')->ignoreOnInvalid()]) // Symfony\Component\Security\Core\Security
         ->lazy()
         ->alias(TwitchUserOAuth::class, 'bytes_twitch_client.oauth.user')
         ->public();
