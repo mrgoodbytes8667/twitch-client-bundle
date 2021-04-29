@@ -3,7 +3,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Bytes\ResponseBundle\Services\OAuthInterface;
+use Bytes\ResponseBundle\Routing\OAuthInterface;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
