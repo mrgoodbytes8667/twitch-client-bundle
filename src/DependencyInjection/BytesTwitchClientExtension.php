@@ -33,7 +33,7 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
 
         $config = $this->processConfiguration($configuration, $configs);
 
-        $config = ConfigNormalizer::normalizeEndpoints($config, ['eventsub_subscribe', 'app', 'user']);
+        $config = ConfigNormalizer::normalizeEndpoints($config, ['eventsub_subscribe', 'app', 'user'], ['scopes']);
 
         $definition = $container->getDefinition('bytes_twitch_client.httpclient.twitch');
         $definition->replaceArgument(3, $config['client_id']);
