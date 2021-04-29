@@ -22,11 +22,6 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppTokenClientInterface
 {
     /**
-     * @var string
-     */
-    protected static $tokenResponseClass = TwitchAppTokenResponse::class;
-
-    /**
      * Refreshes the provided access token
      * @param AccessTokenInterface|null $token
      * @return AccessTokenInterface|null

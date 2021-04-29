@@ -71,6 +71,22 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
     }
 
     /**
+     * @return string|null
+     */
+    protected static function getTokenExchangeBaseUri()
+    {
+        return TwitchClientEndpoints::ENDPOINT_TWITCH_OAUTH;
+    }
+
+    /**
+     * @return string|null
+     */
+    protected static function getTokenExchangeDeserializationClass()
+    {
+        return Token::class;
+    }
+
+    /**
      * @param string $path
      * @param string $prepend
      * @return string

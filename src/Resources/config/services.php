@@ -51,6 +51,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setDispatcher', [service('event_dispatcher')])
         ->call('setResponse', [service('bytes_twitch_client.httpclient.twitch.response')])
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
+        ->call('setOAuth', [service('bytes_twitch_client.oauth.user')]) // Bytes\TwitchClientBundle\Routing\TwitchUserOAuth
         ->lazy()
         ->alias(TwitchUserTokenClient::class, 'bytes_twitch_client.httpclient.twitch.token.user')
         ->public();
