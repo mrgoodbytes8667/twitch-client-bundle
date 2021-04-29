@@ -49,11 +49,12 @@ abstract class AbstractTwitchOAuth extends AbstractOAuth
     /**
      * Returns the $prompt argument for getAuthorizationCodeGrantURL() after normalization and validation
      * @param OAuthPromptInterface|string|bool|null $prompt
+     * @param mixed ...$options
      * @return string|bool
      *
      * @throws BadMethodCallException
      */
-    protected function normalizePrompt(OAuthPromptInterface|bool|string|null $prompt)
+    protected function normalizePrompt(bool|OAuthPromptInterface|string|null $prompt, ...$options)
     {
         if ($prompt instanceof OAuthForceVerify) {
             return $prompt->prompt();
