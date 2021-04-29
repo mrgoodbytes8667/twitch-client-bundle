@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Bytes\TwitchClientBundle\Services;
+namespace Bytes\TwitchClientBundle\Routing;
 
 
 /**
  * Class TwitchUserOAuth
- * @package Bytes\TwitchClientBundle\Services
+ * @package Bytes\TwitchClientBundle\Routing
  */
 class TwitchUserOAuth extends AbstractTwitchOAuth
 {

@@ -9,8 +9,8 @@ use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
-use Bytes\TwitchClientBundle\Services\TwitchBotOAuth;
-use Bytes\TwitchClientBundle\Services\TwitchUserOAuth;
+use Bytes\TwitchClientBundle\Routing\TwitchBotOAuth;
+use Bytes\TwitchClientBundle\Routing\TwitchUserOAuth;
 
 /**
  * @param ContainerConfigurator $container

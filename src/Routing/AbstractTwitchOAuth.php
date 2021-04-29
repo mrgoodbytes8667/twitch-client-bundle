@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Bytes\TwitchClientBundle\Services;
+namespace Bytes\TwitchClientBundle\Routing;
 
 
 use BadMethodCallException;
@@ -15,7 +15,7 @@ use function Symfony\Component\String\u;
 
 /**
  * Class AbstractTwitchOAuth
- * @package Bytes\TwitchClientBundle\Services
+ * @package Bytes\TwitchClientBundle\Routing
  */
 abstract class AbstractTwitchOAuth extends AbstractOAuth
 {
