@@ -7,12 +7,13 @@ namespace Bytes\TwitchClientBundle\HttpClient\Token;
 use Bytes\ResponseBundle\Enums\HttpMethods;
 use Bytes\ResponseBundle\Event\EventDispatcherTrait;
 use Bytes\ResponseBundle\Event\TokenRevokedEvent;
+use Bytes\ResponseBundle\Event\TokenValidatedEvent;
 use Bytes\ResponseBundle\HttpClient\Token\AbstractTokenClient;
 use Bytes\ResponseBundle\HttpClient\Token\TokenRevokeInterface;
+use Bytes\ResponseBundle\HttpClient\Token\TokenValidateInterface;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Objects\Push;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
-use Bytes\ResponseBundle\Token\Interfaces\TokenValidateInterface;
 use Bytes\ResponseBundle\Token\Interfaces\TokenValidationResponseInterface;
 use Bytes\TwitchClientBundle\HttpClient\TwitchClientEndpoints;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
@@ -132,19 +133,22 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
 
     /**
      * Validates the provided access token
+     * Fires a TokenValidatedEvent on success
      * @param AccessTokenInterface $token
      * @return TokenValidationResponseInterface|null
      */
     public function validateToken(AccessTokenInterface $token): ?TokenValidationResponseInterface
     {
-        $token = static::normalizeAccessToken($token, false, 'The $token argument is required and cannot be empty.');
+        $tokenString = static::normalizeAccessToken($token, false, 'The $token argument is required and cannot be empty.');
 
         try {
             return $this->request($this->buildURL('oauth2/validate'), type: Validate::class, options: [
                 'headers' => [
-                    'Authorization' => 'OAuth ' . $token
+                    'Authorization' => 'OAuth ' . $tokenString
                 ]
-            ], method: HttpMethods::get())->deserialize(false);
+            ], method: HttpMethods::get(), onSuccessCallable: function ($self, $results) use ($token) {
+                $this->dispatcher->dispatch(TokenValidatedEvent::new($token, $results), TokenValidatedEvent::NAME);
+            })->deserialize(false);
         } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $exception) {
             return null;
         }
