@@ -8,7 +8,9 @@ use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
+use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenResponse;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
+use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenResponse;
 use Bytes\TwitchClientBundle\Routing\TwitchAppOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchUserOAuth;
 
@@ -34,7 +36,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setSerializer', [service('serializer')])
         ->call('setValidator', [service('validator')])
         ->call('setDispatcher', [service('event_dispatcher')])
-        ->call('setResponse', [service('bytes_twitch_client.httpclient.twitch.response')])
+        ->call('setResponse', [service('bytes_twitch_client.httpclient.response')])
         ->lazy()
         ->alias(TwitchClient::class, 'bytes_twitch_client.httpclient.twitch')
         ->public();
@@ -49,7 +51,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setSerializer', [service('serializer')])
         ->call('setValidator', [service('validator')])
         ->call('setDispatcher', [service('event_dispatcher')])
-        ->call('setResponse', [service('bytes_twitch_client.httpclient.twitch.response')])
+        ->call('setResponse', [service('bytes_twitch_client.httpclient.response.token.user')])
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->call('setOAuth', [service('bytes_twitch_client.oauth.user')]) // Bytes\TwitchClientBundle\Routing\TwitchUserOAuth
         ->lazy()
@@ -66,7 +68,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setSerializer', [service('serializer')])
         ->call('setValidator', [service('validator')])
         ->call('setDispatcher', [service('event_dispatcher')])
-        ->call('setResponse', [service('bytes_twitch_client.httpclient.twitch.response')])
+        ->call('setResponse', [service('bytes_twitch_client.httpclient.response.token.app')])
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->lazy()
         ->alias(TwitchAppTokenClient::class, 'bytes_twitch_client.httpclient.twitch.token.app')
@@ -74,12 +76,28 @@ return static function (ContainerConfigurator $container) {
     //endregion
 
     //region Response
-    $services->set('bytes_twitch_client.httpclient.twitch.response', TwitchResponse::class)
+    $services->set('bytes_twitch_client.httpclient.response', TwitchResponse::class)
         ->args([
             service('serializer'), // Symfony\Component\Serializer\SerializerInterface
         ])
         ->call('setDispatcher', [service('event_dispatcher')])
-        ->alias(TwitchResponse::class, 'bytes_twitch_client.httpclient.twitch.response')
+        ->alias(TwitchResponse::class, 'bytes_twitch_client.httpclient.response')
+        ->public();
+    
+    $services->set('bytes_twitch_client.httpclient.response.token.app', TwitchAppTokenResponse::class)
+        ->args([
+            service('serializer'), // Symfony\Component\Serializer\SerializerInterface
+        ])
+        ->call('setDispatcher', [service('event_dispatcher')])
+        ->alias(TwitchAppTokenResponse::class, 'bytes_twitch_client.httpclient.response.token.app')
+        ->public();
+
+    $services->set('bytes_twitch_client.httpclient.response.token.user', TwitchUserTokenResponse::class)
+        ->args([
+            service('serializer'), // Symfony\Component\Serializer\SerializerInterface
+        ])
+        ->call('setDispatcher', [service('event_dispatcher')])
+        ->alias(TwitchUserTokenResponse::class, 'bytes_twitch_client.httpclient.response.token.user')
         ->public();
     //endregion
 
