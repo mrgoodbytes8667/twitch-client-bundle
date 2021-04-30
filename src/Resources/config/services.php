@@ -79,24 +79,24 @@ return static function (ContainerConfigurator $container) {
     $services->set('bytes_twitch_client.httpclient.response', TwitchResponse::class)
         ->args([
             service('serializer'), // Symfony\Component\Serializer\SerializerInterface
+            service('event_dispatcher'), // Symfony\Component\Serializer\SerializerInterface
         ])
-        ->call('setDispatcher', [service('event_dispatcher')])
         ->alias(TwitchResponse::class, 'bytes_twitch_client.httpclient.response')
         ->public();
     
     $services->set('bytes_twitch_client.httpclient.response.token.app', TwitchAppTokenResponse::class)
         ->args([
             service('serializer'), // Symfony\Component\Serializer\SerializerInterface
+            service('event_dispatcher'), // Symfony\Component\Serializer\SerializerInterface
         ])
-        ->call('setDispatcher', [service('event_dispatcher')])
         ->alias(TwitchAppTokenResponse::class, 'bytes_twitch_client.httpclient.response.token.app')
         ->public();
 
     $services->set('bytes_twitch_client.httpclient.response.token.user', TwitchUserTokenResponse::class)
         ->args([
             service('serializer'), // Symfony\Component\Serializer\SerializerInterface
+            service('event_dispatcher'), // Symfony\Component\Serializer\SerializerInterface
         ])
-        ->call('setDispatcher', [service('event_dispatcher')])
         ->alias(TwitchUserTokenResponse::class, 'bytes_twitch_client.httpclient.response.token.user')
         ->public();
     //endregion
