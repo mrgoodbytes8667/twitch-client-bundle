@@ -47,6 +47,7 @@ trait TwitchClientSetupTrait
      */
     private function postClientSetup($client, ?EventDispatcher $dispatcher = null)
     {
+        $dispatcher = $dispatcher ?? new EventDispatcher();
         $client->setSerializer($this->serializer);
         $client->setValidator($this->validator);
         if(method_exists($client, 'setDispatcher'))
@@ -55,7 +56,10 @@ trait TwitchClientSetupTrait
         }
 
         $response = TwitchResponse::make($this->serializer);
-        $response->setDispatcher($dispatcher ?? new EventDispatcher());
+        if(method_exists($response, 'setDispatcher'))
+        {
+            $response->setDispatcher($dispatcher ?? new EventDispatcher());
+        }
         $client->setResponse($response);
         return $client;
     }
