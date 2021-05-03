@@ -45,6 +45,6 @@ class EventSubDeleteTest extends TestTwitchClientCase
 
         $client = $this->setupClient(MockClient::empty(), $dispatcher);
 
-        $client->eventSubDelete($this->faker->uuid())->callback();
+        $client->eventSubDelete($this->faker->uuid())->onSuccessCallback();
     }
 }
