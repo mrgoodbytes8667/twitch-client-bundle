@@ -5,7 +5,7 @@ namespace Bytes\TwitchClientBundle\HttpClient\Token;
 
 
 use Bytes\ResponseBundle\Enums\OAuthGrantTypes;
-use Bytes\ResponseBundle\Event\TokenChangedEvent;
+use Bytes\ResponseBundle\Event\TokenRefreshedEvent;
 use Bytes\ResponseBundle\HttpClient\Token\UserTokenClientInterface;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
@@ -41,7 +41,7 @@ class TwitchUserTokenClient extends AbstractTwitchTokenClient implements UserTok
         return $this->tokenExchange($token, url: $redirect, scopes: OAuthScopes::getUserScopes(), grantType: OAuthGrantTypes::refreshToken(), onSuccessCallable: function ($self, $results) use ($token) {
             /** @var ClientResponseInterface $self */
             /** @var AccessTokenInterface|null $results */
-            $this->dispatcher->dispatch(TokenChangedEvent::new($results, Token::createFromAccessToken($token)));
+            $this->dispatcher->dispatch(TokenRefreshedEvent::new($results, Token::createFromAccessToken($token)));
         });
 
     }

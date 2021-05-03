@@ -113,22 +113,13 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
      */
     public function revokeToken(AccessTokenInterface $token): ClientResponseInterface
     {
-        $token = static::normalizeAccessToken($token, false, 'The $token argument is required and cannot be empty.');
+        $tokenString = static::normalizeAccessToken($token, false, 'The $token argument is required and cannot be empty.');
 
         return $this->request($this->buildURL('oauth2/revoke'), options: ['query' => [
-            'token' => $token
-        ]], method: HttpMethods::post(), onSuccessCallable: function ($self, $results) {
-            /** @var ClientResponseInterface $self */
-            if (array_key_exists('token', $self->getExtraParams())) {
-                $token = $self->getExtraParams()['token'];
-                if(!empty($token) && is_string($token)) {
-                    $token = Token::createFromAccessToken($token);
-                }
-                if(!empty($token) && $token instanceof AccessTokenInterface) {
-                    $this->dispatcher->dispatch(TokenRevokedEvent::new($token), TokenRevokedEvent::NAME);
-                }
-            }
-        }, params: ['token' => Token::createFromAccessToken($token)]);
+            'token' => $tokenString
+        ]], method: HttpMethods::post(), onSuccessCallable: function ($self, $results) use ($token) {
+            $this->dispatcher->dispatch(TokenRevokedEvent::new($token), TokenRevokedEvent::NAME);
+        });
     }
 
     /**

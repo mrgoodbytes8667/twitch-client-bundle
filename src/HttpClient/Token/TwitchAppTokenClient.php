@@ -5,7 +5,8 @@ namespace Bytes\TwitchClientBundle\HttpClient\Token;
 
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
-use Bytes\ResponseBundle\Event\TokenChangedEvent;
+use Bytes\ResponseBundle\Event\TokenGrantedEvent;
+use Bytes\ResponseBundle\Event\TokenRefreshedEvent;
 use Bytes\ResponseBundle\HttpClient\Token\AppTokenClientInterface;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
@@ -28,7 +29,7 @@ class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppToken
      */
     public function refreshToken(AccessTokenInterface $token = null): ?AccessTokenInterface
     {
-        return $this->getToken();
+        return $this->getOrRefreshToken($token);
         // @todo
         // revoke token
     }
@@ -39,14 +40,32 @@ class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppToken
      */
     public function getToken(): ?AccessTokenInterface
     {
+        return $this->getOrRefreshToken(null);
+    }
+
+    /**
+     * @param AccessTokenInterface|null $token
+     * @return AccessTokenInterface|null
+     */
+    private function getOrRefreshToken(?AccessTokenInterface $token)
+    {
+        if (empty($token)) {
+            $onSuccessCallable = function ($self, $results) {
+                /** @var ClientResponseInterface $self */
+                /** @var AccessTokenInterface|null $results */
+                $this->dispatcher->dispatch(TokenGrantedEvent::new($results));
+            };
+        } else {
+            $onSuccessCallable = function ($self, $results) use ($token) {
+                /** @var ClientResponseInterface $self */
+                /** @var AccessTokenInterface|null $results */
+                $this->dispatcher->dispatch(TokenRefreshedEvent::new($results, $token));
+            };
+        }
         try {
             return $this->request($this->buildURL('oauth2/token'), type: Token::class, options: ['query' => [
                 'grant_type' => 'client_credentials'
-            ]], method: HttpMethods::post(), onSuccessCallable: function ($self, $results) {
-                /** @var ClientResponseInterface $self */
-                /** @var AccessTokenInterface|null $results */
-                $this->dispatcher->dispatch(TokenChangedEvent::new($results));
-            })->deserialize();
+            ]], method: HttpMethods::post(), onSuccessCallable: $onSuccessCallable)->deserialize();
         } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $exception) {
             return null;
         }
