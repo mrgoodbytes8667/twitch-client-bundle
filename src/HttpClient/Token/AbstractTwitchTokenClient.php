@@ -5,7 +5,9 @@ namespace Bytes\TwitchClientBundle\HttpClient\Token;
 
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
+use Bytes\ResponseBundle\Enums\OAuthGrantTypes;
 use Bytes\ResponseBundle\Event\EventDispatcherTrait;
+use Bytes\ResponseBundle\Event\TokenGrantedEvent;
 use Bytes\ResponseBundle\Event\TokenRevokedEvent;
 use Bytes\ResponseBundle\Event\TokenValidatedEvent;
 use Bytes\ResponseBundle\HttpClient\Token\AbstractTokenClient;
@@ -143,5 +145,31 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
         } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $exception) {
             return null;
         }
+    }
+
+    /**
+     * Exchanges the provided code (or token) for a (new) access token
+     * @param string $code
+     * @param string|null $route Either $route or $url (or setOAuth(()) is required, $route takes precedence over $url
+     * @param string|null|callable(string, array) $url Either $route or $url (or setOAuth(()) is required, $route takes precedence over $url
+     * @param array $scopes
+     * @param callable(static, mixed)|null $onSuccessCallable If set, will be triggered if it returns successfully
+     * @return AccessTokenInterface|null
+     *
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function exchange(string $code, ?string $route = null, string|callable|null $url = null, array $scopes = [], ?callable $onSuccessCallable = null): ?AccessTokenInterface
+    {
+        $token = $this->tokenExchange($code, $route, $url, $scopes, OAuthGrantTypes::authorizationCode(), onDeserializeCallable: function ($self, $results) {
+            /** @var TokenGrantedEvent $event */
+            $event = $this->dispatcher->dispatch(TokenGrantedEvent::new($results), TokenGrantedEvent::NAME);
+            return $event->getToken();
+        }, onSuccessCallable: $onSuccessCallable)
+            ->deserialize();
+
+        return $token;
     }
 }

@@ -50,13 +50,13 @@ class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppToken
     private function getOrRefreshToken(?AccessTokenInterface $token)
     {
         if (empty($token)) {
-            $onSuccessCallable = function ($self, $results) {
+            $onDeserializeCallable = function ($self, $results) {
                 /** @var ClientResponseInterface $self */
                 /** @var AccessTokenInterface|null $results */
                 $this->dispatcher->dispatch(TokenGrantedEvent::new($results));
             };
         } else {
-            $onSuccessCallable = function ($self, $results) use ($token) {
+            $onDeserializeCallable = function ($self, $results) use ($token) {
                 /** @var ClientResponseInterface $self */
                 /** @var AccessTokenInterface|null $results */
                 $this->dispatcher->dispatch(TokenRefreshedEvent::new($results, $token));
@@ -65,7 +65,7 @@ class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppToken
         try {
             return $this->request($this->buildURL('oauth2/token'), type: Token::class, options: ['query' => [
                 'grant_type' => 'client_credentials'
-            ]], method: HttpMethods::post(), onSuccessCallable: $onSuccessCallable)->deserialize();
+            ]], method: HttpMethods::post(), onDeserializeCallable: $onDeserializeCallable)->deserialize();
         } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $exception) {
             return null;
         }

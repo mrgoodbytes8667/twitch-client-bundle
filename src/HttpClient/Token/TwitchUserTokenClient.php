@@ -38,11 +38,16 @@ class TwitchUserTokenClient extends AbstractTwitchTokenClient implements UserTok
             return null;
         }
         $redirect = $this->oAuth->getRedirect();
-        return $this->tokenExchange($token, url: $redirect, scopes: OAuthScopes::getUserScopes(), grantType: OAuthGrantTypes::refreshToken(), onSuccessCallable: function ($self, $results) use ($token) {
-            /** @var ClientResponseInterface $self */
-            /** @var AccessTokenInterface|null $results */
-            $this->dispatcher->dispatch(TokenRefreshedEvent::new($results, Token::createFromAccessToken($token)));
-        });
+        return $this->tokenExchange($token, url: $redirect, scopes: OAuthScopes::getUserScopes(), grantType: OAuthGrantTypes::refreshToken(),
+            onDeserializeCallable: function ($self, $results) use ($token) {
+                /** @var ClientResponseInterface $self */
+                /** @var AccessTokenInterface|null $results */
+
+                /** @var TokenRefreshedEvent $event */
+                $event = $this->dispatcher->dispatch(TokenRefreshedEvent::new($results, Token::createFromAccessToken($token)));
+
+                return $event->getToken();
+            })->deserialize();
 
     }
 }
