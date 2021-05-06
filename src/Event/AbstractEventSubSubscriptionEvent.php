@@ -11,9 +11,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class AbstractEventSubSubscriptionEvent
- * @package App\Event
+ * @package Bytes\TwitchClientBundle\Event
  */
-abstract class AbstractEventSubSubscriptionEvent
+abstract class AbstractEventSubSubscriptionEvent extends Event
 {
     /**
      * AbstractEventSubSubscriptionEvent constructor.

@@ -14,11 +14,6 @@ use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
 class EventSubSubscriptionCreatePreRequestEvent extends AbstractEventSubSubscriptionEvent
 {
     /**
-     * @Event("Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePreRequestEvent")
-     */
-    public const NAME = 'bytes_twitch_client.eventsub_subscription.create.prerequest';
-
-    /**
      * @param EventSubSubscriptionTypes $subscriptionType
      * @param UserInterface $stream
      * @param string $callback

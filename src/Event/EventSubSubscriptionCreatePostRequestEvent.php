@@ -15,11 +15,6 @@ use DateTimeInterface;
 class EventSubSubscriptionCreatePostRequestEvent extends AbstractEventSubSubscriptionEvent
 {
     /**
-     * @Event("Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePostRequestEvent")
-     */
-    public const NAME = 'bytes_twitch_client.eventsub_subscription.create.postrequest';
-
-    /**
      * @param EventSubSubscriptionTypes $subscriptionType
      * @param UserInterface $stream
      * @param string $callback

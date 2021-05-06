@@ -11,11 +11,6 @@ namespace Bytes\TwitchClientBundle\Event;
 class EventSubSubscriptionDeleteEvent extends AbstractEventSubSubscriptionEvent
 {
     /**
-     * @Event("Bytes\TwitchClientBundle\Event\EventSubSubscriptionDeleteEvent")
-     */
-    public const NAME = 'bytes_twitch_client.eventsub_subscription.delete';
-
-    /**
      * @param string $id
      * @return static
      */
