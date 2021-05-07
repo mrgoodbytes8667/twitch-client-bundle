@@ -3,6 +3,9 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Bytes\ResponseBundle\HttpClient\Token\AppTokenClientInterface;
+use Bytes\ResponseBundle\HttpClient\Token\TokenClientInterface;
+use Bytes\ResponseBundle\HttpClient\Token\UserTokenClientInterface;
 use Bytes\ResponseBundle\Routing\OAuthInterface;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
@@ -40,6 +43,9 @@ return static function (ContainerConfigurator $container) {
         ->lazy()
         ->alias(TwitchClient::class, 'bytes_twitch_client.httpclient.twitch')
         ->public();
+    //endregion
+
+    //region Clients (Tokens)
 
     $services->set('bytes_twitch_client.httpclient.twitch.token.user', TwitchUserTokenClient::class)
         ->args([
@@ -58,6 +64,9 @@ return static function (ContainerConfigurator $container) {
         ->alias(TwitchUserTokenClient::class, 'bytes_twitch_client.httpclient.twitch.token.user')
         ->public();
 
+    $services->alias(TokenClientInterface::class.' $twitchUserTokenClient', TwitchUserTokenClient::class);
+    $services->alias(UserTokenClientInterface::class.' $twitchTokenClient', TwitchUserTokenClient::class);
+
     $services->set('bytes_twitch_client.httpclient.twitch.token.app', TwitchAppTokenClient::class)
         ->args([
             service('http_client'), // Symfony\Contracts\HttpClient\HttpClientInterface
@@ -73,6 +82,9 @@ return static function (ContainerConfigurator $container) {
         ->lazy()
         ->alias(TwitchAppTokenClient::class, 'bytes_twitch_client.httpclient.twitch.token.app')
         ->public();
+
+    $services->alias(TokenClientInterface::class.' $twitchAppTokenClient', TwitchAppTokenClient::class);
+    $services->alias(AppTokenClientInterface::class.' $twitchTokenClient', TwitchAppTokenClient::class);
     //endregion
 
     //region Response
