@@ -10,7 +10,6 @@ use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\Tests\Common\Constraint\ResponseContentSame;
 use Bytes\Tests\Common\Constraint\ResponseStatusCodeSame;
 use Bytes\Tests\Common\TestFullValidatorTrait;
-use Bytes\Tests\Common\TestSerializerTrait;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\Tests\FullSerializerTrait;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockStandaloneResponse;

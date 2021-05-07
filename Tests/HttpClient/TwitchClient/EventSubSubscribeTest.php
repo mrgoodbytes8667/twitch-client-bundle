@@ -42,11 +42,34 @@ class EventSubSubscribeTest extends TestTwitchClientCase
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher);
 
-        $cmd = $client->eventSubSubscribe(EventSubSubscriptionTypes::streamOnline(), $this->createMockUser(), $callback, []);
+        $cmd = $client->eventSubSubscribe($type, $this->createMockUser(), $callback, []);
         $this->assertResponseIsSuccessful($cmd);
         $this->assertResponseStatusCodeSame($cmd, Response::HTTP_OK);
 
         return $cmd;
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     */
+    public function testEventSubSubscribeClientInvalidCallback()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The argument "callback" must be a valid URL, a callback, or null.');
+        $this->setupClient()->eventSubSubscribe(EventSubSubscriptionTypes::streamOnline(), $this->createMockUser(), new \stdClass(), []);
+    }
+
+    /**
+     * @dataProvider provideUnsupportedTypes
+     * @param $type
+     * @throws TransportExceptionInterface
+     */
+    public function testEventSubSubscribeClientUnsupportedType($type)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The type "%s" is not yet supported', $type));
+        $client = $this->setupClient();
+        $client->eventSubSubscribe($type, $this->createMockUser(), $this->faker->url(), []);
     }
 
     /**
@@ -56,11 +79,31 @@ class EventSubSubscribeTest extends TestTwitchClientCase
     {
         $this->setupFaker();
 
-        yield ['type' => null, 'user' => null, 'callback' => $this->faker->url(), 'extraConditions' => []];
-        yield ['type' => null, 'user' => null, 'callback' => null, 'extraConditions' => []];
-        yield ['type' => null, 'user' => null, 'callback' => function ($a, $b) {
-            return $this->faker->url();
-        }, 'extraConditions' => []];
+        foreach(self::getSupportedTypes() as $type) {
+
+            yield ['type' => $type, 'user' => null, 'callback' => $this->faker->url(), 'extraConditions' => []];
+            yield ['type' => $type, 'user' => null, 'callback' => null, 'extraConditions' => []];
+            yield ['type' => $type, 'user' => null, 'callback' => function ($a, $b) {
+                return $this->faker->url();
+            }, 'extraConditions' => []];
+        }
+    }
+
+    protected static function getSupportedTypes()
+    {
+        return [EventSubSubscriptionTypes::channelUpdate(), EventSubSubscriptionTypes::streamOnline(), EventSubSubscriptionTypes::streamOffline(), EventSubSubscriptionTypes::channelSubscribe(), EventSubSubscriptionTypes::channelChannelPointsCustomRewardAdd(), EventSubSubscriptionTypes::userUpdate()];
+    }
+
+    public function provideUnsupportedTypes()
+    {
+        foreach (EventSubSubscriptionTypes::getValues() as $value)
+        {
+            $type = EventSubSubscriptionTypes::make($value);
+            if(!in_array($type, self::getSupportedTypes()))
+            {
+                yield ['type' => $type];
+            }
+        }
     }
 
     /**

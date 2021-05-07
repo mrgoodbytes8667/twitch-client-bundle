@@ -5,9 +5,6 @@ namespace Bytes\TwitchClientBundle\HttpClient\Token;
 
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
-use Bytes\ResponseBundle\Enums\OAuthGrantTypes;
-use Bytes\ResponseBundle\Event\EventDispatcherTrait;
-use Bytes\ResponseBundle\Event\TokenGrantedEvent;
 use Bytes\ResponseBundle\Event\TokenRevokedEvent;
 use Bytes\ResponseBundle\Event\TokenValidatedEvent;
 use Bytes\ResponseBundle\HttpClient\Token\AbstractTokenClient;
@@ -20,9 +17,6 @@ use Bytes\ResponseBundle\Token\Interfaces\TokenValidationResponseInterface;
 use Bytes\TwitchClientBundle\HttpClient\TwitchClientEndpoints;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Validate;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use function Symfony\Component\String\u;
@@ -33,8 +27,6 @@ use function Symfony\Component\String\u;
  */
 abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements TokenRevokeInterface, TokenValidateInterface
 {
-    use EventDispatcherTrait;
-
     /**
      * TwitchTokenClient constructor.
      * @param HttpClientInterface $httpClient
@@ -52,7 +44,7 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
             // Matches OAuth Token Get/Refresh API routes
             TwitchClientEndpoints::SCOPE_OAUTH_TOKEN => [
                 'headers' => $headers,
-                'query' => [
+                'body' => [
                     'client_id' => $clientId,
                     'client_secret' => $clientSecret,
                 ]
@@ -120,7 +112,7 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
         return $this->request($this->buildURL('oauth2/revoke'), options: ['query' => [
             'token' => $tokenString
         ]], method: HttpMethods::post(), onSuccessCallable: function ($self, $results) use ($token) {
-            $this->dispatcher->dispatch(TokenRevokedEvent::new($token), TokenRevokedEvent::NAME);
+            $this->dispatch(TokenRevokedEvent::new($token));
         });
     }
 
@@ -134,42 +126,12 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
     {
         $tokenString = static::normalizeAccessToken($token, false, 'The $token argument is required and cannot be empty.');
 
-        try {
-            return $this->request($this->buildURL('oauth2/validate'), type: Validate::class, options: [
-                'headers' => [
-                    'Authorization' => 'OAuth ' . $tokenString
-                ]
-            ], method: HttpMethods::get(), onSuccessCallable: function ($self, $results) use ($token) {
-                $this->dispatcher->dispatch(TokenValidatedEvent::new($token, $results), TokenValidatedEvent::NAME);
-            })->deserialize(false);
-        } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $exception) {
-            return null;
-        }
-    }
-
-    /**
-     * Exchanges the provided code (or token) for a (new) access token
-     * @param string $code
-     * @param string|null $route Either $route or $url (or setOAuth(()) is required, $route takes precedence over $url
-     * @param string|null|callable(string, array) $url Either $route or $url (or setOAuth(()) is required, $route takes precedence over $url
-     * @param array $scopes
-     * @param callable(static, mixed)|null $onSuccessCallable If set, will be triggered if it returns successfully
-     * @return AccessTokenInterface|null
-     *
-     * @throws ClientExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     */
-    public function exchange(string $code, ?string $route = null, string|callable|null $url = null, array $scopes = [], ?callable $onSuccessCallable = null): ?AccessTokenInterface
-    {
-        $token = $this->tokenExchange($code, $route, $url, $scopes, OAuthGrantTypes::authorizationCode(), onDeserializeCallable: function ($self, $results) {
-            /** @var TokenGrantedEvent $event */
-            $event = $this->dispatcher->dispatch(TokenGrantedEvent::new($results), TokenGrantedEvent::NAME);
-            return $event->getToken();
-        }, onSuccessCallable: $onSuccessCallable)
-            ->deserialize();
-
-        return $token;
+        return $this->request($this->buildURL('oauth2/validate'), type: Validate::class, options: [
+            'headers' => [
+                'Authorization' => 'OAuth ' . $tokenString
+            ]
+        ], method: HttpMethods::get(), onSuccessCallable: function ($self, $results) use ($token) {
+            $this->dispatch(TokenValidatedEvent::new($token, $results));
+        })->deserialize(false);
     }
 }

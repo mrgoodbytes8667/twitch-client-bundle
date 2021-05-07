@@ -5,7 +5,6 @@ namespace Bytes\TwitchClientBundle\HttpClient\Api;
 
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
-use Bytes\ResponseBundle\Event\EventDispatcherTrait;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Interfaces\IdInterface;
 use Bytes\ResponseBundle\Objects\IdNormalizer;
@@ -38,8 +37,6 @@ use function Symfony\Component\String\u;
  */
 class TwitchClient extends AbstractTwitchClient
 {
-    use EventDispatcherTrait;
-
     /**
      * TwitchClient constructor.
      * @param HttpClientInterface $httpClient
@@ -81,7 +78,7 @@ class TwitchClient extends AbstractTwitchClient
                 $conditions->setUserId($stream->getId());
                 break;
             default:
-                throw new InvalidArgumentException(sprintf("The type '%s' is not yet supported", $type));
+                throw new InvalidArgumentException(sprintf('The type "%s" is not yet supported', $type));
                 break;
         }
 
@@ -99,13 +96,13 @@ class TwitchClient extends AbstractTwitchClient
         $json = $this->serializer->serialize($create, 'json', [AbstractObjectNormalizer::SKIP_NULL_VALUES => true]);
         $params['body'] = $json;
 
-        $this->dispatcher?->dispatch(EventSubSubscriptionCreatePreRequestEvent::make($type, $stream, $url));
+        $this->dispatch(EventSubSubscriptionCreatePreRequestEvent::make($type, $stream, $url));
         return $this->request(url: 'https://api.twitch.tv/helix/eventsub/subscriptions', type: Subscriptions::class, options: $params, method: HttpMethods::post(), onSuccessCallable: function ($self, $subscriptions) {
             /** @var TwitchResponse $self */
             if (array_key_exists('user', $self->getExtraParams())) {
                 $user = $self->getExtraParams()['user'];
             }
-            $this->dispatcher->dispatch(EventSubSubscriptionCreatePostRequestEvent::createFromSubscription($subscriptions->getSubscription(), $user));
+            $this->dispatch(EventSubSubscriptionCreatePostRequestEvent::createFromSubscription($subscriptions->getSubscription(), $user));
         }, params: ['user' => $stream]);
     }
 
@@ -125,7 +122,7 @@ class TwitchClient extends AbstractTwitchClient
             /** @var TwitchResponse $self */
             if (array_key_exists('id', $self->getExtraParams())) {
                 $user = $self->getExtraParams()['id'];
-                $this->dispatcher->dispatch(EventSubSubscriptionDeleteEvent::make($user));
+                $this->dispatch(EventSubSubscriptionDeleteEvent::make($user));
             }
         }, params: ['id' => $id]);
     }

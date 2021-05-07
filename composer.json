@@ -29,7 +29,7 @@
     "require-dev": {
         "doctrine/common": "^3.0",
         "fakerphp/faker": "^1.13",
-        "mrgoodbytes8667/test-common": ">=0.0.16",
+        "mrgoodbytes8667/test-common": ">=0.0.17",
         "mrgoodbytes8667/test-common-faker": "^0.3.4",
         "mrgoodbytes8667/test-twitch-faker": ">=0.0.2",
         "phpunit/phpunit": "*",

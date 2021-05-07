@@ -5,12 +5,12 @@ namespace Bytes\TwitchClientBundle\HttpClient\Token;
 
 
 use Bytes\ResponseBundle\Enums\OAuthGrantTypes;
+use Bytes\ResponseBundle\Event\TokenGrantedEvent;
 use Bytes\ResponseBundle\Event\TokenRefreshedEvent;
 use Bytes\ResponseBundle\HttpClient\Token\UserTokenClientInterface;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\TwitchResponseBundle\Enums\OAuthScopes;
-use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -33,21 +33,47 @@ class TwitchUserTokenClient extends AbstractTwitchTokenClient implements UserTok
      */
     public function refreshToken(AccessTokenInterface $token = null): ?AccessTokenInterface
     {
-        $token = static::normalizeRefreshToken($token);
-        if (empty($token)) {
+        $tokenString = static::normalizeRefreshToken($token);
+        if (empty($tokenString)) {
             return null;
         }
         $redirect = $this->oAuth->getRedirect();
-        return $this->tokenExchange($token, url: $redirect, scopes: OAuthScopes::getUserScopes(), grantType: OAuthGrantTypes::refreshToken(),
+        return $this->tokenExchange($tokenString, url: $redirect, scopes: OAuthScopes::getUserScopes(), grantType: OAuthGrantTypes::refreshToken(),
             onDeserializeCallable: function ($self, $results) use ($token) {
                 /** @var ClientResponseInterface $self */
                 /** @var AccessTokenInterface|null $results */
 
                 /** @var TokenRefreshedEvent $event */
-                $event = $this->dispatcher->dispatch(TokenRefreshedEvent::new($results, Token::createFromAccessToken($token)));
+                $event = $this->dispatch(TokenRefreshedEvent::new($results, $token));
 
                 return $event->getToken();
             })->deserialize();
 
+    }
+
+    /**
+     * Exchanges the provided code (or token) for a (new) access token
+     * @param string $code
+     * @param string|null $route Either $route or $url (or setOAuth(()) is required, $route takes precedence over $url
+     * @param string|null|callable(string, array) $url Either $route or $url (or setOAuth(()) is required, $route takes precedence over $url
+     * @param array $scopes
+     * @param callable(static, mixed)|null $onSuccessCallable If set, will be triggered if it returns successfully
+     * @return AccessTokenInterface|null
+     *
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function exchange(string $code, ?string $route = null, string|callable|null $url = null, array $scopes = [], ?callable $onSuccessCallable = null): ?AccessTokenInterface
+    {
+        $token = $this->tokenExchange($code, $route, $url, $scopes, OAuthGrantTypes::authorizationCode(), onDeserializeCallable: function ($self, $results) {
+            /** @var TokenGrantedEvent $event */
+            $event = $this->dispatch(TokenGrantedEvent::new($results));
+            return $event->getToken();
+        }, onSuccessCallable: $onSuccessCallable)
+            ->deserialize();
+
+        return $token;
     }
 }

@@ -11,6 +11,7 @@ use Bytes\ResponseBundle\HttpClient\Token\AppTokenClientInterface;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
+use LogicException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -35,15 +36,6 @@ class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppToken
     }
 
     /**
-     * Returns an access token
-     * @return AccessTokenInterface|null
-     */
-    public function getToken(): ?AccessTokenInterface
-    {
-        return $this->getOrRefreshToken(null);
-    }
-
-    /**
      * @param AccessTokenInterface|null $token
      * @return AccessTokenInterface|null
      */
@@ -53,13 +45,17 @@ class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppToken
             $onDeserializeCallable = function ($self, $results) {
                 /** @var ClientResponseInterface $self */
                 /** @var AccessTokenInterface|null $results */
-                $this->dispatcher->dispatch(TokenGrantedEvent::new($results));
+                /** @var TokenGrantedEvent $event */
+                $event = $this->dispatch(TokenGrantedEvent::new($results));
+                return $event->getToken();
             };
         } else {
             $onDeserializeCallable = function ($self, $results) use ($token) {
                 /** @var ClientResponseInterface $self */
                 /** @var AccessTokenInterface|null $results */
-                $this->dispatcher->dispatch(TokenRefreshedEvent::new($results, $token));
+                /** @var TokenRefreshedEvent $event */
+                $event = $this->dispatch(TokenRefreshedEvent::new($results, $token));
+                return $event->getToken();
             };
         }
         try {
@@ -69,5 +65,28 @@ class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppToken
         } catch (ClientExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $exception) {
             return null;
         }
+    }
+
+    /**
+     * Returns an access token
+     * @return AccessTokenInterface|null
+     */
+    public function getToken(): ?AccessTokenInterface
+    {
+        return $this->getOrRefreshToken(null);
+    }
+
+    /**
+     * Exchanges the provided code for a new access token
+     * @param string $code
+     * @param string|null $route Either $route or $url is required, $route takes precedence over $url
+     * @param string|null|callable(string, array) $url Either $route or $url is required, $route takes precedence over $url
+     * @param array $scopes
+     * @param callable|null $onSuccessCallable If set, will be triggered if it returns successfully
+     * @return AccessTokenInterface|null
+     */
+    public function exchange(string $code, ?string $route = null, callable|string|null $url = null, array $scopes = [], ?callable $onSuccessCallable = null): ?AccessTokenInterface
+    {
+        throw new LogicException('Twitch app tokens do not have an exchange protocol');
     }
 }
