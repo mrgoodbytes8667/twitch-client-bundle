@@ -66,6 +66,7 @@ return static function (ContainerConfigurator $container) {
 
     $services->alias(TokenClientInterface::class.' $twitchUserTokenClient', TwitchUserTokenClient::class);
     $services->alias(UserTokenClientInterface::class.' $twitchTokenClient', TwitchUserTokenClient::class);
+    $services->alias(UserTokenClientInterface::class.' $twitchUserTokenClient', TwitchUserTokenClient::class);
 
     $services->set('bytes_twitch_client.httpclient.twitch.token.app', TwitchAppTokenClient::class)
         ->args([
@@ -85,6 +86,7 @@ return static function (ContainerConfigurator $container) {
 
     $services->alias(TokenClientInterface::class.' $twitchAppTokenClient', TwitchAppTokenClient::class);
     $services->alias(AppTokenClientInterface::class.' $twitchTokenClient', TwitchAppTokenClient::class);
+    $services->alias(AppTokenClientInterface::class.' $twitchAppTokenClient', TwitchAppTokenClient::class);
     //endregion
 
     //region Response
