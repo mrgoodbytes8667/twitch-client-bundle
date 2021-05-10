@@ -108,7 +108,15 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                         ->end()
                                     ->end()
-                                ->end()
+                                ->end() // end scopes
+                                ->booleanNode('revokeOnRefresh')
+                                    ->info('Should the existing token be revoked when refreshing a token?')
+                                    ->defaultFalse()
+                                ->end() // end revokeOnRefresh
+                                ->booleanNode('fireRevokeOnRefresh')
+                                    ->info('Should the existing token fire the revoke event when refreshing a token? Ignored if revokeOnRefresh is true.')
+                                    ->defaultFalse()
+                                ->end() // end fireRevokeOnRefresh
                             ->end()
                         ->end()
                     //->end()
