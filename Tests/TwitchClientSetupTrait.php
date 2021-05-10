@@ -87,7 +87,7 @@ trait TwitchClientSetupTrait
      */
     private function setupTokenClient($class, $responseClass, ?HttpClientInterface $httpClient = null, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
-        $client = new $class($httpClient ?? MockClient::empty(), Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::USER_AGENT, $defaultOptionsByRegexp, $defaultRegexp);
+        $client = new $class($httpClient ?? MockClient::empty(), Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::USER_AGENT, true, true, $defaultOptionsByRegexp, $defaultRegexp);
         return $this->postClientSetup($client, $dispatcher, $responseClass);
     }
 

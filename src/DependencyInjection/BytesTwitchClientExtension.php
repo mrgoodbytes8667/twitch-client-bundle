@@ -69,11 +69,13 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
         $definition->replaceArgument(6, $config['user_agent']);
         $definition->replaceArgument(7, $config['endpoints']['eventsub_subscribe']['redirects']['route_name']);
 
-        foreach (['bytes_twitch_client.httpclient.twitch.token.user', 'bytes_twitch_client.httpclient.twitch.token.app'] as $value) {
+        foreach (['user' => 'bytes_twitch_client.httpclient.twitch.token.user', 'app' => 'bytes_twitch_client.httpclient.twitch.token.app'] as $endpoint => $value) {
             $definition = $container->getDefinition($value);
             $definition->replaceArgument(1, $config['client_id']);
             $definition->replaceArgument(2, $config['client_secret']);
             $definition->replaceArgument(3, $config['user_agent']);
+            $definition->replaceArgument(4, $config['endpoints'][$endpoint]['revoke_on_refresh']);
+            $definition->replaceArgument(5, $config['endpoints'][$endpoint]['fire_revoke_on_refresh']);
         }
 
         foreach (['bytes_twitch_client.oauth.app', 'bytes_twitch_client.oauth.user'] as $value) {

@@ -54,6 +54,8 @@ return static function (ContainerConfigurator $container) {
             '', // $config['client_id']
             '', // $config['client_secret']
             '', // $config['user_agent']
+            '', // revoke_on_refresh
+            '', // fire_revoke_on_refresh
         ])
         ->call('setSerializer', [service('serializer')])
         ->call('setValidator', [service('validator')])
@@ -75,6 +77,8 @@ return static function (ContainerConfigurator $container) {
             '', // $config['client_id']
             '', // $config['client_secret']
             '', // $config['user_agent']
+            '', // revoke_on_refresh
+            '', // fire_revoke_on_refresh
         ])
         ->call('setSerializer', [service('serializer')])
         ->call('setValidator', [service('validator')])
