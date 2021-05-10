@@ -15,6 +15,7 @@ use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenResponse;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenResponse;
 use Bytes\TwitchClientBundle\Routing\TwitchAppOAuth;
+use Bytes\TwitchClientBundle\Routing\TwitchLoginOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchUserOAuth;
 use Bytes\TwitchClientBundle\Subscriber\RevokeTokenSubscriber;
 
@@ -126,7 +127,7 @@ return static function (ContainerConfigurator $container) {
         ->public();
     //endregion
 
-    //region OAuth
+    //region Routing
     $services->set('bytes_twitch_client.oauth.app', TwitchAppOAuth::class)
         ->args([
             '', // $config['client_id']
@@ -138,6 +139,19 @@ return static function (ContainerConfigurator $container) {
         ->call('setSecurity', [service('security.helper')->ignoreOnInvalid()]) // Symfony\Component\Security\Core\Security
         ->lazy()
         ->alias(TwitchAppOAuth::class, 'bytes_twitch_client.oauth.app')
+        ->public();
+
+    $services->set('bytes_twitch_client.oauth.login', TwitchLoginOAuth::class)
+        ->args([
+            '', // $config['client_id']
+            [],
+            [] // $config['options']
+        ])
+        ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
+        ->call('setValidator', [service('validator')])
+        ->call('setSecurity', [service('security.helper')->ignoreOnInvalid()]) // Symfony\Component\Security\Core\Security
+        ->lazy()
+        ->alias(TwitchLoginOAuth::class, 'bytes_twitch_client.oauth.login')
         ->public();
 
     $services->set('bytes_twitch_client.oauth.user', TwitchUserOAuth::class)
@@ -154,6 +168,7 @@ return static function (ContainerConfigurator $container) {
         ->public();
 
     $services->alias(OAuthInterface::class.' $twitchAppOAuth', TwitchAppOAuth::class);
+    $services->alias(OAuthInterface::class.' $twitchLoginOAuth', TwitchLoginOAuth::class);
     $services->alias(OAuthInterface::class.' $twitchUserOAuth', TwitchUserOAuth::class);
     //endregion
 

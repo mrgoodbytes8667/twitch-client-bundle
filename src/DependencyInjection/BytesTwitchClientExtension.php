@@ -78,7 +78,7 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
             $definition->replaceArgument(5, $config['endpoints'][$endpoint]['fire_revoke_on_refresh']);
         }
 
-        foreach (['bytes_twitch_client.oauth.app', 'bytes_twitch_client.oauth.user'] as $value) {
+        foreach (['bytes_twitch_client.oauth.app', 'bytes_twitch_client.oauth.login', 'bytes_twitch_client.oauth.user'] as $value) {
             $definition = $container->getDefinition($value);
             $definition->replaceArgument(0, $config['client_id']);
             $definition->replaceArgument(1, $config['endpoints']);
