@@ -17,6 +17,7 @@ use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenResponse;
 use Bytes\TwitchClientBundle\Routing\TwitchAppOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchLoginOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchUserOAuth;
+use Bytes\TwitchClientBundle\Security\TwitchOAuthAuthenticator;
 use Bytes\TwitchClientBundle\Subscriber\RevokeTokenSubscriber;
 
 /**
@@ -179,5 +180,10 @@ return static function (ContainerConfigurator $container) {
             service('bytes_twitch_client.httpclient.twitch.token.user'),
         ])
         ->tag('kernel.event_subscriber');
+    //endregion
+
+    //region Security
+    $services->set('bytes_twitch_client.security.oauth.handler', TwitchOAuthAuthenticator::class)
+        ->tag('bytes_response.security.oauth');
     //endregion
 };
