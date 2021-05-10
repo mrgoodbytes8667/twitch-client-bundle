@@ -113,7 +113,7 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
             'token' => $tokenString
         ]], method: HttpMethods::post(), onSuccessCallable: function ($self, $results) use ($token) {
             $this->dispatch(TokenRevokedEvent::new($token));
-        });
+        })->onSuccessCallback();
     }
 
     /**
