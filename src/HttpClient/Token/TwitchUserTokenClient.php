@@ -5,8 +5,10 @@ namespace Bytes\TwitchClientBundle\HttpClient\Token;
 
 
 use Bytes\ResponseBundle\Enums\OAuthGrantTypes;
+use Bytes\ResponseBundle\Event\RevokeTokenEvent;
 use Bytes\ResponseBundle\Event\TokenGrantedEvent;
 use Bytes\ResponseBundle\Event\TokenRefreshedEvent;
+use Bytes\ResponseBundle\Event\TokenRevokedEvent;
 use Bytes\ResponseBundle\HttpClient\Token\UserTokenClientInterface;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
@@ -45,6 +47,14 @@ class TwitchUserTokenClient extends AbstractTwitchTokenClient implements UserTok
 
                 /** @var TokenRefreshedEvent $event */
                 $event = $this->dispatch(TokenRefreshedEvent::new($results, $token));
+
+                if($this->revokeOnRefresh) {
+                    $this->dispatch(RevokeTokenEvent::new($token));
+                }
+                if($this->fireRevokeOnRefresh)
+                {
+                    $this->dispatch(TokenRevokedEvent::new($event->getToken()));
+                }
 
                 return $event->getToken();
             })->deserialize();
