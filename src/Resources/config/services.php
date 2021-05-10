@@ -16,6 +16,7 @@ use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenResponse;
 use Bytes\TwitchClientBundle\Routing\TwitchAppOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchUserOAuth;
+use Bytes\TwitchClientBundle\Subscriber\RevokeTokenSubscriber;
 
 /**
  * @param ContainerConfigurator $container
@@ -150,5 +151,14 @@ return static function (ContainerConfigurator $container) {
 
     $services->alias(OAuthInterface::class.' $twitchAppOAuth', TwitchAppOAuth::class);
     $services->alias(OAuthInterface::class.' $twitchUserOAuth', TwitchUserOAuth::class);
+    //endregion
+
+    //region Subscribers
+    $services->set('bytes_twitch_client.subscriber.revoke_token', RevokeTokenSubscriber::class)
+        ->args([
+            service('bytes_twitch_client.httpclient.twitch.token.app'),
+            service('bytes_twitch_client.httpclient.twitch.token.user'),
+        ])
+        ->tag('kernel.event_subscriber');
     //endregion
 };
