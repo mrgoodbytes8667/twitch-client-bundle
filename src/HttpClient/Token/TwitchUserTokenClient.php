@@ -50,10 +50,9 @@ class TwitchUserTokenClient extends AbstractTwitchTokenClient implements UserTok
 
                 if($this->revokeOnRefresh) {
                     $this->dispatch(RevokeTokenEvent::new($token));
-                }
-                if($this->fireRevokeOnRefresh)
+                } elseif($this->fireRevokeOnRefresh)
                 {
-                    $this->dispatch(TokenRevokedEvent::new($event->getToken()));
+                    $this->dispatch(TokenRevokedEvent::new($token));
                 }
 
                 return $event->getToken();
