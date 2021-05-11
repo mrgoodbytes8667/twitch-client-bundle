@@ -203,18 +203,4 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('kernel.event_subscriber');
     //endregion
-
-    //region Security
-    $services->set('bytes_twitch_client.security.oauth.handler', TwitchOAuthAuthenticator::class)
-        ->args([
-            service('doctrine.orm.default_entity_manager'),
-            service('security.helper'),
-            service('router.default'),
-            service('bytes_twitch_client.oauth.login'),
-            service('bytes_twitch_client.httpclient.twitch.token.user'),
-            '',
-            ''
-        ])
-        ->tag('bytes_response.security.oauth');
-    //endregion
 };

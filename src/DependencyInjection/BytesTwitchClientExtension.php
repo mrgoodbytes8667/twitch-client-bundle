@@ -84,10 +84,6 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
             $definition->replaceArgument(1, $config['endpoints']);
         }
 
-        $container->getDefinition('bytes_twitch_client.security.oauth.handler')
-            ->replaceArgument(5, $config['login_redirect_route'])
-            ->replaceArgument(6, $config['login_success_route']);
-
         foreach (['app', 'login', 'user'] as $type) {
             $container->getDefinition(sprintf('bytes_twitch_client.oauth_controller.%s', $type))
                 ->replaceArgument(2, $config['login_success_route']);
