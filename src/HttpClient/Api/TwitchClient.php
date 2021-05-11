@@ -5,6 +5,7 @@ namespace Bytes\TwitchClientBundle\HttpClient\Api;
 
 
 use Bytes\ResponseBundle\Enums\HttpMethods;
+use Bytes\ResponseBundle\Enums\TokenSource;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Interfaces\IdInterface;
 use Bytes\ResponseBundle\Objects\IdNormalizer;
@@ -15,6 +16,7 @@ use Bytes\TwitchClientBundle\Event\EventSubSubscriptionDeleteEvent;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchFollowersResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchUserResponse;
+use Bytes\TwitchClientBundle\HttpClient\Token\TwitchTokenResponseTrait;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Condition;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Create;
@@ -37,6 +39,17 @@ use function Symfony\Component\String\u;
  */
 class TwitchClient extends AbstractTwitchClient
 {
+    use TwitchTokenResponseTrait;
+
+    /**
+     * Returns the TokenSource for the token
+     * @return TokenSource
+     */
+    protected static function getTokenSource(): TokenSource
+    {
+        return TokenSource::app();
+    }
+
     /**
      * TwitchClient constructor.
      * @param HttpClientInterface $httpClient
@@ -250,4 +263,20 @@ class TwitchClient extends AbstractTwitchClient
     {
         return 'TWITCH';
     }
+
+    /**
+     * @return array
+     */
+    protected function getAuthenticationOption()
+    {
+        $token = $this->getToken();
+        if(!empty($token))
+        {
+            return ['auth_bearer' => $token->getAccessToken()];
+        }
+
+        return [];
+    }
+
+
 }
