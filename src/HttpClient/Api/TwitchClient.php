@@ -198,7 +198,7 @@ class TwitchClient extends AbstractTwitchClient
      */
     public function getUser(?string $id = null, ?string $login = null)
     {
-        return $this->getUsers(ids: [$id], logins: [$login], throw: false, responseClass: TwitchUserResponse::class);
+        return $this->getUsers(ids: !is_null($id) ? [$id] : [], logins: !is_null($login) ? [$login] : [], throw: false, responseClass: TwitchUserResponse::class);
     }
 
     /**
@@ -277,6 +277,4 @@ class TwitchClient extends AbstractTwitchClient
 
         return [];
     }
-
-
 }
