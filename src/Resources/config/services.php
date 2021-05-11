@@ -45,6 +45,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setDispatcher', [service('event_dispatcher')])
         ->call('setResponse', [service('bytes_twitch_client.httpclient.response')])
         ->tag('bytes_response.http_client')
+        ->tag('bytes_response.http_client.api')
         ->lazy()
         ->alias(TwitchClient::class, 'bytes_twitch_client.httpclient.twitch')
         ->public();
@@ -68,6 +69,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->call('setOAuth', [service('bytes_twitch_client.oauth.user')]) // Bytes\TwitchClientBundle\Routing\TwitchUserOAuth
         ->tag('bytes_response.http_client')
+        ->tag('bytes_response.http_client.token')
         ->lazy()
         ->alias(TwitchUserTokenClient::class, 'bytes_twitch_client.httpclient.twitch.token.user')
         ->public();
@@ -91,6 +93,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setResponse', [service('bytes_twitch_client.httpclient.response.token.app')])
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->tag('bytes_response.http_client')
+        ->tag('bytes_response.http_client.token')
         ->lazy()
         ->alias(TwitchAppTokenClient::class, 'bytes_twitch_client.httpclient.twitch.token.app')
         ->public();
