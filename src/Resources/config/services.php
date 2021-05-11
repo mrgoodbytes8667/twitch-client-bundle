@@ -3,6 +3,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Bytes\ResponseBundle\Controller\OAuthController;
 use Bytes\ResponseBundle\HttpClient\Token\AppTokenClientInterface;
 use Bytes\ResponseBundle\HttpClient\Token\TokenClientInterface;
 use Bytes\ResponseBundle\HttpClient\Token\UserTokenClientInterface;
@@ -96,6 +97,17 @@ return static function (ContainerConfigurator $container) {
     $services->alias(AppTokenClientInterface::class.' $twitchAppTokenClient', TwitchAppTokenClient::class);
     //endregion
 
+    //region Controllers
+    $services->set('bytes_twitch_client.oauth_controller', OAuthController::class)
+        ->args([
+            service('bytes_twitch_client.oauth.login'), // Bytes\ResponseBundle\Routing\OAuthInterface
+            service('router.default'), // Symfony\Component\Routing\Generator\UrlGeneratorInterface
+            '', // destination route
+        ])
+        ->alias(OAuthController::class, 'bytes_twitch_client.oauth_controller')
+        ->public();
+    //endregion
+
     //region Response
     $services->set('bytes_twitch_client.httpclient.response', TwitchResponse::class)
         ->args([
@@ -184,6 +196,14 @@ return static function (ContainerConfigurator $container) {
 
     //region Security
     $services->set('bytes_twitch_client.security.oauth.handler', TwitchOAuthAuthenticator::class)
-        ->tag('bytes_response.security.oauth');
+        ->args([
+            service('doctrine.orm.default_entity_manager'),
+            service('security.helper'),
+            service('router.default'),
+            service('bytes_twitch_client.oauth.login'),
+            service('bytes_twitch_client.httpclient.twitch.token.user'),
+            '',
+            ''
+        ]);
     //endregion
 };
