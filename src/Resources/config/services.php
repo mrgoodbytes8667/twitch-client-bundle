@@ -214,6 +214,7 @@ return static function (ContainerConfigurator $container) {
             service('bytes_twitch_client.httpclient.twitch.token.user'),
             '',
             ''
-        ]);
+        ])
+        ->tag('bytes_response.security.oauth');
     //endregion
 };
