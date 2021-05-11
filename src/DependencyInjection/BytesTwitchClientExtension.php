@@ -23,7 +23,7 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
     /**
      * @var string[]
      */
-    public static $endpoints = ['eventsub_subscribe', 'app', 'user'];
+    public static $endpoints = ['eventsub_subscribe', 'app', 'login', 'user'];
 
     /**
      * @var string[]
