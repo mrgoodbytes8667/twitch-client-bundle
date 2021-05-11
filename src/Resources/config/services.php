@@ -98,14 +98,16 @@ return static function (ContainerConfigurator $container) {
     //endregion
 
     //region Controllers
-    $services->set('bytes_twitch_client.oauth_controller', OAuthController::class)
-        ->args([
-            service('bytes_twitch_client.oauth.login'), // Bytes\ResponseBundle\Routing\OAuthInterface
-            service('router.default'), // Symfony\Component\Routing\Generator\UrlGeneratorInterface
-            '', // destination route
-        ])
-        ->alias(OAuthController::class, 'bytes_twitch_client.oauth_controller')
-        ->public();
+    foreach (['app', 'login', 'user'] as $type) {
+        $services->set(sprintf('bytes_twitch_client.oauth_controller.%s', $type), OAuthController::class)
+            ->args([
+                service(sprintf('bytes_twitch_client.oauth.%s', $type)), // Bytes\ResponseBundle\Routing\OAuthInterface
+                service('router.default'), // Symfony\Component\Routing\Generator\UrlGeneratorInterface
+                '', // destination route
+            ])
+            ->alias(OAuthController::class, sprintf('bytes_twitch_client.oauth_controller.%s', $type))
+            ->public();
+    }
     //endregion
 
     //region Response
