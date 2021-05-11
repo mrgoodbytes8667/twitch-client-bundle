@@ -85,4 +85,13 @@ class TwitchUserTokenClient extends AbstractTwitchTokenClient implements UserTok
 
         return $token;
     }
+
+    /**
+     * Return the client name
+     * @return string
+     */
+    public static function getDefaultIndexName(): string
+    {
+        return 'TWITCH-TOKEN-USER';
+    }
 }

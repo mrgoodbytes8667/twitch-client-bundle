@@ -99,4 +99,13 @@ class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppToken
     {
         throw new LogicException('Twitch app tokens do not have an exchange protocol');
     }
+
+    /**
+     * Return the client name
+     * @return string
+     */
+    public static function getDefaultIndexName(): string
+    {
+        return 'TWITCH-TOKEN-APP';
+    }
 }

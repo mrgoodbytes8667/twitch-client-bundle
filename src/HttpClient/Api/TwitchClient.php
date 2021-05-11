@@ -241,4 +241,13 @@ class TwitchClient extends AbstractTwitchClient
             'login' => $stream->getLogin(),
         ], UrlGeneratorInterface::ABSOLUTE_URL);
     }
+
+    /**
+     * Return the client name
+     * @return string
+     */
+    public static function getDefaultIndexName(): string
+    {
+        return 'TWITCH';
+    }
 }
