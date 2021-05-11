@@ -105,7 +105,6 @@ return static function (ContainerConfigurator $container) {
                 service('router.default'), // Symfony\Component\Routing\Generator\UrlGeneratorInterface
                 '', // destination route
             ])
-            ->alias(OAuthController::class, sprintf('bytes_twitch_client.oauth_controller.%s', $type))
             ->public();
     }
     //endregion
