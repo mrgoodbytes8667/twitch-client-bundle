@@ -4,6 +4,7 @@
 namespace Bytes\TwitchClientBundle\HttpClient\Api;
 
 
+use Bytes\ResponseBundle\Annotations\Client;
 use Bytes\ResponseBundle\HttpClient\Api\AbstractApiClient;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Objects\Push;

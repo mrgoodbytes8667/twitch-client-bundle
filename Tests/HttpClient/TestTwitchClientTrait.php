@@ -7,11 +7,16 @@ namespace Bytes\TwitchClientBundle\Tests\HttpClient;
 use Bytes\Common\Faker\Providers\Twitch;
 use Bytes\Common\Faker\Providers\MiscProvider;
 use Bytes\Tests\Common\ClientExceptionResponseProviderTrait;
+use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
+use Bytes\TwitchClientBundle\HttpClient\Token\AbstractTwitchTokenClient;
+use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
+use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
 use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
 use Bytes\ResponseBundle\Enums\OAuthGrantTypes;
 use Faker\Factory;
 use Generator;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -33,7 +38,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @method assertNull($actual, string $message = '')
  * @method expectException(string $exception)
  * @method expectExceptionMessage(string $message)
- * @method setupClient(HttpClientInterface $httpClient)
+ * @method TwitchClient|AbstractTwitchTokenClient|TwitchAppTokenClient|TwitchUserTokenClient setupClient(?HttpClientInterface $httpClient = null, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
  * @property SerializerInterface $serializer
  */
 trait TestTwitchClientTrait

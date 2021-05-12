@@ -5,6 +5,7 @@ namespace Bytes\TwitchClientBundle\HttpClient\Api;
 
 
 use Bytes\ResponseBundle\Annotations\Auth;
+use Bytes\ResponseBundle\Annotations\Client;
 use Bytes\ResponseBundle\Enums\HttpMethods;
 use Bytes\ResponseBundle\Enums\TokenSource;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
@@ -36,20 +37,11 @@ use function Symfony\Component\String\u;
 /**
  * Class TwitchClient
  * @package Bytes\TwitchClientBundle\HttpClient\Api
+ *
+ * @Client(identifier="TWITCH", tokenSource="app")
  */
 class TwitchClient extends AbstractTwitchClient
 {
-    use TwitchTokenResponseTrait;
-
-    /**
-     * Returns the TokenSource for the token
-     * @return TokenSource
-     */
-    protected static function getTokenSource(): TokenSource
-    {
-        return TokenSource::app();
-    }
-
     /**
      * TwitchClient constructor.
      * @param HttpClientInterface $httpClient

@@ -15,12 +15,5 @@ class TwitchAppTokenResponse extends TokenResponse
 {
     use TwitchTokenResponseTrait;
 
-    /**
-     * Returns the TokenSource for the token
-     * @return TokenSource
-     */
-    protected static function getTokenSource(): TokenSource
-    {
-        return TokenSource::app();
-    }
+    protected static $tokenSource = 'app';
 }

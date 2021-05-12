@@ -4,6 +4,7 @@
 namespace Bytes\TwitchClientBundle\HttpClient\Token;
 
 
+use Bytes\ResponseBundle\Annotations\Client;
 use Bytes\ResponseBundle\Enums\OAuthGrantTypes;
 use Bytes\ResponseBundle\Event\RevokeTokenEvent;
 use Bytes\ResponseBundle\Event\TokenGrantedEvent;
@@ -21,6 +22,8 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 /**
  * Class TwitchUserTokenClient
  * @package Bytes\TwitchClientBundle\HttpClient\Token
+ *
+ * @Client(identifier="TWITCH", tokenSource="user")
  */
 class TwitchUserTokenClient extends AbstractTwitchTokenClient implements UserTokenClientInterface
 {

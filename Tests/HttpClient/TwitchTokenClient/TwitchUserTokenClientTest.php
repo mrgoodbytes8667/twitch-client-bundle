@@ -7,6 +7,7 @@ use Bytes\ResponseBundle\Enums\TokenSource;
 use Bytes\ResponseBundle\Exception\Response\EmptyContentException;
 use Bytes\ResponseBundle\Interfaces\ClientTokenResponseInterface;
 use Bytes\ResponseBundle\Test\AssertAccessTokenInterfaceTrait;
+use Bytes\ResponseBundle\Test\AssertClientAnnotationsSameTrait;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\ResponseBundle\Token\Interfaces\TokenValidationResponseInterface;
 use Bytes\Tests\Common\MockHttpClient\MockEmptyResponse;
@@ -32,7 +33,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  */
 class TwitchUserTokenClientTest extends TestHttpClientCase
 {
-    use AssertAccessTokenInterfaceTrait, TestTwitchClientTrait, TestTwitchFakerTrait, TestUrlGeneratorTrait, TwitchClientSetupTrait {
+    use AssertAccessTokenInterfaceTrait, AssertClientAnnotationsSameTrait, TestTwitchClientTrait, TestTwitchFakerTrait, TestUrlGeneratorTrait, TwitchClientSetupTrait {
         TwitchClientSetupTrait::setupUserTokenClient as setupClient;
     }
 
@@ -67,7 +68,7 @@ class TwitchUserTokenClientTest extends TestHttpClientCase
         $client = $this->setupClient(new MockHttpClient([
             MockJsonResponse::makeFixture('HttpClient/get-app-token-success.json')
         ]))
-        ->setOAuth($oAuth);
+            ->setOAuth($oAuth);
 
         $existingToken = Token::createFromAccessToken($this->faker->accessToken());
         $existingToken->setRefreshToken($this->faker->refreshToken());
@@ -133,6 +134,12 @@ class TwitchUserTokenClientTest extends TestHttpClientCase
         $this->assertFalse($response->hasExpired());
     }
 
+    /**
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
     public function testExchange()
     {
         $client = $this->setupClient(MockClient::requests(MockJsonResponse::makeFixture('HttpClient/get-user-token-success.json')));
@@ -141,15 +148,39 @@ class TwitchUserTokenClientTest extends TestHttpClientCase
         $this->assertInstanceOf(AccessTokenInterface::class, $response);
 
         $token = Token::createFromParts(accessToken: 'vkhp8pva30rb0df4z80fesvarzpxn8', refreshToken: 'svavkhp8pva38pv30rb0df40rb0dsvaf4z80fessvavarpxn8', expiresIn: 13573,
-        scope: 'user:read:email', tokenType: 'bearer', tokenSource: TokenSource::user(), identifier: 'TWITCH');
+            scope: 'user:read:email', tokenType: 'bearer', tokenSource: TokenSource::user(), identifier: 'TWITCH');
 
         $this->assertTokenEquals($token, $response);
     }
 
-    public function testExchangeInvalid() {
+    /**
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function testExchangeInvalid()
+    {
         $this->expectException(EmptyContentException::class);
 
         $client = $this->setupClient(MockClient::empty());
         $client->exchange($this->faker->accessToken(), url: 'https://www.example.com');
+    }
+
+    /**
+     *
+     */
+    public function testClientAnnotations()
+    {
+        $client = $this->setupClient();
+        $this->assertClientAnnotationEquals('TWITCH', TokenSource::user(), $client);
+    }
+
+    /**
+     *
+     */
+    public function testUsesClientAnnotations()
+    {
+        $this->assertUsesClientAnnotations($this->setupClient());
     }
 }

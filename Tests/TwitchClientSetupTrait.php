@@ -14,6 +14,7 @@ use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenResponse;
 use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -52,6 +53,7 @@ trait TwitchClientSetupTrait
         $dispatcher = $dispatcher ?? new EventDispatcher();
         $client->setSerializer($this->serializer);
         $client->setValidator($this->validator);
+        $client->setReader(new AnnotationReader());
         if (method_exists($client, 'setDispatcher')) {
             $client->setDispatcher($dispatcher ?? new EventDispatcher());
         }

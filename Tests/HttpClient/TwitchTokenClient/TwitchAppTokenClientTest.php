@@ -3,7 +3,9 @@
 namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchTokenClient;
 
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
+use Bytes\ResponseBundle\Enums\TokenSource;
 use Bytes\ResponseBundle\Interfaces\ClientTokenResponseInterface;
+use Bytes\ResponseBundle\Test\AssertClientAnnotationsSameTrait;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\ResponseBundle\Token\Interfaces\TokenValidationResponseInterface;
 use Bytes\Tests\Common\MockHttpClient\MockEmptyResponse;
@@ -15,6 +17,7 @@ use Bytes\TwitchClientBundle\Tests\TestUrlGeneratorTrait;
 use Bytes\TwitchClientBundle\Tests\TwitchClientSetupTrait;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
 use Exception;
+use LogicException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -28,7 +31,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  */
 class TwitchAppTokenClientTest extends TestHttpClientCase
 {
-    use TestTwitchClientTrait, TestTwitchFakerTrait, TestUrlGeneratorTrait, TwitchClientSetupTrait {
+    use AssertClientAnnotationsSameTrait, TestTwitchClientTrait, TestTwitchFakerTrait, TestUrlGeneratorTrait, TwitchClientSetupTrait {
         TwitchClientSetupTrait::setupAppTokenClient as setupClient;
     }
 
@@ -125,10 +128,31 @@ class TwitchAppTokenClientTest extends TestHttpClientCase
         $this->assertFalse($response->hasExpired());
     }
 
-    public function testExchange() {
-        $this->expectException(\LogicException::class);
+    /**
+     *
+     */
+    public function testExchange()
+    {
+        $this->expectException(LogicException::class);
 
         $client = $this->setupClient(MockClient::empty());
         $client->exchange($this->faker->accessToken());
+    }
+
+    /**
+     *
+     */
+    public function testClientAnnotations()
+    {
+        $client = $this->setupClient();
+        $this->assertClientAnnotationEquals('TWITCH', TokenSource::app(), $client);
+    }
+
+    /**
+     *
+     */
+    public function testUsesClientAnnotations()
+    {
+        $this->assertUsesClientAnnotations($this->setupClient());
     }
 }
