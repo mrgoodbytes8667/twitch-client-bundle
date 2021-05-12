@@ -18,7 +18,6 @@ use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenResponse;
 use Bytes\TwitchClientBundle\Routing\TwitchAppOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchLoginOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchUserOAuth;
-use Bytes\TwitchClientBundle\Security\TwitchOAuthAuthenticator;
 use Bytes\TwitchClientBundle\Subscriber\RevokeTokenSubscriber;
 
 /**
@@ -40,11 +39,7 @@ return static function (ContainerConfigurator $container) {
             '', // $config['user_agent']
             '', // $config['eventsub_subscribe_callback_route_name']
         ])
-        ->call('setSerializer', [service('serializer')])
-        ->call('setValidator', [service('validator')])
-        ->call('setDispatcher', [service('event_dispatcher')])
         ->call('setResponse', [service('bytes_twitch_client.httpclient.response')])
-        ->call('setReader', [service('annotations.cached_reader')])
         ->tag('bytes_response.http_client')
         ->tag('bytes_response.http_client.api')
         ->lazy()
@@ -63,11 +58,7 @@ return static function (ContainerConfigurator $container) {
             '', // revoke_on_refresh
             '', // fire_revoke_on_refresh
         ])
-        ->call('setSerializer', [service('serializer')])
-        ->call('setValidator', [service('validator')])
-        ->call('setDispatcher', [service('event_dispatcher')])
         ->call('setResponse', [service('bytes_twitch_client.httpclient.response.token.user')])
-        ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->call('setOAuth', [service('bytes_twitch_client.oauth.user')]) // Bytes\TwitchClientBundle\Routing\TwitchUserOAuth
         ->tag('bytes_response.http_client')
         ->tag('bytes_response.http_client.token')
@@ -88,11 +79,7 @@ return static function (ContainerConfigurator $container) {
             '', // revoke_on_refresh
             '', // fire_revoke_on_refresh
         ])
-        ->call('setSerializer', [service('serializer')])
-        ->call('setValidator', [service('validator')])
-        ->call('setDispatcher', [service('event_dispatcher')])
         ->call('setResponse', [service('bytes_twitch_client.httpclient.response.token.app')])
-        ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->tag('bytes_response.http_client')
         ->tag('bytes_response.http_client.token')
         ->lazy()
