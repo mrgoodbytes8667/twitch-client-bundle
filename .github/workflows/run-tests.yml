@@ -5,6 +5,7 @@ name: tests
 on:
   pull_request:
   workflow_dispatch:
+  repository_dispatch:
   push:
     branches:
       - "main"
