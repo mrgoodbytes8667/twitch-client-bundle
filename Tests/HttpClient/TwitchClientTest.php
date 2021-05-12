@@ -41,7 +41,7 @@ class TwitchClientTest extends TestHttpClientCase
             ]),
         ]));
 
-        $response = $client->request($faker->url());
+        $response = $client->request($faker->url(), caller: __METHOD__);
 
         $this->assertResponseIsSuccessful($response);
         $this->assertResponseStatusCodeSame($response, Response::HTTP_OK);
@@ -64,7 +64,7 @@ class TwitchClientTest extends TestHttpClientCase
         $client = $this->setupClient(new MockHttpClient());
 
         $this->expectException(InvalidArgumentException::class);
-        $client->request($url);
+        $client->request($url, caller: __METHOD__);
     }
 
     /**
