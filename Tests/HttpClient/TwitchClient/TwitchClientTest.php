@@ -19,16 +19,20 @@ class TwitchClientTest extends TestTwitchClientCase
 {
     use AssertClientAnnotationsSameTrait, TestTwitchClientTrait;
 
+    /**
+     *
+     */
     public function testClientAnnotations()
     {
         $client = $this->setupClient();
         $this->assertClientAnnotationEquals('TWITCH', TokenSource::app(), $client);
     }
 
+    /**
+     *
+     */
     public function testUsesClientAnnotations()
     {
-        $reader = $this->getMockBuilder(Reader::class)->getMock();
-
         $this->assertUsesClientAnnotations($this->setupClient());
     }
 }
