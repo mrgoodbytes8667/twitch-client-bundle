@@ -4,6 +4,7 @@
 namespace Bytes\TwitchClientBundle\HttpClient\Api;
 
 
+use Bytes\ResponseBundle\Annotations\Auth;
 use Bytes\ResponseBundle\Enums\HttpMethods;
 use Bytes\ResponseBundle\Enums\TokenSource;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
@@ -35,6 +36,9 @@ use function Symfony\Component\String\u;
 /**
  * Class TwitchClient
  * @package Bytes\TwitchClientBundle\HttpClient\Api
+ *
+ * @Auth(authRequired=true, identifier="TWITCH", tokenSource="app")
+ * @Auth(authRequired=true, identifier="TWITCH", tokenSource="user")
  *
  */
 class TwitchClient extends AbstractTwitchClient
@@ -75,6 +79,8 @@ class TwitchClient extends AbstractTwitchClient
      * @param array $extraConditions
      * @return ClientResponseInterface
      * @throws TransportExceptionInterface
+     *
+     * @Auth(tokenSource="app")
      */
     public function eventSubSubscribe(EventSubSubscriptionTypes $type, UserInterface $stream, $callback = null, $extraConditions = []): ClientResponseInterface
     {
@@ -110,7 +116,7 @@ class TwitchClient extends AbstractTwitchClient
         $params['body'] = $json;
 
         $this->dispatch(EventSubSubscriptionCreatePreRequestEvent::make($type, $stream, $url));
-        return $this->request(url: 'https://api.twitch.tv/helix/eventsub/subscriptions', type: Subscriptions::class, options: $params, method: HttpMethods::post(), onSuccessCallable: function ($self, $subscriptions) {
+        return $this->request(url: 'https://api.twitch.tv/helix/eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class, options: $params, method: HttpMethods::post(), onSuccessCallable: function ($self, $subscriptions) {
             /** @var TwitchResponse $self */
             if (array_key_exists('user', $self->getExtraParams())) {
                 $user = $self->getExtraParams()['user'];
@@ -123,11 +129,13 @@ class TwitchClient extends AbstractTwitchClient
      * @param IdInterface|string $id
      * @return ClientResponseInterface
      * @throws TransportExceptionInterface
+     *
+     * @Auth(tokenSource="app")
      */
     public function eventSubDelete($id): ClientResponseInterface
     {
         $id = IdNormalizer::normalizeIdArgument($id, 'The argument "id" is required.');
-        return $this->request(url: 'https://api.twitch.tv/helix/eventsub/subscriptions', options: [
+        return $this->request(url: 'https://api.twitch.tv/helix/eventsub/subscriptions', caller: __METHOD__, options: [
             'query' => [
                 'id' => $id
             ]
@@ -154,7 +162,7 @@ class TwitchClient extends AbstractTwitchClient
      * @throws TransportExceptionInterface
      * @link https://dev.twitch.tv/docs/api/reference#get-users
      */
-    public function getUsers(array $ids = [], array $logins = [], bool $throw = true, ClientResponseInterface|string|null $responseClass = null): ClientResponseInterface
+    public function getUsers(array $ids = [], array $logins = [], bool $throw = true, ClientResponseInterface|string|null $responseClass = null, \ReflectionMethod|string $caller = __METHOD__): ClientResponseInterface
     {
         if ($throw) {
             if (count($ids) + count($logins) > 100) {
@@ -184,7 +192,7 @@ class TwitchClient extends AbstractTwitchClient
             }
         }
         $url = $url->beforeLast('&')->toString();
-        return $this->request(url: $url,
+        return $this->request(url: $url, caller: $caller,
             type: '\Bytes\TwitchResponseBundle\Objects\Users\User[]',
             responseClass: $responseClass, context: [UnwrappingDenormalizer::UNWRAP_PATH => '[data]']);
     }
@@ -198,7 +206,7 @@ class TwitchClient extends AbstractTwitchClient
      */
     public function getUser(?string $id = null, ?string $login = null)
     {
-        return $this->getUsers(ids: !is_null($id) ? [$id] : [], logins: !is_null($login) ? [$login] : [], throw: false, responseClass: TwitchUserResponse::class);
+        return $this->getUsers(ids: !is_null($id) ? [$id] : [], logins: !is_null($login) ? [$login] : [], throw: false, responseClass: TwitchUserResponse::class, caller: __METHOD__);
     }
 
     /**
@@ -235,7 +243,7 @@ class TwitchClient extends AbstractTwitchClient
 
         $query = $query->value();
 
-        return $this->request(url: 'https://api.twitch.tv/helix/users/follows', type: FollowersResponse::class,
+        return $this->request(url: 'https://api.twitch.tv/helix/users/follows', caller: __METHOD__, type: FollowersResponse::class,
             options: ['query' => $query], responseClass: TwitchFollowersResponse::class,
             params: ['followPagination' => $followPagination, 'client' => $this, 'fromId' => $fromId,
                 'toId' => $toId, 'limit' => $limit]);
