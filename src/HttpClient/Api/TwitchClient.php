@@ -4,6 +4,7 @@
 namespace Bytes\TwitchClientBundle\HttpClient\Api;
 
 
+use Bytes\ResponseBundle\Annotations\Auth;
 use Bytes\ResponseBundle\Enums\HttpMethods;
 use Bytes\ResponseBundle\Enums\TokenSource;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
@@ -268,9 +269,10 @@ class TwitchClient extends AbstractTwitchClient
     }
 
     /**
+     * @param Auth|null $auth
      * @return array
      */
-    protected function getAuthenticationOption()
+    protected function getAuthenticationOption(?Auth $auth = null)
     {
         $token = $this->getToken();
         if(!empty($token))
