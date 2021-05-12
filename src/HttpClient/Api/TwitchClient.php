@@ -4,7 +4,6 @@
 namespace Bytes\TwitchClientBundle\HttpClient\Api;
 
 
-use Bytes\ResponseBundle\Annotations\Auth;
 use Bytes\ResponseBundle\Enums\HttpMethods;
 use Bytes\ResponseBundle\Enums\TokenSource;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
@@ -36,10 +35,6 @@ use function Symfony\Component\String\u;
 /**
  * Class TwitchClient
  * @package Bytes\TwitchClientBundle\HttpClient\Api
- *
- * @Auth(authRequired=true, identifier="TWITCH", tokenSource="app")
- * @Auth(authRequired=true, identifier="TWITCH", tokenSource="user")
- *
  */
 class TwitchClient extends AbstractTwitchClient
 {
@@ -80,7 +75,7 @@ class TwitchClient extends AbstractTwitchClient
      * @return ClientResponseInterface
      * @throws TransportExceptionInterface
      *
-     * @Auth(tokenSource="app")
+     * @todo Move to TwitchAppClient
      */
     public function eventSubSubscribe(EventSubSubscriptionTypes $type, UserInterface $stream, $callback = null, $extraConditions = []): ClientResponseInterface
     {
@@ -130,7 +125,7 @@ class TwitchClient extends AbstractTwitchClient
      * @return ClientResponseInterface
      * @throws TransportExceptionInterface
      *
-     * @Auth(tokenSource="app")
+     * @todo Move to TwitchAppClient
      */
     public function eventSubDelete($id): ClientResponseInterface
     {
