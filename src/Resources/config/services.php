@@ -44,6 +44,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setValidator', [service('validator')])
         ->call('setDispatcher', [service('event_dispatcher')])
         ->call('setResponse', [service('bytes_twitch_client.httpclient.response')])
+        ->call('setReader', [service('annotations.cached_reader')])
         ->tag('bytes_response.http_client')
         ->tag('bytes_response.http_client.api')
         ->lazy()
