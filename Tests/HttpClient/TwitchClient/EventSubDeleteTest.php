@@ -40,7 +40,7 @@ class EventSubDeleteTest extends TestTwitchClientCase
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
 
-        $dispatcher->expects($this->exactly(2))
+        $dispatcher->expects($this->once())
             ->method('dispatch');
 
         $client = $this->setupClient(MockClient::empty(), $dispatcher);

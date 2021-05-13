@@ -14,7 +14,9 @@ use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenResponse;
 use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
+use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Exception;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -37,10 +39,17 @@ trait TwitchClientSetupTrait
      * @param array $defaultOptionsByRegexp
      * @param string|null $defaultRegexp
      * @return TwitchClient
+     * @throws Exception
      */
     protected function setupBaseClient(?HttpClientInterface $httpClient = null, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
-        $client = new TwitchClient($httpClient ?? MockClient::empty(), new TwitchRetryStrategy(), $this->urlGenerator, Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::HUB_SECRET, Fixture::USER_AGENT, '', $defaultOptionsByRegexp, $defaultRegexp);
+        $client = $this->getMockBuilder(TwitchClient::class)
+            ->setConstructorArgs([$httpClient ?? MockClient::empty(), new TwitchRetryStrategy(), $this->urlGenerator, Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::HUB_SECRET, Fixture::USER_AGENT, '', $defaultOptionsByRegexp, $defaultRegexp])
+            ->onlyMethods(['getToken'])
+            ->getMock();
+        $client->method('getToken')
+            ->willReturn(Token::createFromAccessToken(Fixture::BOT_TOKEN));
+
         return $this->postClientSetup($client, $dispatcher);
     }
 
@@ -64,6 +73,20 @@ trait TwitchClientSetupTrait
         }
         $client->setResponse($response);
         return $client;
+    }
+
+    /**
+     * @param HttpClientInterface|null $httpClient
+     * @param EventDispatcher|null $dispatcher
+     * @param array $defaultOptionsByRegexp
+     * @param string|null $defaultRegexp
+     * @return TwitchClient
+     */
+    protected function setupRealClient(?HttpClientInterface $httpClient = null, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
+    {
+        $client = new TwitchClient($httpClient ?? MockClient::empty(), new TwitchRetryStrategy(), $this->urlGenerator, Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::HUB_SECRET, Fixture::USER_AGENT, '', $defaultOptionsByRegexp, $defaultRegexp);
+
+        return $this->postClientSetup($client, $dispatcher);
     }
 
     /**

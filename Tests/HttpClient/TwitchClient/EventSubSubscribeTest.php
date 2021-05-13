@@ -36,7 +36,7 @@ class EventSubSubscribeTest extends TestTwitchClientCase
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
 
-        $dispatcher->expects($this->exactly(2))
+        $dispatcher->expects($this->once())
             ->method('dispatch');
 
         $client = $this->setupClient(MockClient::requests(
@@ -113,7 +113,7 @@ class EventSubSubscribeTest extends TestTwitchClientCase
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
 
-        $dispatcher->expects($this->exactly(3))
+        $dispatcher->expects($this->exactly(2))
             ->method('dispatch');
 
         $client = $this->setupClient(MockClient::requests(

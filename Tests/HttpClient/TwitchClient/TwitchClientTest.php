@@ -3,10 +3,12 @@
 namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient;
 
 use Bytes\ResponseBundle\Enums\TokenSource;
+use Bytes\ResponseBundle\HttpClient\Retry\APIRetryStrategy;
 use Bytes\ResponseBundle\Test\AssertClientAnnotationsSameTrait;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Bytes\TwitchClientBundle\Tests\HttpClient\TestTwitchClientTrait;
+use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\HttpClient\HttpClient;
@@ -24,7 +26,7 @@ class TwitchClientTest extends TestTwitchClientCase
      */
     public function testClientAnnotations()
     {
-        $client = $this->setupClient();
+        $client = $this->setupRealClient();
         $this->assertClientAnnotationEquals('TWITCH', TokenSource::app(), $client);
     }
 
@@ -33,6 +35,6 @@ class TwitchClientTest extends TestTwitchClientCase
      */
     public function testUsesClientAnnotations()
     {
-        $this->assertUsesClientAnnotations($this->setupClient());
+        $this->assertUsesClientAnnotations($this->setupRealClient());
     }
 }
