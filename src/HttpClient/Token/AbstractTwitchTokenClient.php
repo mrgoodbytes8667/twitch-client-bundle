@@ -17,6 +17,7 @@ use Bytes\ResponseBundle\Token\Interfaces\TokenValidationResponseInterface;
 use Bytes\TwitchClientBundle\HttpClient\TwitchClientEndpoints;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Validate;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use function Symfony\Component\String\u;
@@ -34,10 +35,10 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
      * @param array $defaultOptionsByRegexp
      * @param string|null $defaultRegexp
      */
-    public function __construct(HttpClientInterface $httpClient, string $clientId, string $clientSecret, ?string $userAgent, bool $revokeOnRefresh, bool $fireRevokeOnRefresh, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
+    public function __construct(HttpClientInterface $httpClient, EventDispatcherInterface $dispatcher, string $clientId, string $clientSecret, ?string $userAgent, bool $revokeOnRefresh, bool $fireRevokeOnRefresh, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
         $headers = Push::createPush(value: $userAgent, key: 'User-Agent')->value();
-        parent::__construct($httpClient, $userAgent, $revokeOnRefresh, $fireRevokeOnRefresh, array_merge_recursive([
+        parent::__construct($httpClient, $dispatcher, $userAgent, $revokeOnRefresh, $fireRevokeOnRefresh, array_merge_recursive([
             // the options defined as values apply only to the URLs matching
             // the regular expressions defined as keys
 

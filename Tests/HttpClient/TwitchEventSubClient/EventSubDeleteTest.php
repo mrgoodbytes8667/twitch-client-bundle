@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient;
+namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchEventSubClient;
 
 
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
@@ -14,7 +14,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  * Class EventSubDeleteTest
  * @package Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient
  */
-class EventSubDeleteTest extends TestTwitchClientCase
+class EventSubDeleteTest extends TestTwitchEventSubClientCase
 {
     use TestTwitchFakerTrait;
 

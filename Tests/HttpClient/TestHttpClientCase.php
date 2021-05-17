@@ -8,32 +8,21 @@ use Bytes\Common\Faker\Providers\Twitch;
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Test\AssertClientResponseTrait;
-use Bytes\Tests\Common\Constraint\ResponseContentSame;
-use Bytes\Tests\Common\Constraint\ResponseStatusCodeSame;
 use Bytes\Tests\Common\TestFullValidatorTrait;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\Tests\FullSerializerTrait;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockStandaloneResponse;
 use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
 use Bytes\TwitchResponseBundle\Objects\Users\User;
-use ErrorException;
 use Exception;
 use Faker\Factory;
 use Faker\Generator;
 use Faker\Provider\Internet;
 use InvalidArgumentException;
-use PHPUnit\Framework\Constraint\Constraint;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpFoundation\Response as Http;
-use Symfony\Component\HttpFoundation\Test\Constraint as ResponseConstraint;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Class TestHttpClientCase

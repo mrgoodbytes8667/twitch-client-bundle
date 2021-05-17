@@ -36,6 +36,9 @@ class TwitchRetryStrategy extends APIRetryStrategy implements RetryStrategyInter
         if ($context->getStatusCode() == Response::HTTP_SERVICE_UNAVAILABLE && ($context->getInfo('retry_count') ?? 0) > 0) {
             return false;
         }
+        if ($context->getStatusCode() == Response::HTTP_UNAUTHORIZED && ($context->getInfo('retry_count') ?? 0) < 1) {
+            return true;
+        }
         return parent::shouldRetry($context, $responseContent, $exception);
     }
 
