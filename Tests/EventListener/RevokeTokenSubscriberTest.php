@@ -5,8 +5,8 @@ namespace Bytes\TwitchClientBundle\Tests\EventListener;
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
 use Bytes\ResponseBundle\Enums\TokenSource;
 use Bytes\ResponseBundle\Event\RevokeTokenEvent;
+use Bytes\ResponseBundle\Handler\HttpClientLocator;
 use Bytes\TwitchClientBundle\EventListener\RevokeTokenSubscriber;
-use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
 use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
 use Generator;
@@ -34,10 +34,13 @@ class RevokeTokenSubscriberTest extends TestCase
             ->setTokenSource($tokenSource);
         $event = RevokeTokenEvent::new($token);
 
-        $appClient = $this->getMockBuilder(TwitchAppTokenClient::class)->disableOriginalConstructor()->getMock();
         $userClient = $this->getMockBuilder(TwitchUserTokenClient::class)->disableOriginalConstructor()->getMock();
 
-        $subscriber = new RevokeTokenSubscriber($appClient, $userClient);
+        $locator = $this->getMockBuilder(HttpClientLocator::class)->disableOriginalConstructor()->getMock();
+        $locator->method('getTokenClient')
+            ->willReturn($userClient);
+
+        $subscriber = new RevokeTokenSubscriber($locator);
 
         $this->assertInstanceOf(RevokeTokenEvent::class, $subscriber->onRevokeToken($event));
     }

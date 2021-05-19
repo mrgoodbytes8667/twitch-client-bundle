@@ -4,11 +4,9 @@
 namespace Bytes\TwitchClientBundle\EventListener;
 
 
-use Bytes\ResponseBundle\Enums\TokenSource;
 use Bytes\ResponseBundle\Event\RevokeTokenEvent;
 use Bytes\ResponseBundle\EventListener\AbstractRevokeTokenSubscriber;
-use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
-use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
+use Bytes\ResponseBundle\Handler\HttpClientLocator;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
@@ -19,10 +17,9 @@ class RevokeTokenSubscriber extends AbstractRevokeTokenSubscriber
 {
     /**
      * RevokeTokenSubscriber constructor.
-     * @param TwitchAppTokenClient $twitchAppTokenClient
-     * @param TwitchUserTokenClient $twitchUserTokenClient
+     * @param HttpClientLocator $httpClientTokenLocator
      */
-    public function __construct(private TwitchAppTokenClient $twitchAppTokenClient, private TwitchUserTokenClient $twitchUserTokenClient)
+    public function __construct(private HttpClientLocator $httpClientTokenLocator)
     {
     }
 
@@ -35,11 +32,8 @@ class RevokeTokenSubscriber extends AbstractRevokeTokenSubscriber
     {
         $token = $event->getToken();
         if ($token->getIdentifier() == 'TWITCH') {
-            if ($token->getTokenSource()->equals(TokenSource::user())) {
-                $this->twitchUserTokenClient->revokeToken($token);
-            } elseif ($token->getTokenSource()->equals(TokenSource::app())) {
-                $this->twitchAppTokenClient->revokeToken($token);
-            }
+            $client = $this->httpClientTokenLocator->getTokenClient($token->getIdentifier(), $token->getTokenSource());
+            $client->revokeToken($token);
         }
 
         return $event;
