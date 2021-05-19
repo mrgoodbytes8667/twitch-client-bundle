@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient;
+namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchEventSubClient;
 
 
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
@@ -19,7 +19,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  * Class EventSubSubscribeTest
  * @package Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient
  */
-class EventSubSubscribeTest extends TestTwitchClientCase
+class EventSubSubscribeTest extends TestTwitchEventSubClientCase
 {
     use TestTwitchFakerTrait;
 

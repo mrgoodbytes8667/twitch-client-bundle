@@ -4,8 +4,11 @@
 namespace Bytes\TwitchClientBundle\Tests;
 
 
+use Bytes\ResponseBundle\HttpClient\Retry\APIRetryStrategy;
 use Bytes\Tests\Common\TestFullValidatorTrait;
+use Bytes\TwitchClientBundle\HttpClient\Api\AbstractTwitchClient;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
+use Bytes\TwitchClientBundle\HttpClient\Api\TwitchEventSubClient;
 use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
 use Bytes\TwitchClientBundle\HttpClient\Token\AbstractTwitchTokenClient;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
@@ -44,7 +47,27 @@ trait TwitchClientSetupTrait
     protected function setupBaseClient(?HttpClientInterface $httpClient = null, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
         $client = $this->getMockBuilder(TwitchClient::class)
-            ->setConstructorArgs([$httpClient ?? MockClient::empty(), new TwitchRetryStrategy(), $this->urlGenerator, Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::HUB_SECRET, Fixture::USER_AGENT, '', $defaultOptionsByRegexp, $defaultRegexp])
+            ->setConstructorArgs([$httpClient ?? MockClient::empty(), $dispatcher ?? new EventDispatcher(), new TwitchRetryStrategy(), Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::USER_AGENT, $defaultOptionsByRegexp, $defaultRegexp])
+            ->onlyMethods(['getToken'])
+            ->getMock();
+        $client->method('getToken')
+        ->willReturn(Token::createFromAccessToken(Fixture::BOT_TOKEN));
+
+        return $this->postClientSetup($client, $dispatcher);
+    }
+
+    /**
+     * @param HttpClientInterface|null $httpClient
+     * @param EventDispatcher|null $dispatcher
+     * @param array $defaultOptionsByRegexp
+     * @param string|null $defaultRegexp
+     * @return TwitchEventSubClient
+     * @throws Exception
+     */
+    protected function setupEventSubClient(?HttpClientInterface $httpClient = null, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
+    {
+        $client = $this->getMockBuilder(TwitchEventSubClient::class)
+            ->setConstructorArgs([$httpClient ?? MockClient::empty(), $dispatcher ?? new EventDispatcher(), new TwitchRetryStrategy(), $this->urlGenerator, Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::HUB_SECRET, Fixture::USER_AGENT, '', $defaultOptionsByRegexp, $defaultRegexp])
             ->onlyMethods(['getToken'])
             ->getMock();
         $client->method('getToken')
@@ -54,8 +77,8 @@ trait TwitchClientSetupTrait
     }
 
     /**
-     * @param TwitchClient|AbstractTwitchTokenClient|TwitchAppTokenClient|TwitchUserTokenClient $client
-     * @return TwitchClient|AbstractTwitchTokenClient|TwitchAppTokenClient|TwitchUserTokenClient
+     * @param TwitchClient|AbstractTwitchTokenClient|TwitchAppTokenClient|TwitchUserTokenClient|TwitchEventSubClient $client
+     * @return TwitchClient|AbstractTwitchTokenClient|TwitchAppTokenClient|TwitchUserTokenClient|TwitchEventSubClient
      */
     private function postClientSetup($client, ?EventDispatcher $dispatcher = null, ?string $responseClass = '\Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse')
     {
@@ -84,7 +107,21 @@ trait TwitchClientSetupTrait
      */
     protected function setupRealClient(?HttpClientInterface $httpClient = null, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
-        $client = new TwitchClient($httpClient ?? MockClient::empty(), new TwitchRetryStrategy(), $this->urlGenerator, Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::HUB_SECRET, Fixture::USER_AGENT, '', $defaultOptionsByRegexp, $defaultRegexp);
+        $client = new TwitchClient($httpClient ?? MockClient::empty(), $dispatcher ?? new EventDispatcher(), new TwitchRetryStrategy(), Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::USER_AGENT, $defaultOptionsByRegexp, $defaultRegexp);
+
+        return $this->postClientSetup($client, $dispatcher);
+    }
+
+    /**
+     * @param HttpClientInterface|null $httpClient
+     * @param EventDispatcher|null $dispatcher
+     * @param array $defaultOptionsByRegexp
+     * @param string|null $defaultRegexp
+     * @return TwitchEventSubClient
+     */
+    protected function setupRealEventSubClient(?HttpClientInterface $httpClient = null, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
+    {
+        $client = new TwitchEventSubClient($httpClient ?? MockClient::empty(), $dispatcher ?? new EventDispatcher(), new TwitchRetryStrategy(), $this->urlGenerator, Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::HUB_SECRET, Fixture::USER_AGENT, '', $defaultOptionsByRegexp, $defaultRegexp);
 
         return $this->postClientSetup($client, $dispatcher);
     }
@@ -112,7 +149,7 @@ trait TwitchClientSetupTrait
      */
     private function setupTokenClient($class, $responseClass, ?HttpClientInterface $httpClient = null, ?EventDispatcher $dispatcher = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
-        $client = new $class($httpClient ?? MockClient::empty(), Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::USER_AGENT, true, true, $defaultOptionsByRegexp, $defaultRegexp);
+        $client = new $class($httpClient ?? MockClient::empty(), $dispatcher ?? new EventDispatcher(), Fixture::CLIENT_ID, Fixture::CLIENT_SECRET, Fixture::USER_AGENT, true, true, $defaultOptionsByRegexp, $defaultRegexp);
         return $this->postClientSetup($client, $dispatcher, $responseClass);
     }
 

@@ -9,6 +9,7 @@ use Bytes\ResponseBundle\HttpClient\Token\TokenClientInterface;
 use Bytes\ResponseBundle\HttpClient\Token\UserTokenClientInterface;
 use Bytes\ResponseBundle\Routing\OAuthInterface;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
+use Bytes\TwitchClientBundle\HttpClient\Api\TwitchEventSubClient;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\HttpClient\Retry\TwitchRetryStrategy;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
@@ -31,6 +32,23 @@ return static function (ContainerConfigurator $container) {
     $services->set('bytes_twitch_client.httpclient.twitch', TwitchClient::class)
         ->args([
             service('http_client'), // Symfony\Contracts\HttpClient\HttpClientInterface
+            service('event_dispatcher'),
+            service('bytes_twitch_client.httpclient.retry_strategy.twitch'), // Symfony\Component\HttpClient\Retry\RetryStrategyInterface
+            '', // $config['client_id']
+            '', // $config['client_secret']
+            '', // $config['user_agent']
+        ])
+        ->call('setResponse', [service('bytes_twitch_client.httpclient.response')])
+        ->tag('bytes_response.http_client')
+        ->tag('bytes_response.http_client.api')
+        ->lazy()
+        ->alias(TwitchClient::class, 'bytes_twitch_client.httpclient.twitch')
+        ->public();
+
+    $services->set('bytes_twitch_client.httpclient.twitch.eventsub', TwitchEventSubClient::class)
+        ->args([
+            service('http_client'), // Symfony\Contracts\HttpClient\HttpClientInterface
+            service('event_dispatcher'),
             service('bytes_twitch_client.httpclient.retry_strategy.twitch'), // Symfony\Component\HttpClient\Retry\RetryStrategyInterface
             service('router.default'), // Symfony\Component\Routing\Generator\UrlGeneratorInterface
             '', // $config['client_id']
@@ -43,7 +61,7 @@ return static function (ContainerConfigurator $container) {
         ->tag('bytes_response.http_client')
         ->tag('bytes_response.http_client.api')
         ->lazy()
-        ->alias(TwitchClient::class, 'bytes_twitch_client.httpclient.twitch')
+        ->alias(TwitchEventSubClient::class, 'bytes_twitch_client.httpclient.twitch.eventsub')
         ->public();
     //endregion
 
@@ -52,6 +70,7 @@ return static function (ContainerConfigurator $container) {
     $services->set('bytes_twitch_client.httpclient.twitch.token.user', TwitchUserTokenClient::class)
         ->args([
             service('http_client'), // Symfony\Contracts\HttpClient\HttpClientInterface
+            service('event_dispatcher'),
             '', // $config['client_id']
             '', // $config['client_secret']
             '', // $config['user_agent']
@@ -73,6 +92,7 @@ return static function (ContainerConfigurator $container) {
     $services->set('bytes_twitch_client.httpclient.twitch.token.app', TwitchAppTokenClient::class)
         ->args([
             service('http_client'), // Symfony\Contracts\HttpClient\HttpClientInterface
+            service('event_dispatcher'),
             '', // $config['client_id']
             '', // $config['client_secret']
             '', // $config['user_agent']
