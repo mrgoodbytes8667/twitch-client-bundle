@@ -8,6 +8,7 @@ use Bytes\ResponseBundle\HttpClient\Token\AppTokenClientInterface;
 use Bytes\ResponseBundle\HttpClient\Token\TokenClientInterface;
 use Bytes\ResponseBundle\HttpClient\Token\UserTokenClientInterface;
 use Bytes\ResponseBundle\Routing\OAuthInterface;
+use Bytes\TwitchClientBundle\EventListener\RevokeTokenSubscriber;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchEventSubClient;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
@@ -19,7 +20,6 @@ use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenResponse;
 use Bytes\TwitchClientBundle\Routing\TwitchAppOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchLoginOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchUserOAuth;
-use Bytes\TwitchClientBundle\Subscriber\RevokeTokenSubscriber;
 
 /**
  * @param ContainerConfigurator $container
