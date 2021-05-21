@@ -131,7 +131,7 @@ return static function (ContainerConfigurator $container) {
         ])
         ->alias(TwitchResponse::class, 'bytes_twitch_client.httpclient.response')
         ->public();
-    
+
     $services->set('bytes_twitch_client.httpclient.response.token.app', TwitchAppTokenResponse::class)
         ->args([
             service('serializer'), // Symfony\Component\Serializer\SerializerInterface
@@ -206,8 +206,7 @@ return static function (ContainerConfigurator $container) {
     //region Subscribers
     $services->set('bytes_twitch_client.subscriber.revoke_token', RevokeTokenSubscriber::class)
         ->args([
-            service('bytes_twitch_client.httpclient.twitch.token.app'),
-            service('bytes_twitch_client.httpclient.twitch.token.user'),
+            service('bytes_response.locator.http_client.token'),
         ])
         ->tag('kernel.event_subscriber');
     //endregion
