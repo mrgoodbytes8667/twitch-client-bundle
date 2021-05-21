@@ -30,7 +30,7 @@ class DependencyInjectionTest extends TestCase
     private $fs;
 
     /**
-     * @group Legacy
+     * @group legacy
      */
     public function testEventListener()
     {
