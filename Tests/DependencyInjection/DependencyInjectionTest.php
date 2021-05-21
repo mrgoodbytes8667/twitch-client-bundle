@@ -34,7 +34,7 @@ class DependencyInjectionTest extends TestCase
      */
     public function testEventListener()
     {
-        $this->expectDeprecation('Since mrgoodbytes8667/twitch-response-bundle 0.3.0: This "%s" normalizer is deprecated');
+        $this->expectDeprecation('Since mrgoodbytes8667/twitch-response-bundle 0.3.0: The "Bytes\TwitchResponseBundle\Serializer\SubscriptionNormalizer" normalizer is deprecated, use "Bytes\TwitchResponseBundle\Objects\Interfaces\TwitchDateTimeInterface" instead.');
 
         $kernel = $this->kernel;
         $kernel->boot();
