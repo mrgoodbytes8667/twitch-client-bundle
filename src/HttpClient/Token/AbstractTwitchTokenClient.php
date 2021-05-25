@@ -119,11 +119,12 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
 
     /**
      * Validates the provided access token
-     * Fires a TokenValidatedEvent on success
+     * Should fire a TokenValidatedEvent on success if $fireCallback is true
      * @param AccessTokenInterface $token
+     * @param bool $fireCallback Should a TokenValidatedEvent be fired?
      * @return TokenValidationResponseInterface|null
      */
-    public function validateToken(AccessTokenInterface $token): ?TokenValidationResponseInterface
+    public function validateToken(AccessTokenInterface $token, bool $fireCallback = false): ?TokenValidationResponseInterface
     {
         $tokenString = static::normalizeAccessToken($token, false, 'The $token argument is required and cannot be empty.');
 
@@ -131,8 +132,10 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
             'headers' => [
                 'Authorization' => 'OAuth ' . $tokenString
             ]
-        ], method: HttpMethods::get(), onSuccessCallable: function ($self, $results) use ($token) {
-            $this->dispatchTokenValidatedEvent($token, $results);
+        ], method: HttpMethods::get(), onSuccessCallable: function ($self, $results) use ($fireCallback, $token) {
+            if($fireCallback) {
+                $this->dispatchTokenValidatedEvent($token, $results);
+            }
         })->deserialize(false);
     }
 }
