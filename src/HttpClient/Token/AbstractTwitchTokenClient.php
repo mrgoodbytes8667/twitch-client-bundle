@@ -113,7 +113,7 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
         return $this->request($this->buildURL('oauth2/revoke'), options: ['query' => [
             'token' => $tokenString
         ]], method: HttpMethods::post(), onSuccessCallable: function ($self, $results) use ($token) {
-            $this->dispatch(TokenRevokedEvent::new($token));
+            $this->dispatchTokenRevokedEvent($token);
         })->onSuccessCallback();
     }
 
@@ -132,7 +132,7 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
                 'Authorization' => 'OAuth ' . $tokenString
             ]
         ], method: HttpMethods::get(), onSuccessCallable: function ($self, $results) use ($token) {
-            $this->dispatch(TokenValidatedEvent::new($token, $results));
+            $this->dispatchTokenValidatedEvent($token, $results);
         })->deserialize(false);
     }
 }
