@@ -16,6 +16,8 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 /**
  * Class Kernel
@@ -89,6 +91,7 @@ class Kernel extends BaseKernel
         $loader->load(function (ContainerBuilder $container) {
             $container->register('security.helper', Security::class);
             $container->register('router.default', UrlGeneratorInterface::class);
+            $container->register('security.csrf.token_manager', CsrfTokenManagerInterface::class);
 
             foreach ($this->classes as $class) {
                 if(is_array($class)) {
