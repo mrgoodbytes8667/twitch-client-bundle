@@ -4,49 +4,34 @@
 namespace Bytes\TwitchClientBundle\HttpClient\Api;
 
 
-use Bytes\ResponseBundle\Annotations\Auth;
-use Bytes\ResponseBundle\Annotations\Client;
-use Bytes\ResponseBundle\Event\ObtainValidTokenEvent;
 use Bytes\ResponseBundle\HttpClient\Api\AbstractApiClient;
 use Bytes\ResponseBundle\HttpClient\ApiAuthenticationTrait;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Objects\IdNormalizer;
 use Bytes\ResponseBundle\Objects\Push;
 use Bytes\ResponseBundle\Token\Exceptions\NoTokenException;
-use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\ResponseBundle\Validator\ValidatorTrait;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchFollowersResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchUserResponse;
 use Bytes\TwitchClientBundle\HttpClient\TwitchClientEndpoints;
 use Bytes\TwitchResponseBundle\Objects\Follows\FollowersResponse;
-use Bytes\TwitchResponseBundle\Objects\OAuth2\Token;
+use InvalidArgumentException;
+use ReflectionMethod;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use function Symfony\Component\String\u;
-use InvalidArgumentException;
 
 /**
  * Class AbstractTwitchClient
  * @package Bytes\TwitchClientBundle\HttpClient\Api
  *
  * @var TwitchResponse|ClientResponseInterface $response
- *
- * https://id.twitch.tv/oauth2/validate - Validate token (curl -H "Authorization: OAuth <access token>" https://id.twitch.tv/oauth2/validate)
- * https://id.twitch.tv/oauth2/revoke?client_id=uo6dggojyb8d6soh92zknwmi5ej1q2&token=0123456789abcdefghijABCDEFGHIJ - Revoke token
- * https://id.twitch.tv/oauth2/token - refresh (client id/secret in body), get app/user token (client id/secret in query string)
- * https://id.twitch.tv/oauth2/authorize - send to get token, not applicable for HttpClient
- *
- * https://api.twitch.tv/helix - all helix calls
- * https://api.twitch.tv/kraken - all kraken calls
- *
- * https://api.twitch.tv/helix/eventsub/subscriptions - create sub, headers: Client-ID, Authorization: Bearer token
  */
 abstract class AbstractTwitchClient extends AbstractApiClient implements SerializerAwareInterface
 {
@@ -93,6 +78,17 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
         ], $defaultOptionsByRegexp), $defaultRegexp);
     }
 
+    /**
+     * Helper wrapper around getUsers that will deserialize into a single User
+     * @param string|null $id
+     * @param string|null $login
+     * @return ClientResponseInterface
+     * @throws TransportExceptionInterface
+     */
+    public function getUser(?string $id = null, ?string $login = null)
+    {
+        return $this->getUsers(ids: !is_null($id) ? [$id] : [], logins: !is_null($login) ? [$login] : [], throw: false, responseClass: TwitchUserResponse::class, caller: __METHOD__);
+    }
 
     /**
      * Get Users
@@ -108,7 +104,7 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
      * @throws TransportExceptionInterface
      * @link https://dev.twitch.tv/docs/api/reference#get-users
      */
-    public function getUsers(array $ids = [], array $logins = [], bool $throw = true, ClientResponseInterface|string|null $responseClass = null, \ReflectionMethod|string $caller = __METHOD__): ClientResponseInterface
+    public function getUsers(array $ids = [], array $logins = [], bool $throw = true, ClientResponseInterface|string|null $responseClass = null, ReflectionMethod|string $caller = __METHOD__): ClientResponseInterface
     {
         if ($throw) {
             if (count($ids) + count($logins) > 100) {
@@ -141,18 +137,6 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
         return $this->request(url: $url, caller: $caller,
             type: '\Bytes\TwitchResponseBundle\Objects\Users\User[]',
             responseClass: $responseClass, context: [UnwrappingDenormalizer::UNWRAP_PATH => '[data]']);
-    }
-
-    /**
-     * Helper wrapper around getUsers that will deserialize into a single User
-     * @param string|null $id
-     * @param string|null $login
-     * @return ClientResponseInterface
-     * @throws TransportExceptionInterface
-     */
-    public function getUser(?string $id = null, ?string $login = null)
-    {
-        return $this->getUsers(ids: !is_null($id) ? [$id] : [], logins: !is_null($login) ? [$login] : [], throw: false, responseClass: TwitchUserResponse::class, caller: __METHOD__);
     }
 
     /**
@@ -193,5 +177,65 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
             options: ['query' => $query], responseClass: TwitchFollowersResponse::class,
             params: ['followPagination' => $followPagination, 'client' => $this, 'fromId' => $fromId,
                 'toId' => $toId, 'limit' => $limit]);
+    }
+
+    /**
+     * Helper wrapper around getGames that will deserialize into a single Game
+     * @param string|null $id
+     * @param string|null $name
+     * @return ClientResponseInterface
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     */
+    public function getGame(?string $id = null, ?string $name = null)
+    {
+        return $this->getGames(ids: !is_null($id) ? [$id] : [], names: !is_null($name) ? [$name] : [], throw: false, responseClass: TwitchUserResponse::class, caller: __METHOD__);
+    }
+
+    /**
+     * Get Games
+     * Gets game information by game ID or name.
+     * @param string[] $ids
+     * @param string[] $names
+     * @param bool $throw
+     * @param ClientResponseInterface|string|null $responseClass
+     * @param ReflectionMethod|string $caller
+     * @return ClientResponseInterface
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     */
+    public function getGames(array $ids = [], array $names = [], bool $throw = true, ClientResponseInterface|string|null $responseClass = null, ReflectionMethod|string $caller = __METHOD__)
+    {
+        if ($throw) {
+            if (count($ids) + count($names) > 100) {
+                throw new InvalidArgumentException('There can only be a maximum of 100 combined ids and names.');
+            }
+        }
+        $url = u('https://api.twitch.tv/helix/games?');
+        $counter = 0;
+        foreach ($ids as $id) {
+            if ($counter < 100) {
+                $id = IdNormalizer::normalizeIdArgument($id, 'The "id" argument is required.');
+                $url = $url->append('id=' . $id . '&');
+                $counter++;
+            } else {
+                break;
+            }
+        }
+        if (!empty($url) && !empty($names) && $counter < 100) {
+            $url = $url->append('&');
+        }
+        foreach ($names as $name) {
+            if ($counter < 100) {
+                $url = $url->append('name=' . $name . '&');
+                $counter++;
+            } else {
+                break;
+            }
+        }
+        $url = $url->beforeLast('&')->toString();
+        return $this->request(url: $url, caller: $caller,
+            type: '\Bytes\TwitchResponseBundle\Objects\Games\Game[]',
+            responseClass: $responseClass, context: [UnwrappingDenormalizer::UNWRAP_PATH => '[data]']);
     }
 }
