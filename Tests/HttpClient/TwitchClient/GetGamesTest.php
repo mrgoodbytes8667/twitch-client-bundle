@@ -5,6 +5,7 @@ namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient;
 
 
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
+use Bytes\ResponseBundle\Token\Exceptions\NoTokenException;
 use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockExceededRateLimitResponse;
@@ -140,6 +141,19 @@ class GetGamesTest extends TestTwitchClientCase
         $this->assertResponseContentSame($response, '{"data": []}');
 
         return $response;
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws NoTokenException
+     */
+    public function testGetGamesClientFailureIdZero()
+    {
+        $client = $this->setupClient(MockClient::emptyData());
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $client->getGame(id: '0');
     }
 
     /**
