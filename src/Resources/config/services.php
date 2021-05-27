@@ -165,6 +165,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->call('setValidator', [service('validator')])
         ->call('setSecurity', [service('security.helper')->ignoreOnInvalid()]) // Symfony\Component\Security\Core\Security
+        ->call('setCsrfTokenManager', [service('security.csrf.token_manager')])
         ->tag('bytes_response.oauth')
         ->lazy()
         ->alias(TwitchAppOAuth::class, 'bytes_twitch_client.oauth.app')
@@ -179,6 +180,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->call('setValidator', [service('validator')])
         ->call('setSecurity', [service('security.helper')->ignoreOnInvalid()]) // Symfony\Component\Security\Core\Security
+        ->call('setCsrfTokenManager', [service('security.csrf.token_manager')])
         ->tag('bytes_response.oauth')
         ->lazy()
         ->alias(TwitchLoginOAuth::class, 'bytes_twitch_client.oauth.login')
@@ -193,6 +195,7 @@ return static function (ContainerConfigurator $container) {
         ->call('setUrlGenerator', [service('router.default')]) // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ->call('setValidator', [service('validator')])
         ->call('setSecurity', [service('security.helper')->ignoreOnInvalid()]) // Symfony\Component\Security\Core\Security
+        ->call('setCsrfTokenManager', [service('security.csrf.token_manager')])
         ->tag('bytes_response.oauth')
         ->lazy()
         ->alias(TwitchUserOAuth::class, 'bytes_twitch_client.oauth.user')
