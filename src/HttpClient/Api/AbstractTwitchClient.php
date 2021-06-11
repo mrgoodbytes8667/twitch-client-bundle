@@ -13,9 +13,11 @@ use Bytes\ResponseBundle\Token\Exceptions\NoTokenException;
 use Bytes\ResponseBundle\Validator\ValidatorTrait;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchFollowersResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
+use Bytes\TwitchClientBundle\HttpClient\Response\TwitchTopGamesResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchUserResponse;
 use Bytes\TwitchClientBundle\HttpClient\TwitchClientEndpoints;
 use Bytes\TwitchResponseBundle\Objects\Follows\FollowersResponse;
+use Bytes\TwitchResponseBundle\Objects\Games\GamesResponse;
 use InvalidArgumentException;
 use ReflectionMethod;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -177,6 +179,43 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
             options: ['query' => $query], responseClass: TwitchFollowersResponse::class,
             params: ['followPagination' => $followPagination, 'client' => $this, 'fromId' => $fromId,
                 'toId' => $toId, 'limit' => $limit]);
+    }
+
+    /**
+     * Get Top Games
+     * Gets games sorted by number of current viewers on Twitch, most popular first.
+     * @param int $limit
+     * @param bool $throw
+     * @param string|null $before
+     * @param string|null $after
+     * @param bool $followPagination
+     * @return ClientResponseInterface
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     *
+     * @link https://dev.twitch.tv/docs/api/reference#get-top-games
+     */
+    public function getTopGames(int $limit = 20, bool $throw = true, ?string $before = null, ?string $after = null, bool $followPagination = true): ClientResponseInterface
+    {
+        if ($limit < 1) {
+            if ($throw) {
+                throw new InvalidArgumentException('The "limit" argument must be greater than or equal to 1.');
+            }
+            $limit = 1;
+        }
+        $handoffLimit = $limit;
+        if ($limit > 100) {
+            $limit = 100;
+        }
+
+        $query = Push::createPush(value: $limit, key: 'first')
+            ->push($before, 'before')
+            ->push($after, 'after');
+
+        return $this->request(url: 'https://api.twitch.tv/helix/games/top', caller: __METHOD__, type: GamesResponse::class,
+            options: ['query' => $query->value()], responseClass: TwitchTopGamesResponse::class,
+            params: ['followPagination' => $followPagination, 'client' => $this, 'before' => $before,
+                'after' => $after, 'limit' => $handoffLimit - $limit]);
     }
 
     /**
