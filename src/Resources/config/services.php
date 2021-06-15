@@ -20,6 +20,7 @@ use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenResponse;
 use Bytes\TwitchClientBundle\Routing\TwitchAppOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchLoginOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchUserOAuth;
+use Bytes\TwitchClientBundle\Security\Voters\TwitchHubSignatureVoter;
 
 /**
  * @param ContainerConfigurator $container
@@ -204,6 +205,15 @@ return static function (ContainerConfigurator $container) {
     $services->alias(OAuthInterface::class.' $twitchAppOAuth', TwitchAppOAuth::class);
     $services->alias(OAuthInterface::class.' $twitchLoginOAuth', TwitchLoginOAuth::class);
     $services->alias(OAuthInterface::class.' $twitchUserOAuth', TwitchUserOAuth::class);
+    //endregion
+
+    //region Voters
+    $services->set('bytes_twitch_client.security.voter.signature', TwitchHubSignatureVoter::class)
+        ->args([
+            service('bytes_twitch_response.locator.signature') // \Bytes\ResponseBundle\Handler\Locator
+        ])
+        ->tag('security.voter')
+        ->lazy();
     //endregion
 
     //region Subscribers
