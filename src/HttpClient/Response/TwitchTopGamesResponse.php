@@ -4,6 +4,7 @@
 namespace Bytes\TwitchClientBundle\HttpClient\Response;
 
 
+use Bytes\ResponseBundle\Token\Exceptions\NoTokenException;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchResponseBundle\Objects\Games\GamesResponse;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -26,7 +27,7 @@ class TwitchTopGamesResponse extends TwitchResponse
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
-     * @throws \Bytes\ResponseBundle\Token\Exceptions\NoTokenException
+     * @throws NoTokenException
      */
     public function deserialize(bool $throw = true, array $context = [], ?string $type = null)
     {
