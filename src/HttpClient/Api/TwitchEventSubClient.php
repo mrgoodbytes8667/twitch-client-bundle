@@ -74,10 +74,10 @@ class TwitchEventSubClient extends AbstractTwitchClient
             case EventSubSubscriptionTypes::streamOffline():
             case EventSubSubscriptionTypes::channelSubscribe():
             case EventSubSubscriptionTypes::channelChannelPointsCustomRewardAdd():
-                $conditions->setBroadcasterUserId($stream->getId());
+                $conditions->setBroadcasterUserId($stream->getUserId());
                 break;
             case EventSubSubscriptionTypes::userUpdate():
-                $conditions->setUserId($stream->getId());
+                $conditions->setUserId($stream->getUserId());
                 break;
             default:
                 throw new InvalidArgumentException(sprintf('The type "%s" is not yet supported', $type));
@@ -138,7 +138,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
     {
         return $this->urlGenerator->generate($this->callbackName, [
             'type' => $type,
-            'stream' => $stream->getId(),
+            'stream' => $stream->getUserId(),
             'login' => $stream->getLogin(),
         ], UrlGeneratorInterface::ABSOLUTE_URL);
     }

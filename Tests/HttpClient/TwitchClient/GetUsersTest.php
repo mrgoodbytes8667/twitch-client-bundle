@@ -242,7 +242,7 @@ class GetUsersTest extends TestTwitchClientCase
         $this->assertEquals($created_at, $user->getCreatedAt());
         $this->assertEquals($description, $user->getDescription());
         $this->assertEquals($display_name, $user->getDisplayName());
-        $this->assertEquals($id, $user->getId());
+        $this->assertEquals($id, $user->getUserId());
         $this->assertEquals($login, $user->getLogin());
         $this->assertEquals($offline_image_url, $user->getOfflineImageUrl());
         $this->assertEquals($profile_image_url, $user->getProfileImageUrl());
