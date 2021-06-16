@@ -17,6 +17,7 @@ use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePostRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePreRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionDeleteEvent;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
+use Bytes\TwitchResponseBundle\Enums\EventSubStatus;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Condition;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Create;
@@ -99,13 +100,41 @@ class TwitchEventSubClient extends AbstractTwitchClient
         $params['body'] = $json;
 
         $this->dispatch(EventSubSubscriptionCreatePreRequestEvent::make($type, $stream, $url));
-        return $this->request(url: 'https://api.twitch.tv/helix/eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class, options: $params, method: HttpMethods::post(), onSuccessCallable: function ($self, $subscriptions) {
+        return $this->jsonRequest(url: 'eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class,
+            options: $params, method: HttpMethods::post(), onSuccessCallable: function ($self, $subscriptions) {
             /** @var TwitchResponse $self */
             if (array_key_exists('user', $self->getExtraParams())) {
                 $user = $self->getExtraParams()['user'];
             }
             $this->dispatch(EventSubSubscriptionCreatePostRequestEvent::createFromSubscription($subscriptions->getSubscription(), $user));
         }, params: ['user' => $stream]);
+    }
+
+    /**
+     * Get EventSub Subscriptions
+     * Get a list of your EventSub subscriptions. The subscriptions are paginated and ordered by most recent first.
+     * @param EventSubStatus|EventSubSubscriptionTypes|null $filter
+     * @return ClientResponseInterface
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     *
+     * @link https://dev.twitch.tv/docs/api/reference#get-eventsub-subscriptions
+     */
+    public function eventSubGetSubscriptions(EventSubStatus|EventSubSubscriptionTypes|null $filter = null): ClientResponseInterface
+    {
+        $options = [];
+        if(!empty($filter))
+        {
+            if($filter instanceof EventSubStatus)
+            {
+                $options['query'] = ['status' => $filter->value];
+            } elseif($filter instanceof EventSubSubscriptionTypes)
+            {
+                $options['query'] = ['type' => $filter->value];
+            }
+        }
+        return $this->request(url: 'eventsub/subscriptions', caller: __METHOD__,
+            type: Subscriptions::class, options: $options, method: HttpMethods::get());
     }
 
     /**

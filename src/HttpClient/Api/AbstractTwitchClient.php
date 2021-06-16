@@ -277,4 +277,21 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
             type: '\Bytes\TwitchResponseBundle\Objects\Games\Game[]',
             responseClass: $responseClass, context: [UnwrappingDenormalizer::UNWRAP_PATH => '[data]']);
     }
+
+    /**
+     * @param string $path
+     * @param string $prepend
+     * @return string
+     */
+    protected function buildURL(string $path, string $prepend = 'helix')
+    {
+        $url = u($path);
+        if ($url->startsWith(TwitchClientEndpoints::ENDPOINT_TWITCH_API)) {
+            return $path;
+        }
+        if (!empty($prepend)) {
+            $url = $url->ensureStart($prepend . '/');
+        }
+        return $url->ensureStart(TwitchClientEndpoints::ENDPOINT_TWITCH_API)->toString();
+    }
 }

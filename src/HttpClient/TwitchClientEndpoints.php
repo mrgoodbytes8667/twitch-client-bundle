@@ -44,4 +44,9 @@ interface TwitchClientEndpoints
      * Base URL for all Twitch OAuth calls
      */
     const ENDPOINT_TWITCH_OAUTH = 'https://id.twitch.tv/';
+
+    /**
+     * Base URL for all Twitch API calls
+     */
+    const ENDPOINT_TWITCH_API = 'https://api.twitch.tv/';
 }
