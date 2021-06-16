@@ -100,7 +100,8 @@ class TwitchEventSubClient extends AbstractTwitchClient
         $params['body'] = $json;
 
         $this->dispatch(EventSubSubscriptionCreatePreRequestEvent::make($type, $stream, $url));
-        return $this->request(url: 'https://api.twitch.tv/helix/eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class, options: $params, method: HttpMethods::post(), onSuccessCallable: function ($self, $subscriptions) {
+        return $this->jsonRequest(url: 'eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class,
+            options: $params, method: HttpMethods::post(), onSuccessCallable: function ($self, $subscriptions) {
             /** @var TwitchResponse $self */
             if (array_key_exists('user', $self->getExtraParams())) {
                 $user = $self->getExtraParams()['user'];
