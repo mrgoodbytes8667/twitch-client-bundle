@@ -207,6 +207,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
     /**
      * @param EventSubSubscriptionTypes $type
      * @param UserInterface $user
+     * @param string|null $callbackName
      * @param string $typeKey
      * @param string $userKey
      * @param bool $addLogin
@@ -215,9 +216,9 @@ class TwitchEventSubClient extends AbstractTwitchClient
      * @param int $referenceType
      * @return EventSubSubscriptionGenerateCallbackEvent
      */
-    protected function dispatchEventSubSubscriptionGenerateCallbackEvent(EventSubSubscriptionTypes $type, UserInterface $user, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): EventSubSubscriptionGenerateCallbackEvent
+    protected function dispatchEventSubSubscriptionGenerateCallbackEvent(EventSubSubscriptionTypes $type, UserInterface $user, string $callbackName = null, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): EventSubSubscriptionGenerateCallbackEvent
     {
-        return $this->dispatch(EventSubSubscriptionGenerateCallbackEvent::new(type: $type, user: $user, typeKey: $typeKey, userKey: $userKey, addLogin: $addLogin, loginKey: $loginKey, extraParameters: $extraParameters, referenceType: $referenceType));
+        return $this->dispatch(EventSubSubscriptionGenerateCallbackEvent::new(callbackName: $callbackName ?? $this->callbackName, type: $type, user: $user, typeKey: $typeKey, userKey: $userKey, addLogin: $addLogin, loginKey: $loginKey, extraParameters: $extraParameters, referenceType: $referenceType));
     }
 
     /**

@@ -28,6 +28,7 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
 
     /**
      * EventSubSubscriptionGenerateCallbackEvent constructor.
+     * @param string $callbackName
      * @param EventSubSubscriptionTypes $type
      * @param UserInterface $user
      * @param string $typeKey
@@ -37,7 +38,7 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
      * @param array $extraParameters
      * @param int $referenceType
      */
-    public function __construct(EventSubSubscriptionTypes $type, UserInterface $user, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = [], private int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL)
+    public function __construct(private string $callbackName, EventSubSubscriptionTypes $type, UserInterface $user, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = [], private int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL)
     {
         $this->parameters = Push::create();
         $this->parameters = $this->parameters->push(value: $type->value, key: $typeKey)
@@ -55,6 +56,7 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
     }
 
     /**
+     * @param string $callbackName
      * @param EventSubSubscriptionTypes $type
      * @param UserInterface $user
      * @param string $typeKey
@@ -65,9 +67,27 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
      * @param int $referenceType
      * @return static
      */
-    public static function new(EventSubSubscriptionTypes $type, UserInterface $user, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): static
+    public static function new(string $callbackName, EventSubSubscriptionTypes $type, UserInterface $user, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): static
     {
-        return new static(type: $type, user: $user, typeKey: $typeKey, userKey: $userKey, addLogin: $addLogin, loginKey: $loginKey, extraParameters: $extraParameters, referenceType: $referenceType);
+        return new static(callbackName: $callbackName, type: $type, user: $user, typeKey: $typeKey, userKey: $userKey, addLogin: $addLogin, loginKey: $loginKey, extraParameters: $extraParameters, referenceType: $referenceType);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCallbackName(): string
+    {
+        return $this->callbackName;
+    }
+
+    /**
+     * @param string $callbackName
+     * @return $this
+     */
+    public function setCallbackName(string $callbackName): self
+    {
+        $this->callbackName = $callbackName;
+        return $this;
     }
 
     /**
