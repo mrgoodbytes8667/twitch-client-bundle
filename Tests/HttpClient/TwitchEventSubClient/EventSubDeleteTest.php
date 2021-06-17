@@ -5,6 +5,7 @@ namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchEventSubClient;
 
 
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
+use Bytes\TwitchClientBundle\Event\EventSubSubscriptionDeleteEvent;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Response as Http;
@@ -38,10 +39,12 @@ class EventSubDeleteTest extends TestTwitchEventSubClientCase
      */
     public function testEventSubDeleteResponseCallback()
     {
+        $event = EventSubSubscriptionDeleteEvent::make($this->faker->accessToken());
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $dispatcher->expects($this->once())
-            ->method('dispatch');
+            ->method('dispatch')
+            ->willReturn($event);
 
         $client = $this->setupClient(MockClient::empty(), $dispatcher);
 
