@@ -24,6 +24,8 @@ use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Create;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscription;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions;
 use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
+use Exception;
+use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -31,7 +33,6 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use InvalidArgumentException;
 
 /**
  * Class TwitchEventSubClient
@@ -60,12 +61,22 @@ class TwitchEventSubClient extends AbstractTwitchClient
     }
 
     /**
+     * Return the client name
+     * @return string
+     */
+    public static function getDefaultIndexName(): string
+    {
+        return 'TWITCH-EVENTSUB';
+    }
+
+    /**
      * @param EventSubSubscriptionTypes $type
      * @param UserInterface $stream
      * @param null $callback
-     * @param array $extraConditions
+     * @param array $extraConditions Placeholder for future types
      * @return ClientResponseInterface
      * @throws TransportExceptionInterface
+     * @throws NoTokenException
      */
     public function eventSubSubscribe(EventSubSubscriptionTypes $type, UserInterface $stream, $callback = null, $extraConditions = []): ClientResponseInterface
     {
@@ -104,9 +115,8 @@ class TwitchEventSubClient extends AbstractTwitchClient
          *
          */
         $event = $this->dispatchEventSubSubscriptionCreatePreRequestEvent($type, $stream, $url);
-        if(!$event->hasEntity())
-        {
-            throw new \Exception('Unable to save new subscription');
+        if (!$event->hasEntity()) {
+            throw new Exception('Unable to save new subscription');
         }
         return $this->jsonRequest(url: 'eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class,
             options: $params, method: HttpMethods::post(), onSuccessCallable: function ($self, $subscriptions) {
@@ -140,15 +150,6 @@ class TwitchEventSubClient extends AbstractTwitchClient
     }
 
     /**
-     * @param string $eventId
-     * @return EventSubSubscriptionDeleteEvent
-     */
-    protected function dispatchEventSubSubscriptionDeleteEvent(string $eventId): EventSubSubscriptionDeleteEvent
-    {
-        return $this->dispatch(EventSubSubscriptionDeleteEvent::make($eventId));
-    }
-
-    /**
      * Get EventSub Subscriptions
      * Get a list of your EventSub subscriptions. The subscriptions are paginated and ordered by most recent first.
      * @param EventSubStatus|EventSubSubscriptionTypes|null $filter
@@ -161,13 +162,10 @@ class TwitchEventSubClient extends AbstractTwitchClient
     public function eventSubGetSubscriptions(EventSubStatus|EventSubSubscriptionTypes|null $filter = null): ClientResponseInterface
     {
         $options = [];
-        if(!empty($filter))
-        {
-            if($filter instanceof EventSubStatus)
-            {
+        if (!empty($filter)) {
+            if ($filter instanceof EventSubStatus) {
                 $options['query'] = ['status' => $filter->value];
-            } elseif($filter instanceof EventSubSubscriptionTypes)
-            {
+            } elseif ($filter instanceof EventSubSubscriptionTypes) {
                 $options['query'] = ['type' => $filter->value];
             }
         }
@@ -194,6 +192,15 @@ class TwitchEventSubClient extends AbstractTwitchClient
                 $this->dispatchEventSubSubscriptionDeleteEvent($id);
             }
         }, params: ['id' => $id]);
+    }
+
+    /**
+     * @param string $eventId
+     * @return EventSubSubscriptionDeleteEvent
+     */
+    protected function dispatchEventSubSubscriptionDeleteEvent(string $eventId): EventSubSubscriptionDeleteEvent
+    {
+        return $this->dispatch(EventSubSubscriptionDeleteEvent::make($eventId));
     }
 
     /**
@@ -226,14 +233,4 @@ class TwitchEventSubClient extends AbstractTwitchClient
 
         throw new NoTokenException();
     }
-
-    /**
-     * Return the client name
-     * @return string
-     */
-    public static function getDefaultIndexName(): string
-    {
-        return 'TWITCH-EVENTSUB';
-    }
-
 }
