@@ -188,6 +188,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
     /**
      * @param IdInterface|string $id
      * @return ClientResponseInterface
+     * @throws NoTokenException
      * @throws TransportExceptionInterface
      */
     public function eventSubDelete($id): ClientResponseInterface
@@ -203,7 +204,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
                 $id = $self->getExtraParams()['id'];
                 $this->dispatchEventSubSubscriptionDeleteEvent($id);
             }
-        }, params: ['id' => $id]);
+        }, params: ['id' => $id])->onSuccessCallback();
     }
 
     /**
