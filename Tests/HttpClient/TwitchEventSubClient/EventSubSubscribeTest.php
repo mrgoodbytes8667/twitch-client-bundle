@@ -41,7 +41,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
      */
     public function testEventSubSubscribeClientSuccess($type, $user, $callback, $extraConditions)
     {
-        $event = $this->createEvent($type, $user, $callback);
+        $event = $this->createPreEvent($type, $user, $callback);
         $dispatcher = $this->createMock(EventDispatcher::class);
         $callbackEvent = EventSubSubscriptionGenerateCallbackEvent::new('', EventSubSubscriptionTypes::channelUpdate(), $user);
         $callbackEvent->setUrl($this->faker->url());
@@ -60,7 +60,6 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
                     return $callbackEvent;
                 }
             }));
-        //->will($this->onConsecutiveCalls($callbackEvent, $event));
 
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher)
@@ -79,7 +78,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
      * @param $callback
      * @return EventSubSubscriptionCreatePreRequestEvent
      */
-    protected function createEvent($type, $user, $callback)
+    protected function createPreEvent($type, $user, $callback)
     {
         if (is_string($callback)) {
             $url = $callback;
@@ -96,6 +95,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
     }
 
     /**
+     * @throws NoTokenException
      * @throws TransportExceptionInterface
      */
     public function testEventSubSubscribeClientInvalidCallback()
@@ -108,6 +108,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
     /**
      * @dataProvider provideUnsupportedTypes
      * @param $type
+     * @throws NoTokenException
      * @throws TransportExceptionInterface
      */
     public function testEventSubSubscribeClientUnsupportedType($type)
@@ -136,11 +137,17 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         }
     }
 
+    /**
+     * @return array
+     */
     protected static function getSupportedTypes()
     {
         return [EventSubSubscriptionTypes::channelUpdate(), EventSubSubscriptionTypes::streamOnline(), EventSubSubscriptionTypes::streamOffline(), EventSubSubscriptionTypes::channelSubscribe(), EventSubSubscriptionTypes::channelChannelPointsCustomRewardAdd(), EventSubSubscriptionTypes::userUpdate()];
     }
 
+    /**
+     * @return Generator
+     */
     public function provideUnsupportedTypes()
     {
         foreach (EventSubSubscriptionTypes::getValues() as $value) {
@@ -159,7 +166,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         $type = EventSubSubscriptionTypes::streamOnline();
         $user = $this->createMockUser();
         $callback = $this->faker->url();
-        $event = $this->createEvent($type, $user, $callback);
+        $event = $this->createPreEvent($type, $user, $callback);
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $dispatcher->expects($this->exactly(2))

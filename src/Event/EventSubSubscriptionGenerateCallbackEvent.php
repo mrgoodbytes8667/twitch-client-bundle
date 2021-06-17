@@ -27,14 +27,6 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
     private bool $generationSkipped = false;
 
     /**
-     * @return bool
-     */
-    public function isGenerationSkipped(): bool
-    {
-        return $this->generationSkipped;
-    }
-
-    /**
      * EventSubSubscriptionGenerateCallbackEvent constructor.
      * @param string|null $callbackName
      * @param string $typeKey
@@ -48,13 +40,13 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
      */
     public function __construct(private ?string $callbackName = null, private string $typeKey = 'type', private string $userKey = 'stream', private bool $addLogin = true, private string $loginKey = 'login', private ?int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL, private ?string $url = null, private ?EventSubSubscriptionTypes $type = null, private ?UserInterface $user = null)
     {
-        if(!empty($url))
-        {
+        if (!empty($url)) {
             $this->generationSkipped = true;
         }
         if (is_null($referenceType)) {
             $this->referenceType = UrlGeneratorInterface::ABSOLUTE_URL;
         }
+        $this->parameters = Push::create();
     }
 
     /**
@@ -173,11 +165,19 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
     }
 
     /**
+     * @return bool
+     */
+    public function isGenerationSkipped(): bool
+    {
+        return $this->generationSkipped;
+    }
+
+    /**
      * @return array
      */
     public function getParameters(): array
     {
-        return $this->parameters->value();
+        return $this->parameters?->value() ?? [];
     }
 
     /**
@@ -189,10 +189,12 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
         if (empty($parameters)) {
             $parameters = new Push();
         } elseif (is_array($parameters)) {
-            $parameters = new Push();
+            $temp = new Push();
             foreach ($parameters as $key => $value) {
-                $parameters = $this->parameters->push(value: $value, key: $key);
+                $temp = $temp->push(value: $value, key: $key);
             }
+            $parameters = $temp;
+            unset($temp);
         }
         $this->parameters = $parameters;
         return $this;
@@ -240,7 +242,8 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
     /**
      * @return bool
      */
-    public function hasUrl(): bool {
+    public function hasUrl(): bool
+    {
         return !empty($this->url);
     }
 
