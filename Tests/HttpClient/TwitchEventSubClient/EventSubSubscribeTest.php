@@ -6,7 +6,9 @@ namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchEventSubClient;
 
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
+use Bytes\ResponseBundle\Token\Exceptions\NoTokenException;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePreRequestEvent;
+use Bytes\TwitchClientBundle\Event\EventSubSubscriptionGenerateCallbackEvent;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockJsonResponse;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
@@ -35,18 +37,34 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
      * @param $extraConditions
      * @return ClientResponseInterface
      * @throws TransportExceptionInterface
+     * @throws NoTokenException
      */
     public function testEventSubSubscribeClientSuccess($type, $user, $callback, $extraConditions)
     {
         $event = $this->createEvent($type, $user, $callback);
         $dispatcher = $this->createMock(EventDispatcher::class);
+        $callbackEvent = EventSubSubscriptionGenerateCallbackEvent::new('', EventSubSubscriptionTypes::channelUpdate(), $user);
+        $callbackEvent->setUrl($this->faker->url());
 
-        $dispatcher->expects($this->once())
+        $dispatcherCount = 1;
+        if (is_null($callback)) {
+            $dispatcherCount = 2;
+        }
+
+        $dispatcher->expects($this->exactly($dispatcherCount))
             ->method('dispatch')
-            ->willReturn($event);
+            ->will($this->returnCallback(function ($e) use ($callbackEvent, $event) {
+                if ($e instanceof EventSubSubscriptionCreatePreRequestEvent) {
+                    return $event;
+                } else {
+                    return $callbackEvent;
+                }
+            }));
+        //->will($this->onConsecutiveCalls($callbackEvent, $event));
 
         $client = $this->setupClient(MockClient::requests(
-            MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher);
+            MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher)
+            ->setEventSubSubscriptionGenerateCallbackEvent($callbackEvent);
 
         $cmd = $client->eventSubSubscribe($type, $this->createMockUser(), $callback, []);
         $this->assertResponseIsSuccessful($cmd);
