@@ -21,6 +21,7 @@ use Bytes\TwitchResponseBundle\Enums\EventSubStatus;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Condition;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Create;
+use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscription;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions;
 use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -99,15 +100,52 @@ class TwitchEventSubClient extends AbstractTwitchClient
         $json = $this->serializer->serialize($create, 'json', [AbstractObjectNormalizer::SKIP_NULL_VALUES => true]);
         $params['body'] = $json;
 
-        $this->dispatch(EventSubSubscriptionCreatePreRequestEvent::make($type, $stream, $url));
+        /**
+         *
+         */
+        $event = $this->dispatchEventSubSubscriptionCreatePreRequestEvent($type, $stream, $url);
+        if(!$event->hasEntity())
+        {
+            throw new \Exception('Unable to save new subscription');
+        }
         return $this->jsonRequest(url: 'eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class,
             options: $params, method: HttpMethods::post(), onSuccessCallable: function ($self, $subscriptions) {
-            /** @var TwitchResponse $self */
-            if (array_key_exists('user', $self->getExtraParams())) {
-                $user = $self->getExtraParams()['user'];
-            }
-            $this->dispatch(EventSubSubscriptionCreatePostRequestEvent::createFromSubscription($subscriptions->getSubscription(), $user));
-        }, params: ['user' => $stream]);
+                /** @var TwitchResponse $self */
+                if (array_key_exists('user', $self->getExtraParams())) {
+                    $user = $self->getExtraParams()['user'];
+                }
+                $this->dispatchEventSubSubscriptionCreatePostRequestEvent($subscriptions->getSubscription(), $user);
+            }, params: ['user' => $stream]);
+    }
+
+    /**
+     * @param EventSubSubscriptionTypes $subscriptionType
+     * @param UserInterface $stream
+     * @param string $callback
+     * @return EventSubSubscriptionCreatePreRequestEvent
+     */
+    protected function dispatchEventSubSubscriptionCreatePreRequestEvent(EventSubSubscriptionTypes $subscriptionType, UserInterface $stream, string $callback)
+    {
+        return $this->dispatch(EventSubSubscriptionCreatePreRequestEvent::make($subscriptionType, $stream, $callback));
+    }
+
+    /**
+     * @param Subscription $subscriptionType
+     * @param UserInterface $stream
+     * @return EventSubSubscriptionCreatePostRequestEvent
+     */
+    protected function dispatchEventSubSubscriptionCreatePostRequestEvent(Subscription $subscriptionType, UserInterface $stream)
+    {
+        return $this->dispatch(EventSubSubscriptionCreatePostRequestEvent::createFromSubscription($subscriptionType, $stream));
+    }
+
+    /**
+     * @param string $eventId
+     * @return EventSubSubscriptionDeleteEvent
+     */
+    protected function dispatchEventSubSubscriptionDeleteEvent(string $eventId): EventSubSubscriptionDeleteEvent
+    {
+        return $this->dispatch(EventSubSubscriptionDeleteEvent::make($eventId));
     }
 
     /**
@@ -152,8 +190,8 @@ class TwitchEventSubClient extends AbstractTwitchClient
         ], method: HttpMethods::delete(), onSuccessCallable: function ($self, $subscriptions) {
             /** @var TwitchResponse $self */
             if (array_key_exists('id', $self->getExtraParams())) {
-                $user = $self->getExtraParams()['id'];
-                $this->dispatch(EventSubSubscriptionDeleteEvent::make($user));
+                $id = $self->getExtraParams()['id'];
+                $this->dispatchEventSubSubscriptionDeleteEvent($id);
             }
         }, params: ['id' => $id]);
     }
