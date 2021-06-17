@@ -93,6 +93,15 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
             $container->getDefinition(sprintf('bytes_twitch_client.oauth_controller.%s', $type))
                 ->replaceArgument(2, $config['login_success_route']);
         }
+
+        $definition = $container->getDefinition('bytes_twitch_client.event.generate_callback');
+        $definition->replaceArgument(0, $config['eventsub_callback']['method'] === 'route_name' ? $config['eventsub_callback']['route_name'] : '');//string|null $callbackName
+        $definition->replaceArgument(1, $config['eventsub_callback']['type_key']);//string $typeKey
+        $definition->replaceArgument(2, $config['eventsub_callback']['user_key']);//string $userKey
+        $definition->replaceArgument(3, $config['eventsub_callback']['add_login']);//bool $addLogin
+        $definition->replaceArgument(4, $config['eventsub_callback']['login_key']);//string $loginKey
+        $definition->replaceArgument(5, null);//int $referenceType
+        $definition->replaceArgument(6, $config['eventsub_callback']['method'] === 'url' ? $config['eventsub_callback']['url'] : '');//string $url
     }
 
     /**

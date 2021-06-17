@@ -46,7 +46,7 @@ class EventSubSubscriptionGenerateCallbackSubscriber implements EventSubscriberI
     public static function getSubscribedEvents()
     {
         return [
-            EventSubSubscriptionGenerateCallbackEvent::class => ['onGenerateCallback', 10],
+            EventSubSubscriptionGenerateCallbackEvent::class => ['onGenerateCallback', -1],
         ];
     }
 
@@ -56,6 +56,11 @@ class EventSubSubscriptionGenerateCallbackSubscriber implements EventSubscriberI
      */
     public function onGenerateCallback(EventSubSubscriptionGenerateCallbackEvent $event): EventSubSubscriptionGenerateCallbackEvent
     {
+        if($event->isGenerationSkipped() && $event->hasUrl())
+        {
+            $event->stopPropagation();
+            return $event;
+        }
         $url = $this->urlGenerator->generate($event->getCallbackName(), $event->getParameters(), $event->getReferenceType());
         $event->setUrl($url);
         return $event;

@@ -22,36 +22,38 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
     private $parameters;
 
     /**
-     * @var string
+     * @var bool
      */
-    private $url = '';
+    private bool $generationSkipped = false;
+
+    /**
+     * @return bool
+     */
+    public function isGenerationSkipped(): bool
+    {
+        return $this->generationSkipped;
+    }
 
     /**
      * EventSubSubscriptionGenerateCallbackEvent constructor.
-     * @param string $callbackName
-     * @param EventSubSubscriptionTypes $type
-     * @param UserInterface $user
+     * @param string|null $callbackName
      * @param string $typeKey
      * @param string $userKey
      * @param bool $addLogin
      * @param string $loginKey
-     * @param array $extraParameters
-     * @param int $referenceType
+     * @param int|null $referenceType
+     * @param string|null $url
+     * @param EventSubSubscriptionTypes|null $type
+     * @param UserInterface|null $user
      */
-    public function __construct(private string $callbackName, EventSubSubscriptionTypes $type, UserInterface $user, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = [], private int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL)
+    public function __construct(private ?string $callbackName = null, private string $typeKey = 'type', private string $userKey = 'stream', private bool $addLogin = true, private string $loginKey = 'login', private ?int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL, private ?string $url = null, private ?EventSubSubscriptionTypes $type = null, private ?UserInterface $user = null)
     {
-        $this->parameters = Push::create();
-        $this->parameters = $this->parameters->push(value: $type->value, key: $typeKey)
-            ->push(value: $user->getUserId(), key: $userKey);
-
-        if ($addLogin) {
-            $this->parameters = $this->parameters->push(value: $user->getLogin(), key: $loginKey);
+        if(!empty($url))
+        {
+            $this->generationSkipped = true;
         }
-
-        if (!empty($extraParameters)) {
-            foreach ($extraParameters as $key => $value) {
-                $this->parameters = $this->parameters->push(value: $value, key: $key);
-            }
+        if (is_null($referenceType)) {
+            $this->referenceType = UrlGeneratorInterface::ABSOLUTE_URL;
         }
     }
 
@@ -69,25 +71,105 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
      */
     public static function new(string $callbackName, EventSubSubscriptionTypes $type, UserInterface $user, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): static
     {
-        return new static(callbackName: $callbackName, type: $type, user: $user, typeKey: $typeKey, userKey: $userKey, addLogin: $addLogin, loginKey: $loginKey, extraParameters: $extraParameters, referenceType: $referenceType);
+        $static = new static(callbackName: $callbackName, typeKey: $typeKey, userKey: $userKey, addLogin: $addLogin, loginKey: $loginKey, referenceType: $referenceType, type: $type, user: $user);
+        $static->populate($type, $user, $typeKey, $userKey, $addLogin, $loginKey, $extraParameters);
+        return $static;
+    }
+
+    /**
+     * @param EventSubSubscriptionTypes $type
+     * @param UserInterface $user
+     * @param string $typeKey
+     * @param string $userKey
+     * @param bool $addLogin
+     * @param string $loginKey
+     * @param array $extraParameters
+     * @return $this
+     */
+    public function populate(EventSubSubscriptionTypes $type, UserInterface $user, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = []): self
+    {
+        $parameters = Push::create();
+        $parameters = $parameters->push(value: $type->value, key: $typeKey)
+            ->push(value: $user->getUserId(), key: $userKey);
+
+        if ($addLogin) {
+            $parameters = $parameters->push(value: $user->getLogin(), key: $loginKey);
+        }
+
+        if (!empty($extraParameters)) {
+            foreach ($extraParameters as $key => $value) {
+                $parameters = $parameters->push(value: $value, key: $key);
+            }
+        }
+        $this->setParameters($parameters);
+        return $this;
+    }
+
+    /**
+     * @param EventSubSubscriptionGenerateCallbackEvent $event
+     * @param EventSubSubscriptionTypes $type
+     * @param UserInterface $user
+     * @return static
+     */
+    public static function from(EventSubSubscriptionGenerateCallbackEvent $event, EventSubSubscriptionTypes $type, UserInterface $user): static
+    {
+        $static = clone $event;
+        $static->setType($type)
+            ->setUser($user)
+            ->populate($type, $user, $static->getTypeKey(), $static->getUserKey(), $static->getAddLogin(), $static->getLoginKey());
+        return $static;
+    }
+
+    /**
+     * @param UserInterface|null $user
+     * @return $this
+     */
+    public function setUser(?UserInterface $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @param EventSubSubscriptionTypes|null $type
+     * @return $this
+     */
+    public function setType(?EventSubSubscriptionTypes $type): self
+    {
+        $this->type = $type;
+        return $this;
     }
 
     /**
      * @return string
      */
-    public function getCallbackName(): string
+    public function getTypeKey(): string
     {
-        return $this->callbackName;
+        return $this->typeKey;
     }
 
     /**
-     * @param string $callbackName
-     * @return $this
+     * @return string
      */
-    public function setCallbackName(string $callbackName): self
+    public function getUserKey(): string
     {
-        $this->callbackName = $callbackName;
-        return $this;
+        return $this->userKey;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAddLogin(): bool
+    {
+        return $this->addLogin;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLoginKey(): string
+    {
+        return $this->loginKey;
     }
 
     /**
@@ -138,24 +220,6 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
     }
 
     /**
-     * @return int
-     */
-    public function getReferenceType(): int
-    {
-        return $this->referenceType;
-    }
-
-    /**
-     * @param int $referenceType
-     * @return $this
-     */
-    public function setReferenceType(int $referenceType): self
-    {
-        $this->referenceType = $referenceType;
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getUrl(): string
@@ -170,6 +234,105 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
     public function setUrl(string $url): self
     {
         $this->url = $url;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasUrl(): bool {
+        return !empty($this->url);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCallbackName(): ?string
+    {
+        return $this->callbackName;
+    }
+
+    /**
+     * @param string|null $callbackName
+     * @return $this
+     */
+    public function setCallbackName(?string $callbackName): self
+    {
+        $this->callbackName = $callbackName;
+        return $this;
+    }
+
+    /**
+     * @return EventSubSubscriptionTypes|null
+     */
+    public function getType(): ?EventSubSubscriptionTypes
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return UserInterface|null
+     */
+    public function getUser(): ?UserInterface
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param string $typeKey
+     * @return $this
+     */
+    public function setTypeKey(string $typeKey): self
+    {
+        $this->typeKey = $typeKey;
+        return $this;
+    }
+
+    /**
+     * @param string $userKey
+     * @return $this
+     */
+    public function setUserKey(string $userKey): self
+    {
+        $this->userKey = $userKey;
+        return $this;
+    }
+
+    /**
+     * @param bool $addLogin
+     * @return $this
+     */
+    public function setAddLogin(bool $addLogin): self
+    {
+        $this->addLogin = $addLogin;
+        return $this;
+    }
+
+    /**
+     * @param string $loginKey
+     * @return $this
+     */
+    public function setLoginKey(string $loginKey): self
+    {
+        $this->loginKey = $loginKey;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReferenceType(): int
+    {
+        return $this->referenceType;
+    }
+
+    /**
+     * @param int $referenceType
+     * @return $this
+     */
+    public function setReferenceType(int $referenceType): self
+    {
+        $this->referenceType = $referenceType;
         return $this;
     }
 }
