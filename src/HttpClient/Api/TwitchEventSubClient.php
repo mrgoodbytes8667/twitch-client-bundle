@@ -16,6 +16,7 @@ use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePostRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePreRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionDeleteEvent;
+use Bytes\TwitchClientBundle\Event\EventSubSubscriptionGenerateCallbackEvent;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchResponseBundle\Enums\EventSubStatus;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
@@ -201,6 +202,22 @@ class TwitchEventSubClient extends AbstractTwitchClient
     protected function dispatchEventSubSubscriptionDeleteEvent(string $eventId): EventSubSubscriptionDeleteEvent
     {
         return $this->dispatch(EventSubSubscriptionDeleteEvent::make($eventId));
+    }
+
+    /**
+     * @param EventSubSubscriptionTypes $type
+     * @param UserInterface $user
+     * @param string $typeKey
+     * @param string $userKey
+     * @param bool $addLogin
+     * @param string $loginKey
+     * @param array $extraParameters
+     * @param int $referenceType
+     * @return EventSubSubscriptionGenerateCallbackEvent
+     */
+    protected function dispatchEventSubSubscriptionGenerateCallbackEvent(EventSubSubscriptionTypes $type, UserInterface $user, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): EventSubSubscriptionGenerateCallbackEvent
+    {
+        return $this->dispatch(EventSubSubscriptionGenerateCallbackEvent::new(type: $type, user: $user, typeKey: $typeKey, userKey: $userKey, addLogin: $addLogin, loginKey: $loginKey, extraParameters: $extraParameters, referenceType: $referenceType));
     }
 
     /**
