@@ -95,6 +95,47 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
     }
 
     /**
+     * @dataProvider provideEventSubSubscribes
+     * @param $type
+     * @param $user
+     * @param $callback
+     * @param $extraConditions
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     */
+    public function testEventSubSubscribeClientNoEntity($type, $user, $callback, $extraConditions)
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Unable to save new subscription');
+
+        $event = $this->createPreEvent($type, $user, $callback);
+        $event->setEntity(null);
+        $dispatcher = $this->createMock(EventDispatcher::class);
+        $callbackEvent = EventSubSubscriptionGenerateCallbackEvent::new('', EventSubSubscriptionTypes::channelUpdate(), $user);
+        $callbackEvent->setUrl($this->faker->url());
+
+        $dispatcherCount = 1;
+        if (is_null($callback)) {
+            $dispatcherCount = 2;
+        }
+
+        $dispatcher->expects($this->exactly($dispatcherCount))
+            ->method('dispatch')
+            ->will($this->returnCallback(function ($e) use ($callbackEvent, $event) {
+                if ($e instanceof EventSubSubscriptionCreatePreRequestEvent) {
+                    return $event;
+                } else {
+                    return $callbackEvent;
+                }
+            }));
+
+        $client = $this->setupClient(dispatcher: $dispatcher)
+            ->setEventSubSubscriptionGenerateCallbackEvent($callbackEvent);
+
+        $client->eventSubSubscribe($type, $this->createMockUser(), $callback, []);
+    }
+
+    /**
      * @throws NoTokenException
      * @throws TransportExceptionInterface
      */
