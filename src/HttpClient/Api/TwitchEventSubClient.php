@@ -16,6 +16,7 @@ use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePostRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePreRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionDeleteEvent;
+use Bytes\TwitchClientBundle\Event\EventSubSubscriptionGenerateCallbackEvent;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchResponseBundle\Enums\EventSubStatus;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
@@ -55,7 +56,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
      * @param array $defaultOptionsByRegexp
      * @param string|null $defaultRegexp
      */
-    public function __construct(HttpClientInterface $httpClient, EventDispatcherInterface $dispatcher, ?RetryStrategyInterface $strategy, protected UrlGeneratorInterface $urlGenerator, string $clientId, string $clientSecret, protected string $hubSecret, ?string $userAgent, protected ?string $callbackName = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
+    public function __construct(HttpClientInterface $httpClient, EventDispatcherInterface $dispatcher, ?RetryStrategyInterface $strategy, protected UrlGeneratorInterface $urlGenerator, string $clientId, string $clientSecret, protected string $hubSecret, ?string $userAgent, protected ?string $callbackName = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null, protected ?EventSubSubscriptionGenerateCallbackEvent $eventSubSubscriptionGenerateCallbackEvent = null)
     {
         parent::__construct($httpClient, $dispatcher, $strategy, $clientId, $clientSecret, $userAgent, $defaultOptionsByRegexp, $defaultRegexp);
     }
@@ -72,7 +73,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
     /**
      * @param EventSubSubscriptionTypes $type
      * @param UserInterface $stream
-     * @param null $callback
+     * @param null $callback When null, triggers an EventSubSubscriptionGenerateCallbackEvent event which will generate a full url. Add your own listener/subscriber to add extra parameters or completely replace the built in subscriber.
      * @param array $extraConditions Placeholder for future types
      * @return ClientResponseInterface
      * @throws TransportExceptionInterface
@@ -100,7 +101,8 @@ class TwitchEventSubClient extends AbstractTwitchClient
         if (is_string($callback)) {
             $url = $callback;
         } elseif (is_null($callback)) {
-            $url = $this->generateEventSubSubscribeCallback($type, $stream);
+            $event = $this->dispatchEventSubSubscriptionGenerateCallbackEvent(type: $type, user: $stream);
+            $url = $event->getUrl();
         } elseif (is_callable($callback)) {
             $url = call_user_func($callback, $type, $stream);
         } else {
@@ -126,6 +128,16 @@ class TwitchEventSubClient extends AbstractTwitchClient
                 }
                 $this->dispatchEventSubSubscriptionCreatePostRequestEvent($subscriptions->getSubscription(), $user);
             }, params: ['user' => $stream]);
+    }
+
+    /**
+     * @param EventSubSubscriptionTypes $type
+     * @param UserInterface $user
+     * @return EventSubSubscriptionGenerateCallbackEvent
+     */
+    protected function dispatchEventSubSubscriptionGenerateCallbackEvent(EventSubSubscriptionTypes $type, UserInterface $user): EventSubSubscriptionGenerateCallbackEvent
+    {
+        return $this->dispatch(EventSubSubscriptionGenerateCallbackEvent::from($this->eventSubSubscriptionGenerateCallbackEvent, $type, $user));
     }
 
     /**
@@ -204,12 +216,25 @@ class TwitchEventSubClient extends AbstractTwitchClient
     }
 
     /**
+     * @param EventSubSubscriptionGenerateCallbackEvent $eventSubSubscriptionGenerateCallbackEvent
+     * @return $this
+     */
+    public function setEventSubSubscriptionGenerateCallbackEvent(EventSubSubscriptionGenerateCallbackEvent $eventSubSubscriptionGenerateCallbackEvent): self
+    {
+        $this->eventSubSubscriptionGenerateCallbackEvent = $eventSubSubscriptionGenerateCallbackEvent;
+        return $this;
+    }
+
+    /**
      * @param EventSubSubscriptionTypes $type
      * @param UserInterface $stream
      * @return string
+     *
+     * @deprecated Since 0.0.2, use EventSubSubscriptionGenerateCallbackEvent instead
      */
     protected function generateEventSubSubscribeCallback(EventSubSubscriptionTypes $type, UserInterface $stream): string
     {
+        trigger_deprecation('mrgoodbytes8667/twitch-client-bundle', '0.0.2', 'The "%s()" method has been deprecated.', __METHOD__);
         return $this->urlGenerator->generate($this->callbackName, [
             'type' => $type,
             'stream' => $stream->getUserId(),

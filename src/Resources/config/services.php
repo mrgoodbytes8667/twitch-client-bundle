@@ -8,6 +8,8 @@ use Bytes\ResponseBundle\HttpClient\Token\AppTokenClientInterface;
 use Bytes\ResponseBundle\HttpClient\Token\TokenClientInterface;
 use Bytes\ResponseBundle\HttpClient\Token\UserTokenClientInterface;
 use Bytes\ResponseBundle\Routing\OAuthInterface;
+use Bytes\TwitchClientBundle\Event\EventSubSubscriptionGenerateCallbackEvent;
+use Bytes\TwitchClientBundle\EventListener\EventSubSubscriptionGenerateCallbackSubscriber;
 use Bytes\TwitchClientBundle\EventListener\RevokeTokenSubscriber;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchEventSubClient;
@@ -59,6 +61,7 @@ return static function (ContainerConfigurator $container) {
             '', // $config['eventsub_subscribe_callback_route_name']
         ])
         ->call('setResponse', [service('bytes_twitch_client.httpclient.response')])
+        ->call('setEventSubSubscriptionGenerateCallbackEvent', [service('bytes_twitch_client.event.generate_callback')])
         ->tag('bytes_response.http_client')
         ->tag('bytes_response.http_client.api')
         ->lazy()
@@ -220,6 +223,25 @@ return static function (ContainerConfigurator $container) {
     $services->set('bytes_twitch_client.subscriber.revoke_token', RevokeTokenSubscriber::class)
         ->args([
             service('bytes_response.locator.http_client.token'),
+        ])
+        ->tag('kernel.event_subscriber');
+
+    $services->set('bytes_twitch_client.event.generate_callback', EventSubSubscriptionGenerateCallbackEvent::class)
+        ->args([
+            '', //string|null $callbackName
+                '', //string $typeKey
+                '', //string $userKey
+                '', //bool $addLogin
+                '', //string $loginKey
+                '', //int $referenceType
+                '', //string $url
+        ])
+        ->alias(EventSubSubscriptionGenerateCallbackEvent::class, 'bytes_twitch_client.event.generate_callback')
+        ->public();
+
+    $services->set('bytes_twitch_client.subscriber.generate_callback', EventSubSubscriptionGenerateCallbackSubscriber::class)
+        ->args([
+            service('router.default'), // Symfony\Component\Routing\Generator\UrlGeneratorInterface
         ])
         ->tag('kernel.event_subscriber');
     //endregion

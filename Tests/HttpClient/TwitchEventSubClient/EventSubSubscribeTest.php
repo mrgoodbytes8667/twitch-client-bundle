@@ -6,7 +6,9 @@ namespace Bytes\TwitchClientBundle\Tests\HttpClient\TwitchEventSubClient;
 
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
+use Bytes\ResponseBundle\Token\Exceptions\NoTokenException;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePreRequestEvent;
+use Bytes\TwitchClientBundle\Event\EventSubSubscriptionGenerateCallbackEvent;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockJsonResponse;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
@@ -35,18 +37,33 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
      * @param $extraConditions
      * @return ClientResponseInterface
      * @throws TransportExceptionInterface
+     * @throws NoTokenException
      */
     public function testEventSubSubscribeClientSuccess($type, $user, $callback, $extraConditions)
     {
-        $event = $this->createEvent($type, $user, $callback);
+        $event = $this->createPreEvent($type, $user, $callback);
         $dispatcher = $this->createMock(EventDispatcher::class);
+        $callbackEvent = EventSubSubscriptionGenerateCallbackEvent::new('', EventSubSubscriptionTypes::channelUpdate(), $user);
+        $callbackEvent->setUrl($this->faker->url());
 
-        $dispatcher->expects($this->once())
+        $dispatcherCount = 1;
+        if (is_null($callback)) {
+            $dispatcherCount = 2;
+        }
+
+        $dispatcher->expects($this->exactly($dispatcherCount))
             ->method('dispatch')
-            ->willReturn($event);
+            ->will($this->returnCallback(function ($e) use ($callbackEvent, $event) {
+                if ($e instanceof EventSubSubscriptionCreatePreRequestEvent) {
+                    return $event;
+                } else {
+                    return $callbackEvent;
+                }
+            }));
 
         $client = $this->setupClient(MockClient::requests(
-            MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher);
+            MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher)
+            ->setEventSubSubscriptionGenerateCallbackEvent($callbackEvent);
 
         $cmd = $client->eventSubSubscribe($type, $this->createMockUser(), $callback, []);
         $this->assertResponseIsSuccessful($cmd);
@@ -61,7 +78,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
      * @param $callback
      * @return EventSubSubscriptionCreatePreRequestEvent
      */
-    protected function createEvent($type, $user, $callback)
+    protected function createPreEvent($type, $user, $callback)
     {
         if (is_string($callback)) {
             $url = $callback;
@@ -78,6 +95,48 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
     }
 
     /**
+     * @dataProvider provideEventSubSubscribes
+     * @param $type
+     * @param $user
+     * @param $callback
+     * @param $extraConditions
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     */
+    public function testEventSubSubscribeClientNoEntity($type, $user, $callback, $extraConditions)
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Unable to save new subscription');
+
+        $event = $this->createPreEvent($type, $user, $callback);
+        $event->setEntity(null);
+        $dispatcher = $this->createMock(EventDispatcher::class);
+        $callbackEvent = EventSubSubscriptionGenerateCallbackEvent::new('', EventSubSubscriptionTypes::channelUpdate(), $user);
+        $callbackEvent->setUrl($this->faker->url());
+
+        $dispatcherCount = 1;
+        if (is_null($callback)) {
+            $dispatcherCount = 2;
+        }
+
+        $dispatcher->expects($this->exactly($dispatcherCount))
+            ->method('dispatch')
+            ->will($this->returnCallback(function ($e) use ($callbackEvent, $event) {
+                if ($e instanceof EventSubSubscriptionCreatePreRequestEvent) {
+                    return $event;
+                } else {
+                    return $callbackEvent;
+                }
+            }));
+
+        $client = $this->setupClient(dispatcher: $dispatcher)
+            ->setEventSubSubscriptionGenerateCallbackEvent($callbackEvent);
+
+        $client->eventSubSubscribe($type, $this->createMockUser(), $callback, []);
+    }
+
+    /**
+     * @throws NoTokenException
      * @throws TransportExceptionInterface
      */
     public function testEventSubSubscribeClientInvalidCallback()
@@ -90,6 +149,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
     /**
      * @dataProvider provideUnsupportedTypes
      * @param $type
+     * @throws NoTokenException
      * @throws TransportExceptionInterface
      */
     public function testEventSubSubscribeClientUnsupportedType($type)
@@ -118,11 +178,17 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         }
     }
 
+    /**
+     * @return array
+     */
     protected static function getSupportedTypes()
     {
         return [EventSubSubscriptionTypes::channelUpdate(), EventSubSubscriptionTypes::streamOnline(), EventSubSubscriptionTypes::streamOffline(), EventSubSubscriptionTypes::channelSubscribe(), EventSubSubscriptionTypes::channelChannelPointsCustomRewardAdd(), EventSubSubscriptionTypes::userUpdate()];
     }
 
+    /**
+     * @return Generator
+     */
     public function provideUnsupportedTypes()
     {
         foreach (EventSubSubscriptionTypes::getValues() as $value) {
@@ -141,7 +207,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         $type = EventSubSubscriptionTypes::streamOnline();
         $user = $this->createMockUser();
         $callback = $this->faker->url();
-        $event = $this->createEvent($type, $user, $callback);
+        $event = $this->createPreEvent($type, $user, $callback);
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $dispatcher->expects($this->exactly(2))
