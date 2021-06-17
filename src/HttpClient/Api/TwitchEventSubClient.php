@@ -100,7 +100,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
         if (is_string($callback)) {
             $url = $callback;
         } elseif (is_null($callback)) {
-            $url = call_user_func([$this, 'generateEventSubSubscribeCallback'], $type, $stream);
+            $url = $this->generateEventSubSubscribeCallback($type, $stream);
         } elseif (is_callable($callback)) {
             $url = call_user_func($callback, $type, $stream);
         } else {
