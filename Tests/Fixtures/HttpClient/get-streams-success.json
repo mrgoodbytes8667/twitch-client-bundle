@@ -1,0 +1,45 @@
+{
+  "data": [
+    {
+      "id": "12620234605",
+      "user_id": "91633374",
+      "user_login": "fakeusera",
+      "user_name": "fakeusera",
+      "game_id": "32399",
+      "game_name": "Counter-Strike: Global Offensive",
+      "type": "live",
+      "title": "A stream title",
+      "viewer_count": 82502,
+      "started_at": "2021-06-30T13:32:38Z",
+      "language": "ru",
+      "thumbnail_url": "https://static-cdn.jtvnw.net/previews-ttv/live_user_fakeusera-{width}x{height}.jpg",
+      "tag_ids": [
+        "36a89a80-4fcd-4b74-b3d2-2c6fd9b30c95",
+        "0569b171-2a2b-476e-a596-5bdfb45a1327",
+        "2a14b52e-d459-4c92-be11-5d86b898f6b6"
+      ],
+      "is_mature": false
+    },
+    {
+      "id": "17496382038",
+      "user_id": "904721313",
+      "user_login": "fakeuserb",
+      "user_name": "fakeuserb",
+      "game_id": "516575",
+      "game_name": "VALORANT",
+      "type": "live",
+      "title": "A stream title",
+      "viewer_count": 80232,
+      "started_at": "2021-06-30T17:45:31Z",
+      "language": "tr",
+      "thumbnail_url": "https://static-cdn.jtvnw.net/previews-ttv/live_user_fakeuserb-{width}x{height}.jpg",
+      "tag_ids": [
+        "f08d5873-f0c7-4912-94ba-a41933b4c141"
+      ],
+      "is_mature": true
+    }
+  ],
+  "pagination": {
+    "cursor": "eyJiIjp7IkN1cnNvciI6ImV5SnpJam80TWpVd01pNDNOVGt3Tmpnek16SXdPU3dpWkNJDlptRnNjMlVzSW5RaU9uUnlkV1Y5In0sImEiOnsiQ3Vyc29yIjoiZXlKeklqb3hPVGd3Tnk0eU16SXdNemszTVRBMk1qTXNJbVFpT21aaGJITmxMQ0owSWpwMGNuVmxmUT09In18"
+  }
+}
