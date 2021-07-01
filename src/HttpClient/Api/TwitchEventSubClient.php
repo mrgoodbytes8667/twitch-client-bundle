@@ -11,12 +11,14 @@ use Bytes\ResponseBundle\Event\ObtainValidTokenEvent;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Interfaces\IdInterface;
 use Bytes\ResponseBundle\Objects\IdNormalizer;
+use Bytes\ResponseBundle\Objects\Push;
 use Bytes\ResponseBundle\Token\Exceptions\NoTokenException;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePostRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePreRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionDeleteEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionGenerateCallbackEvent;
+use Bytes\TwitchClientBundle\HttpClient\Response\TwitchEventSubGetSubscriptionsResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchResponseBundle\Enums\EventSubStatus;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
@@ -165,24 +167,38 @@ class TwitchEventSubClient extends AbstractTwitchClient
      * Get EventSub Subscriptions
      * Get a list of your EventSub subscriptions. The subscriptions are paginated and ordered by most recent first.
      * @param EventSubStatus|EventSubSubscriptionTypes|null $filter
+     * @param bool $throw
+     * @param string|null $before
+     * @param string|null $after
+     * @param bool $followPagination
      * @return ClientResponseInterface
      * @throws NoTokenException
      * @throws TransportExceptionInterface
      *
      * @link https://dev.twitch.tv/docs/api/reference#get-eventsub-subscriptions
      */
-    public function eventSubGetSubscriptions(EventSubStatus|EventSubSubscriptionTypes|null $filter = null): ClientResponseInterface
+    public function eventSubGetSubscriptions(EventSubStatus|EventSubSubscriptionTypes|null $filter = null, bool $throw = true, ?string $before = null, ?string $after = null, bool $followPagination = true): ClientResponseInterface
     {
         $options = [];
+        $query = Push::create();
+        $responseFilter = null;
         if (!empty($filter)) {
             if ($filter instanceof EventSubStatus) {
-                $options['query'] = ['status' => $filter->value];
+                $query = $query->push($filter->value, 'status');
             } elseif ($filter instanceof EventSubSubscriptionTypes) {
-                $options['query'] = ['type' => $filter->value];
+                $query = $query->push($filter->value, 'type');
             }
+            $responseFilter = $filter;
+        }
+        $query = $query->push($before, 'before')
+            ->push($after, 'after');
+
+        if(!empty($query->value())) {
+            $options['query'] = $query->value();
         }
         return $this->request(url: 'eventsub/subscriptions', caller: __METHOD__,
-            type: Subscriptions::class, options: $options, method: HttpMethods::get());
+            type: Subscriptions::class, options: $options, method: HttpMethods::get(), responseClass: TwitchEventSubGetSubscriptionsResponse::class, params: ['followPagination' => $followPagination, 'client' => $this, 'before' => $before,
+                'after' => $after, 'filter' => $responseFilter]);
     }
 
     /**

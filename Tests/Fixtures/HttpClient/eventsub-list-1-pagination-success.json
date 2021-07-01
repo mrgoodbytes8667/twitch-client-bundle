@@ -1,0 +1,25 @@
+{
+  "total": 1,
+  "data": [
+    {
+      "id": "4d1k7355-157e-7o28-oe16-72d1e0e07927",
+      "status": "enabled",
+      "type": "channel.update",
+      "version": "1",
+      "condition": {
+        "broadcaster_user_id": "111111111"
+      },
+      "created_at": "2021-04-16T19:22:39.109266699Z",
+      "transport": {
+        "method": "webhook",
+        "callback": "https://example.com"
+      },
+      "cost": 0
+    }
+  ],
+  "max_total_cost": 10000,
+  "total_cost": 0,
+  "pagination": {
+    "cursor": "nlvQepDtwQXO5diMntli5sE9VdipDztwDWvMpvcNHEO6bA2tumeEWG40yY9tBDQ1z7fvCzkmqnnESidyfkpxGZuinjRYQo14LeRQiL2hUgQBORxSBp2TCSCx4ZAFwk9PisyaDydg58dnJ44Pr6qfRTvJGZmyMf7RjHXmTMzaUoLxZEl7dxH1NPwkY3w2NIrylrmtBQ6cvB278zMampIOssnAmsM1UNOTEv1ZWA5NGSC0vwITSbSXesdnk3"
+  }
+}
