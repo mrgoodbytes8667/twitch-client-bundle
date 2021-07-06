@@ -5,11 +5,10 @@ namespace Bytes\TwitchClientBundle\HttpClient\Response;
 
 
 use Bytes\ResponseBundle\Token\Exceptions\NoTokenException;
-use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchEventSubClient;
 use Bytes\TwitchResponseBundle\Enums\EventSubStatus;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
-use Bytes\TwitchResponseBundle\Objects\Games\GamesResponse;
+use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -25,7 +24,7 @@ class TwitchEventSubGetSubscriptionsResponse extends TwitchResponse
      * @param bool $throw
      * @param array $context
      * @param string|null $type
-     * @return \Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions
+     * @return Subscriptions
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
@@ -34,7 +33,7 @@ class TwitchEventSubGetSubscriptionsResponse extends TwitchResponse
      */
     public function deserialize(bool $throw = true, array $context = [], ?string $type = null)
     {
-        /** @var \Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions $origResults */
+        /** @var Subscriptions $origResults */
         $origResults = parent::deserialize($throw, $context, $type);
         if (!$this->getFollowPagination() || empty($this->getClient())) {
             $origResults->setPagination(null);
@@ -42,26 +41,11 @@ class TwitchEventSubGetSubscriptionsResponse extends TwitchResponse
         }
         $results = $origResults;
         while (!empty($results->getPagination()?->getCursor())) {
-            $results = $this->getClient()->eventSubGetSubscriptions($this->getFilter(), throw: false, after: $results->getPagination()?->getCursor(), followPagination: false)->deserialize();
+            $results = $this->getClient()->eventSubGetSubscriptions($this->getFilter(), throw: false, after: $results->getPagination()?->getCursor(), followPagination: true)->deserialize();
             $origResults->setData(array_merge($origResults->getData(), $results->getData()));
             $origResults->setPagination($results->getPagination());
-            $origResults->setTotal($origResults->getTotal() + $results->getTotal());
         }
         return $origResults;
-    }
-
-    /**
-     * @return EventSubStatus|EventSubSubscriptionTypes|null
-     */
-    protected function getFilter()
-    {
-        if (empty($this->getExtraParams())) {
-            return null;
-        }
-        if (!array_key_exists('filter', $this->getExtraParams())) {
-            return null;
-        }
-        return $this->getExtraParams()['filter'];
     }
 
     /**
@@ -90,6 +74,20 @@ class TwitchEventSubGetSubscriptionsResponse extends TwitchResponse
             return null;
         }
         return $this->getExtraParams()['client'];
+    }
+
+    /**
+     * @return EventSubStatus|EventSubSubscriptionTypes|null
+     */
+    protected function getFilter()
+    {
+        if (empty($this->getExtraParams())) {
+            return null;
+        }
+        if (!array_key_exists('filter', $this->getExtraParams())) {
+            return null;
+        }
+        return $this->getExtraParams()['filter'];
     }
 
     /**
