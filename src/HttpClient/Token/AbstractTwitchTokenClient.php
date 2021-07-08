@@ -12,6 +12,7 @@ use Bytes\ResponseBundle\HttpClient\Token\TokenRevokeInterface;
 use Bytes\ResponseBundle\HttpClient\Token\TokenValidateInterface;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Objects\Push;
+use Bytes\ResponseBundle\Token\Exceptions\TokenRevokeException;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\ResponseBundle\Token\Interfaces\TokenValidationResponseInterface;
 use Bytes\TwitchClientBundle\HttpClient\TwitchClientEndpoints;
@@ -20,6 +21,7 @@ use Bytes\TwitchResponseBundle\Objects\OAuth2\Validate;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use UnexpectedValueException;
 use function Symfony\Component\String\u;
 
 /**
@@ -105,16 +107,22 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
      * @return ClientResponseInterface
      *
      * @throws TransportExceptionInterface
+     * @throws UnexpectedValueException
      */
     public function revokeToken(AccessTokenInterface $token): ClientResponseInterface
     {
         $tokenString = static::normalizeAccessToken($token, false, 'The $token argument is required and cannot be empty.');
 
-        return $this->request($this->buildURL('oauth2/revoke'), options: ['query' => [
+        $response = $this->request($this->buildURL('oauth2/revoke'), options: ['query' => [
             'token' => $tokenString
         ]], method: HttpMethods::post(), onSuccessCallable: function ($self, $results) use ($token) {
             $this->dispatchTokenRevokedEvent($token);
-        })->onSuccessCallback();
+        });
+        if(!$response->isSuccess())
+        {
+            throw new TokenRevokeException($response->getResponse(), sprintf('Could not revoke token: %d', $response->getStatusCode()));
+        }
+        return $response->onSuccessCallback();
     }
 
     /**

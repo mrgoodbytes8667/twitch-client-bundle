@@ -6,6 +6,7 @@ use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
 use Bytes\ResponseBundle\Enums\TokenSource;
 use Bytes\ResponseBundle\Interfaces\ClientTokenResponseInterface;
 use Bytes\ResponseBundle\Test\AssertClientAnnotationsSameTrait;
+use Bytes\ResponseBundle\Token\Exceptions\TokenRevokeException;
 use Bytes\ResponseBundle\Token\Interfaces\AccessTokenInterface;
 use Bytes\ResponseBundle\Token\Interfaces\TokenValidationResponseInterface;
 use Bytes\Tests\Common\MockHttpClient\MockEmptyResponse;
@@ -104,9 +105,8 @@ class TwitchAppTokenClientTest extends TestHttpClientCase
     {
         $client = $this->setupClient(MockClient::requests(MockJsonResponse::make(['status' => Response::HTTP_BAD_REQUEST, 'message' => 'Invalid token'], Response::HTTP_BAD_REQUEST)));
 
+        $this->expectException(TokenRevokeException::class);
         $response = $client->revokeToken(Token::createFromAccessToken($this->faker->accessToken()));
-        $this->assertResponseStatusCodeSame($response, Response::HTTP_BAD_REQUEST);
-        $this->assertResponseHasContent($response);
     }
 
     /**
