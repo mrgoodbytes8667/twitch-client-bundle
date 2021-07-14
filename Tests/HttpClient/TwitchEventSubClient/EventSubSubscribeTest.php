@@ -9,6 +9,7 @@ use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
 use Bytes\ResponseBundle\Token\Exceptions\NoTokenException;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePreRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionGenerateCallbackEvent;
+use Bytes\TwitchClientBundle\Exception\EventSubSubscriptionException;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockJsonResponse;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
@@ -105,7 +106,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
      */
     public function testEventSubSubscribeClientNoEntity($type, $user, $callback, $extraConditions)
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(EventSubSubscriptionException::class);
         $this->expectExceptionMessage('Unable to save new subscription');
 
         $event = $this->createPreEvent($type, $user, $callback);

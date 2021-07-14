@@ -18,6 +18,7 @@ use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePostRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionCreatePreRequestEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionDeleteEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionGenerateCallbackEvent;
+use Bytes\TwitchClientBundle\Exception\EventSubSubscriptionException;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchEventSubGetSubscriptionsResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchResponseBundle\Enums\EventSubStatus;
@@ -80,6 +81,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
      * @return ClientResponseInterface
      * @throws TransportExceptionInterface
      * @throws NoTokenException
+     * @throws EventSubSubscriptionException
      */
     public function eventSubSubscribe(EventSubSubscriptionTypes $type, UserInterface $stream, $callback = null, $extraConditions = []): ClientResponseInterface
     {
@@ -115,12 +117,9 @@ class TwitchEventSubClient extends AbstractTwitchClient
         $json = $this->serializer->serialize($create, 'json', [AbstractObjectNormalizer::SKIP_NULL_VALUES => true]);
         $params['body'] = $json;
 
-        /**
-         *
-         */
         $event = $this->dispatchEventSubSubscriptionCreatePreRequestEvent($type, $stream, $url);
         if (!$event->hasEntity()) {
-            throw new Exception('Unable to save new subscription');
+            throw new EventSubSubscriptionException('Unable to save new subscription', subscriptionType: $type, user: $stream, callback: $url, id: $event->getId(), status: $event->getStatus(), createdAt: $event->getCreatedAt());
         }
         return $this->jsonRequest(url: 'eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class,
             options: $params, method: HttpMethods::post(), onSuccessCallable: function ($self, $subscriptions) {
@@ -147,6 +146,8 @@ class TwitchEventSubClient extends AbstractTwitchClient
      * @param UserInterface $stream
      * @param string $callback
      * @return EventSubSubscriptionCreatePreRequestEvent
+     *
+     * @throws EventSubSubscriptionException
      */
     protected function dispatchEventSubSubscriptionCreatePreRequestEvent(EventSubSubscriptionTypes $subscriptionType, UserInterface $stream, string $callback)
     {
