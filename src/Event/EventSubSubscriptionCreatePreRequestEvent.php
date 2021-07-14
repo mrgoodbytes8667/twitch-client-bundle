@@ -13,8 +13,6 @@ use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
  */
 class EventSubSubscriptionCreatePreRequestEvent extends AbstractEventSubSubscriptionEvent
 {
-    private $entity;
-
     /**
      * @param EventSubSubscriptionTypes $subscriptionType
      * @param UserInterface $stream
@@ -29,30 +27,5 @@ class EventSubSubscriptionCreatePreRequestEvent extends AbstractEventSubSubscrip
         $static->setCallback($callback);
 
         return $static;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getEntity()
-    {
-        return $this->entity;
-    }
-
-    /**
-     * @param $entity
-     * @return $this
-     */
-    public function setEntity($entity): self
-    {
-        $this->entity = $entity;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasEntity(): bool {
-        return !is_null($this->entity);
     }
 }

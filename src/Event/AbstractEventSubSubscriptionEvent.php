@@ -15,6 +15,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 abstract class AbstractEventSubSubscriptionEvent extends Event
 {
+    private $entity;
+
     /**
      * AbstractEventSubSubscriptionEvent constructor.
      * @param EventSubSubscriptionTypes|null $subscriptionType
@@ -154,6 +156,31 @@ abstract class AbstractEventSubSubscriptionEvent extends Event
         return $static;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+
+    /**
+     * @param $entity
+     * @return $this
+     */
+    public function setEntity($entity): self
+    {
+        $this->entity = $entity;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasEntity(): bool {
+        return !is_null($this->entity);
+    }
+
 //    /**
 //     * @param Stream $stream
 //     * @param string $type = NotificationTypeEnum::all()[$any]
@@ -165,6 +192,4 @@ abstract class AbstractEventSubSubscriptionEvent extends Event
 //    {
 //        return new self($stream, $type, $notificationTime);
 //    }
-
-
 }
