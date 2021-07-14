@@ -20,6 +20,7 @@ use Bytes\TwitchClientBundle\Event\EventSubSubscriptionDeleteEvent;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionGenerateCallbackEvent;
 use Bytes\TwitchClientBundle\Exception\EventSubSubscriptionException;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchEventSubGetSubscriptionsResponse;
+use Bytes\TwitchClientBundle\HttpClient\Response\TwitchEventSubSubscribeResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchResponseBundle\Enums\EventSubStatus;
 use Bytes\TwitchResponseBundle\Enums\EventSubSubscriptionTypes;
@@ -78,7 +79,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
      * @param UserInterface $stream
      * @param null $callback When null, triggers an EventSubSubscriptionGenerateCallbackEvent event which will generate a full url. Add your own listener/subscriber to add extra parameters or completely replace the built in subscriber.
      * @param array $extraConditions Placeholder for future types
-     * @return ClientResponseInterface
+     * @return TwitchEventSubSubscribeResponse|ClientResponseInterface
      * @throws TransportExceptionInterface
      * @throws NoTokenException
      * @throws EventSubSubscriptionException
@@ -122,13 +123,14 @@ class TwitchEventSubClient extends AbstractTwitchClient
             throw new EventSubSubscriptionException('Unable to save new subscription', subscriptionType: $type, user: $stream, callback: $url, id: $event->getId(), status: $event->getStatus(), createdAt: $event->getCreatedAt());
         }
         return $this->jsonRequest(url: 'eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class,
-            options: $params, method: HttpMethods::post(), onSuccessCallable: function ($self, $subscriptions) {
+            options: $params, method: HttpMethods::post(), responseClass: TwitchEventSubSubscribeResponse::class,
+            onSuccessCallable: function ($self, $subscriptions) {
                 /** @var TwitchResponse $self */
                 if (array_key_exists('user', $self->getExtraParams())) {
                     $user = $self->getExtraParams()['user'];
                 }
                 $this->dispatchEventSubSubscriptionCreatePostRequestEvent($subscriptions->getSubscription(), $user);
-            }, params: ['user' => $stream]);
+            }, params: ['user' => $stream, 'url' => $url]);
     }
 
     /**
@@ -172,7 +174,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
      * @param string|null $before
      * @param string|null $after
      * @param bool $followPagination
-     * @return ClientResponseInterface
+     * @return TwitchEventSubGetSubscriptionsResponse|ClientResponseInterface
      * @throws NoTokenException
      * @throws TransportExceptionInterface
      *
