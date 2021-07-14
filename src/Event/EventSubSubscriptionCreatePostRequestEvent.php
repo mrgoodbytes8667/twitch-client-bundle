@@ -18,12 +18,12 @@ class EventSubSubscriptionCreatePostRequestEvent extends AbstractEventSubSubscri
      * @param EventSubSubscriptionTypes $subscriptionType
      * @param UserInterface $stream
      * @param string $callback
-     * @param string $id
-     * @param string $status
-     * @param DateTimeInterface $createdAt
+     * @param string|null $id
+     * @param string|null $status
+     * @param DateTimeInterface|null $createdAt
      * @return static
      */
-    public static function make(EventSubSubscriptionTypes $subscriptionType, UserInterface $stream, string $callback, string $id, string $status, DateTimeInterface $createdAt): static
+    public static function make(EventSubSubscriptionTypes $subscriptionType, UserInterface $stream, string $callback, ?string $id, ?string $status, ?DateTimeInterface $createdAt): static
     {
         $static = new static();
         $static->setSubscriptionType($subscriptionType);
