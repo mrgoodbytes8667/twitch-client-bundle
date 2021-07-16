@@ -78,6 +78,20 @@ class EventSubSubscriptionGenerateCallbackEventTest extends TestCase
     /**
      *
      */
+    public function testGetSetAddType()
+    {
+        $event = new EventSubSubscriptionGenerateCallbackEvent();
+        $this->assertTrue($event->getAddType());
+
+        $this->assertInstanceOf(EventSubSubscriptionGenerateCallbackEvent::class, $event->setAddType(false));
+        $this->assertFalse($event->getAddType());
+        $this->assertInstanceOf(EventSubSubscriptionGenerateCallbackEvent::class, $event->setAddType(true));
+        $this->assertTrue($event->getAddType());
+    }
+
+    /**
+     *
+     */
     public function testGetSetUserKey()
     {
         $event = new EventSubSubscriptionGenerateCallbackEvent();
