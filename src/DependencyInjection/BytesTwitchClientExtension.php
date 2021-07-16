@@ -96,12 +96,13 @@ class BytesTwitchClientExtension extends Extension implements ExtensionInterface
 
         $definition = $container->getDefinition('bytes_twitch_client.event.generate_callback');
         $definition->replaceArgument(0, $config['eventsub_callback']['method'] === 'route_name' ? $config['eventsub_callback']['route_name'] : '');//string|null $callbackName
-        $definition->replaceArgument(1, $config['eventsub_callback']['type_key']);//string $typeKey
-        $definition->replaceArgument(2, $config['eventsub_callback']['user_key']);//string $userKey
-        $definition->replaceArgument(3, $config['eventsub_callback']['add_login']);//bool $addLogin
-        $definition->replaceArgument(4, $config['eventsub_callback']['login_key']);//string $loginKey
-        $definition->replaceArgument(5, null);//int $referenceType
-        $definition->replaceArgument(6, $config['eventsub_callback']['method'] === 'url' ? $config['eventsub_callback']['url'] : '');//string $url
+        $definition->replaceArgument(1, $config['eventsub_callback']['add_type']);//bool $addType
+        $definition->replaceArgument(2, $config['eventsub_callback']['type_key']);//string $typeKey
+        $definition->replaceArgument(3, $config['eventsub_callback']['user_key']);//string $userKey
+        $definition->replaceArgument(4, $config['eventsub_callback']['add_login']);//bool $addLogin
+        $definition->replaceArgument(5, $config['eventsub_callback']['login_key']);//string $loginKey
+        $definition->replaceArgument(6, null);//int $referenceType
+        $definition->replaceArgument(7, $config['eventsub_callback']['method'] === 'url' ? $config['eventsub_callback']['url'] : '');//string $url
     }
 
     /**

@@ -29,6 +29,7 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
     /**
      * EventSubSubscriptionGenerateCallbackEvent constructor.
      * @param string|null $callbackName
+     * @param bool $addType
      * @param string $typeKey
      * @param string $userKey
      * @param bool $addLogin
@@ -38,7 +39,7 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
      * @param EventSubSubscriptionTypes|null $type
      * @param UserInterface|null $user
      */
-    public function __construct(private ?string $callbackName = null, private string $typeKey = 'type', private string $userKey = 'stream', private bool $addLogin = true, private string $loginKey = 'login', private ?int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL, private ?string $url = null, private ?EventSubSubscriptionTypes $type = null, private ?UserInterface $user = null)
+    public function __construct(private ?string $callbackName = null, private bool $addType = true, private string $typeKey = 'type', private string $userKey = 'stream', private bool $addLogin = true, private string $loginKey = 'login', private ?int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL, private ?string $url = null, private ?EventSubSubscriptionTypes $type = null, private ?UserInterface $user = null)
     {
         if (!empty($url)) {
             $this->generationSkipped = true;
@@ -53,6 +54,7 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
      * @param string $callbackName
      * @param EventSubSubscriptionTypes $type
      * @param UserInterface $user
+     * @param bool $addType
      * @param string $typeKey
      * @param string $userKey
      * @param bool $addLogin
@@ -61,16 +63,17 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
      * @param int $referenceType
      * @return static
      */
-    public static function new(string $callbackName, EventSubSubscriptionTypes $type, UserInterface $user, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): static
+    public static function new(string $callbackName, EventSubSubscriptionTypes $type, UserInterface $user, bool $addType = true, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): static
     {
-        $static = new static(callbackName: $callbackName, typeKey: $typeKey, userKey: $userKey, addLogin: $addLogin, loginKey: $loginKey, referenceType: $referenceType, type: $type, user: $user);
-        $static->populate($type, $user, $typeKey, $userKey, $addLogin, $loginKey, $extraParameters);
+        $static = new static(callbackName: $callbackName, addType: $addType, typeKey: $typeKey, userKey: $userKey, addLogin: $addLogin, loginKey: $loginKey, referenceType: $referenceType, type: $type, user: $user);
+        $static->populate(type: $type, user: $user, addType: $addType, typeKey: $typeKey, userKey: $userKey, addLogin: $addLogin, loginKey: $loginKey, extraParameters: $extraParameters);
         return $static;
     }
 
     /**
      * @param EventSubSubscriptionTypes $type
      * @param UserInterface $user
+     * @param bool $addType
      * @param string $typeKey
      * @param string $userKey
      * @param bool $addLogin
@@ -78,11 +81,15 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
      * @param array $extraParameters
      * @return $this
      */
-    public function populate(EventSubSubscriptionTypes $type, UserInterface $user, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = []): self
+    public function populate(EventSubSubscriptionTypes $type, UserInterface $user, bool $addType = true, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = []): self
     {
         $parameters = Push::create();
-        $parameters = $parameters->push(value: $type->value, key: $typeKey)
-            ->push(value: $user->getUserId(), key: $userKey);
+
+        if ($addType) {
+            $parameters = $parameters->push(value: $type->value, key: $typeKey);
+        }
+
+        $parameters = $parameters->push(value: $user->getUserId(), key: $userKey);
 
         if ($addLogin) {
             $parameters = $parameters->push(value: $user->getLogin(), key: $loginKey);
@@ -108,7 +115,7 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
         $static = clone $event;
         $static->setType($type)
             ->setUser($user)
-            ->populate($type, $user, $static->getTypeKey(), $static->getUserKey(), $static->getAddLogin(), $static->getLoginKey());
+            ->populate(type: $type, user: $user, addType: $static->getAddType(), typeKey: $static->getTypeKey(), userKey: $static->getUserKey(), addLogin: $static->getAddLogin(), loginKey: $static->getLoginKey());
         return $static;
     }
 
@@ -162,6 +169,24 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
     public function getLoginKey(): string
     {
         return $this->loginKey;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAddType(): bool
+    {
+        return $this->addType;
+    }
+
+    /**
+     * @param bool $addType
+     * @return $this
+     */
+    public function setAddType(bool $addType): self
+    {
+        $this->addType = $addType;
+        return $this;
     }
 
     /**

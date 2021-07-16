@@ -229,12 +229,13 @@ return static function (ContainerConfigurator $container) {
     $services->set('bytes_twitch_client.event.generate_callback', EventSubSubscriptionGenerateCallbackEvent::class)
         ->args([
             '', //string|null $callbackName
-                '', //string $typeKey
-                '', //string $userKey
-                '', //bool $addLogin
-                '', //string $loginKey
-                '', //int $referenceType
-                '', //string $url
+            '', // bool $addType
+            '', //string $typeKey
+            '', //string $userKey
+            '', //bool $addLogin
+            '', //string $loginKey
+            '', //int $referenceType
+            '', //string $url
         ])
         ->alias(EventSubSubscriptionGenerateCallbackEvent::class, 'bytes_twitch_client.event.generate_callback')
         ->public();
