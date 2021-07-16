@@ -31,13 +31,14 @@ class EventSubSubscriptionGenerateCallbackEventTest extends TestCase
             ->willReturn('123');
         $user->method('getLogin')
             ->willReturn('abc');
+        $addType = true;
         $typeKey = $this->faker->unique()->word();
         $userKey = $this->faker->unique()->word();
         $addLogin = true;
         $loginKey = $this->faker->unique()->word();
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH;
         $extraParameters = ['q' => 'r'];
-        $event = EventSubSubscriptionGenerateCallbackEvent::new($callbackName, $type, $user, $typeKey, $userKey, $addLogin, $loginKey, $extraParameters, $referenceType);
+        $event = EventSubSubscriptionGenerateCallbackEvent::new(callbackName: $callbackName, type: $type, user: $user, addType: $addType, typeKey: $typeKey, userKey: $userKey, addLogin: $addLogin, loginKey: $loginKey, extraParameters: $extraParameters, referenceType: $referenceType);
 
         $this->assertInstanceOf(EventSubSubscriptionGenerateCallbackEvent::class, $event);
         $this->assertCount(4, $event->getParameters());
