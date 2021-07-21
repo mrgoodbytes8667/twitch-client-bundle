@@ -108,14 +108,25 @@ class GetAllStreamTagsTest extends TestTwitchClientCase
     public function testGetAllStreamTagsWithTagIdsResponseRecursiveSuccess($tagIds)
     {
         $client = $this->setupClient(MockClient::requests(
-            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-1-success.json'),
-            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-2-success.json'),
-            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-3-success.json')));
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-1-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-2-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-3-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-4-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-5-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-6-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-7-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-8-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-9-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-10-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-11-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-12-success.json')));
 
         /** @var TagsResponse $tags */
-        $tags = $client->getAllStreamTags(ids: $tagIds, limit: 300, followPagination: true)->deserialize();
-        $this->assertCount(300, $tags->getData());
+        $tags = $client->getAllStreamTags(ids: $tagIds, limit: 1006, followPagination: true)->deserialize();
+        $this->assertCount(1006, $tags->getData());
         $this->assertEmpty($tags->getPagination());
+
+
     }
 
     /**

@@ -273,8 +273,14 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
         }
 
         return $this->request(url: $url->toString(), caller: __METHOD__, type: TagsResponse::class,
-            responseClass: TwitchAllStreamTagsResponse::class,
-            params: ['ids' => $ids, 'followPagination' => $followPagination, 'client' => $this, 'after' => $after, 'limit' => $handoffLimit - $limit]);
+            responseClass: $followPagination ? TwitchAllStreamTagsResponse::class : null,
+            params: [
+                'ids' => $ids,
+                'followPagination' => $followPagination,
+                'client' => $this,
+                'after' => $after,
+                'limit' => $handoffLimit
+            ]);
     }
 
     /**

@@ -38,8 +38,8 @@ class TwitchAllStreamTagsResponse extends TwitchResponse
             return $origResults;
         }
         $results = $origResults;
-        while (!empty($results->getPagination()?->getCursor())) {
-            $results = $this->getClient()->getAllStreamTags(ids: $this->getIds(), limit: $this->getLimit(), throw: false, after: $results->getPagination()?->getCursor(), followPagination: $this->getLimit() > 0)->deserialize();
+        while (!empty($results->getPagination()?->getCursor()) && count($origResults->getData()) <= $this->getLimit()) {
+            $results = $this->getClient()->getAllStreamTags(ids: $this->getIds(), limit: $this->getLimit(), throw: false, after: $results->getPagination()?->getCursor(), followPagination: false)->deserialize();
             $origResults->setData(array_merge($origResults->getData(), $results->getData()));
             $origResults->setPagination($results->getPagination());
         }
