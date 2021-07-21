@@ -86,13 +86,22 @@ class GetAllStreamTagsTest extends TestTwitchClientCase
     public function testGetAllStreamTagsResponseRecursiveSuccess()
     {
         $client = $this->setupClient(MockClient::requests(
-            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-1-success.json'),
-            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-2-success.json'),
-            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-3-success.json')));
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-1-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-2-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-3-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-4-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-5-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-6-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-7-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-8-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-9-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-10-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-11-success.json'),
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-12-success.json')));
 
         /** @var TagsResponse $tags */
-        $tags = $client->getAllStreamTags(limit: 300, followPagination: true)->deserialize();
-        $this->assertCount(300, $tags->getData());
+        $tags = $client->getAllStreamTags(limit: 1006, followPagination: true)->deserialize();
+        $this->assertCount(1006, $tags->getData());
         $this->assertEmpty($tags->getPagination());
     }
 
@@ -125,8 +134,6 @@ class GetAllStreamTagsTest extends TestTwitchClientCase
         $tags = $client->getAllStreamTags(ids: $tagIds, limit: 1006, followPagination: true)->deserialize();
         $this->assertCount(1006, $tags->getData());
         $this->assertEmpty($tags->getPagination());
-
-
     }
 
     /**
@@ -143,6 +150,84 @@ class GetAllStreamTagsTest extends TestTwitchClientCase
 
         /** @var TagsResponse $tags */
         $tags = $client->getAllStreamTags(followPagination: false)->deserialize();
+        $this->assertCount(100, $tags->getData());
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws NoTokenException
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function testGetAllStreamTagsResponseNegativeLimit()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $client = $this->setupClient(MockClient::requests(
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-1-success.json')));
+
+        /** @var TagsResponse $tags */
+        $tags = $client->getAllStreamTags(limit: -1)->deserialize();
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws NoTokenException
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function testGetAllStreamTagsResponseNegativeLimitNoThrow()
+    {
+        $client = $this->setupClient(MockClient::requests(
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-1-success.json')));
+
+        /** @var TagsResponse $tags */
+        $tags = $client->getAllStreamTags(limit: -1, throw: false, followPagination: false)->deserialize();
+        $this->assertCount(100, $tags->getData());
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws NoTokenException
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function testGetAllStreamTagsResponseTooManyTags()
+    {
+        $ids = [];
+        foreach (range(1, 101) as $index)
+        {
+            $ids[] = $this->faker->uuid();
+        }
+        $this->expectException(\InvalidArgumentException::class);
+        $client = $this->setupClient(MockClient::requests(
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-1-success.json')));
+
+        $client->getAllStreamTags(ids: $ids)->deserialize();
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws NoTokenException
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function testGetAllStreamTagsResponseTooManyTagsNoThrow()
+    {
+        $ids = [];
+        foreach (range(1, 101) as $index)
+        {
+            $ids[] = $this->faker->uuid();
+        }
+
+        $client = $this->setupClient(MockClient::requests(
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-1-success.json')));
+
+        /** @var TagsResponse $tags */
+        $tags = $client->getAllStreamTags(ids: $ids, throw: false)->deserialize();
         $this->assertCount(100, $tags->getData());
     }
 
