@@ -34,13 +34,13 @@ class GetAllStreamTagsTest extends TestTwitchClientCase
     public function testGetAllStreamTagsClientSuccess()
     {
         $client = $this->setupClient(MockClient::requests(
-            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-1-success.json')));
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-1-success.json')));
 
         $response = $client->getAllStreamTags();
         $this->assertResponseIsSuccessful($response);
         $this->assertResponseStatusCodeSame($response, Response::HTTP_OK);
         $this->assertResponseHasContent($response);
-        $this->assertResponseContentSame($response, Fixture::getFixturesData('HttpClient/get-all-stream-tags-1-success.json'));
+        $this->assertResponseContentSame($response, Fixture::getFixturesData('HttpClient/get-all-stream-tags-generated-1-success.json'));
     }
 
     /**
@@ -55,13 +55,13 @@ class GetAllStreamTagsTest extends TestTwitchClientCase
     public function testGetAllStreamTagsWithTagIdsClientSuccess($tagIds)
     {
         $client = $this->setupClient(MockClient::requests(
-            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-1-success.json')));
+            MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-1-success.json')));
 
         $response = $client->getAllStreamTags(ids: $tagIds);
         $this->assertResponseIsSuccessful($response);
         $this->assertResponseStatusCodeSame($response, Response::HTTP_OK);
         $this->assertResponseHasContent($response);
-        $this->assertResponseContentSame($response, Fixture::getFixturesData('HttpClient/get-all-stream-tags-1-success.json'));
+        $this->assertResponseContentSame($response, Fixture::getFixturesData('HttpClient/get-all-stream-tags-generated-1-success.json'));
     }
 
     /**
