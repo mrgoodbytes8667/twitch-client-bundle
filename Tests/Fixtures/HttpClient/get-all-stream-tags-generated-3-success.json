@@ -6401,7 +6401,5 @@
             }
         }
     ],
-    "pagination": {
-        "cursor": "621800df-ec4a-34b6-8a0b-2ed65a7df8f2"
-    }
+    "pagination": {}
 }

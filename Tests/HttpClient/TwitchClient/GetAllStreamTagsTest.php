@@ -144,7 +144,6 @@ class GetAllStreamTagsTest extends TestTwitchClientCase
         /** @var TagsResponse $tags */
         $tags = $client->getAllStreamTags(followPagination: false)->deserialize();
         $this->assertCount(100, $tags->getData());
-        $this->assertNull($tags->getPagination());
     }
 
 }
