@@ -11,6 +11,7 @@ use Bytes\ResponseBundle\Objects\IdNormalizer;
 use Bytes\ResponseBundle\Objects\Push;
 use Bytes\ResponseBundle\Token\Exceptions\NoTokenException;
 use Bytes\ResponseBundle\Validator\ValidatorTrait;
+use Bytes\TwitchClientBundle\HttpClient\Response\TwitchAllStreamTagsResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchFollowersResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchResponse;
 use Bytes\TwitchClientBundle\HttpClient\Response\TwitchTopGamesResponse;
@@ -18,6 +19,8 @@ use Bytes\TwitchClientBundle\HttpClient\Response\TwitchUserResponse;
 use Bytes\TwitchClientBundle\HttpClient\TwitchClientEndpoints;
 use Bytes\TwitchResponseBundle\Objects\Follows\FollowersResponse;
 use Bytes\TwitchResponseBundle\Objects\Games\GamesResponse;
+use Bytes\TwitchResponseBundle\Objects\Tags\TagsResponse;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use ReflectionMethod;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -216,6 +219,62 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
             options: ['query' => $query->value()], responseClass: TwitchTopGamesResponse::class,
             params: ['followPagination' => $followPagination, 'client' => $this, 'before' => $before,
                 'after' => $after, 'limit' => $handoffLimit - $limit]);
+    }
+
+    /**
+     * Get All Stream Tags
+     * Gets the list of all stream tags defined by Twitch, optionally filtered by tag ID(s).
+     * @param string|array|null $ids ID of a tag. Multiple IDs can be specified. If provided, only the specified tag(s) is(are) returned.
+     * @param int $limit
+     * @param bool $throw
+     * @param string|null $after
+     * @param bool $followPagination
+     *
+     * @return ClientResponseInterface
+     *
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     *
+     * @link https://dev.twitch.tv/docs/api/reference#get-all-stream-tags
+     */
+    public function getAllStreamTags(string|array|null $ids = null, int $limit = 20, bool $throw = true, ?string $after = null, bool $followPagination = true): ClientResponseInterface
+    {
+        /** @var string[] $ids */
+        $ids = Arr::wrap($ids ?? []);
+        if ($limit < 1) {
+            if ($throw) {
+                throw new InvalidArgumentException('The "limit" argument must be greater than or equal to 1.');
+            }
+            $limit = 1;
+        }
+        if ($throw) {
+            if (count($ids) > 100) {
+                throw new InvalidArgumentException('There can only be a maximum of 100 tag_ids.');
+            }
+        }
+        $handoffLimit = $limit;
+        if ($limit > 100) {
+            $limit = 100;
+        }
+
+        $query = Push::createPush(value: $limit, key: 'first')
+            ->push($after, 'after');
+
+        $url = u('https://api.twitch.tv/helix/tags/streams?')->append(http_build_query($query->value()));
+        $counter = 0;
+        foreach (Arr::wrap($ids) as $id) {
+            if ($counter < 100) {
+                $id = IdNormalizer::normalizeIdArgument($id, 'The "id" argument is required.');
+                $url = $url->ensureEnd('&')->append('tag_id=' . $id);
+                $counter++;
+            } else {
+                break;
+            }
+        }
+
+        return $this->request(url: $url->toString(), caller: __METHOD__, type: TagsResponse::class,
+            responseClass: TwitchAllStreamTagsResponse::class,
+            params: ['ids' => $ids, 'followPagination' => $followPagination, 'client' => $this, 'after' => $after, 'limit' => $handoffLimit - $limit]);
     }
 
     /**
