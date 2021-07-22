@@ -19,6 +19,7 @@ use Bytes\TwitchClientBundle\HttpClient\Response\TwitchUserResponse;
 use Bytes\TwitchClientBundle\HttpClient\TwitchClientEndpoints;
 use Bytes\TwitchResponseBundle\Objects\Follows\FollowersResponse;
 use Bytes\TwitchResponseBundle\Objects\Games\GamesResponse;
+use Bytes\TwitchResponseBundle\Objects\Tags\Tag;
 use Bytes\TwitchResponseBundle\Objects\Tags\TagsResponse;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
@@ -281,6 +282,21 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
                 'after' => $after,
                 'limit' => $handoffLimit
             ]);
+    }
+
+    /**
+     * Get Stream Tags
+     * Gets the list of current stream tags that have been set for a channel.
+     * @param string $id User ID of the channel to get tags.
+     * @return ClientResponseInterface
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     * @link https://dev.twitch.tv/docs/api/reference#get-stream-tags
+     */
+    public function getStreamTags(string $id): ClientResponseInterface
+    {
+        return $this->request(url: 'streams/tags', caller: __METHOD__, type: '\Bytes\TwitchResponseBundle\Objects\Tags\Tag[]',
+            options: ['query' => ['broadcaster_id' => $id]], context: [UnwrappingDenormalizer::UNWRAP_PATH => '[data]']);
     }
 
     /**
