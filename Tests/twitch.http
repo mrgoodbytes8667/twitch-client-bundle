@@ -1,0 +1,11 @@
+### GET Stream tags for offline user
+GET https://api.twitch.tv/helix/streams/tags?broadcaster_id=1
+Accept: application/json
+Client-ID: {{client_id}}
+Authorization: Bearer {{access_token}}
+
+### GET Stream tags for online user
+GET https://api.twitch.tv/helix/streams/tags?broadcaster_id=1
+Accept: application/json
+Client-ID: {{client_id}}
+Authorization: Bearer {{access_token}}
