@@ -7,9 +7,11 @@ namespace Bytes\TwitchClientBundle\HttpClient\Api;
 use Bytes\ResponseBundle\Annotations\Client;
 use Bytes\ResponseBundle\Enums\HttpMethods;
 use Bytes\ResponseBundle\Interfaces\ClientResponseInterface;
+use Bytes\ResponseBundle\Interfaces\UserIdInterface;
 use Bytes\ResponseBundle\Objects\IdNormalizer;
 use Bytes\ResponseBundle\Token\Exceptions\NoTokenException;
 use Bytes\TwitchResponseBundle\Objects\Streams\StreamsResponse;
+use Bytes\TwitchResponseBundle\Objects\Videos\VideosResponse;
 use InvalidArgumentException;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use function Symfony\Component\String\u;
@@ -30,7 +32,6 @@ class TwitchClient extends AbstractTwitchClient
     {
         return 'TWITCH';
     }
-
 
     /**
      * Get Streams
@@ -97,5 +98,33 @@ class TwitchClient extends AbstractTwitchClient
         $url = $url->append('first=')->append($first)->toString();
         return $this->request(url: $url, caller: __METHOD__,
             type: StreamsResponse::class, method: HttpMethods::get());
+    }
+
+    /**
+     * Get Videos
+     * Gets video information by one or more video IDs, user ID, or game ID. For lookup by user or game, several filters
+     * are available that can be specified as query parameters.
+     * @param UserIdInterface|string|null $userId
+     * @param int $limit
+     *
+     * @return ClientResponseInterface
+     *
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     *
+     * @link https://dev.twitch.tv/docs/api/reference#get-videos
+     *
+     * @todo Pagination
+     * @todo Finish implementation
+     */
+    public function getVideos(UserIdInterface|string|null $userId, int $limit = 20): ClientResponseInterface
+    {
+        $userId = IdNormalizer::normalizeIdArgument($userId, 'The userId argument is required and cannot be blank');
+        return $this->request(url: 'videos', caller: __METHOD__, type: VideosResponse::class, options: [
+            'query' => [
+                'user_id' => $userId,
+                'first' => $limit
+            ]
+        ], method: HttpMethods::get());
     }
 }

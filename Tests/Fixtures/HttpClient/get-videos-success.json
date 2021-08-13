@@ -1,0 +1,102 @@
+{
+  "data": [
+    {
+      "videoId": "162901999459",
+      "streamId": "904740397508",
+      "userId": "699002552466",
+      "userLogin": "goodwin.daija",
+      "userName": "klocko.hosea",
+      "title": "Repellendus quis autem excepturi nihil aliquid porro recusandae.",
+      "description": "Reprehenderit asperiores placeat repellendus in voluptates.",
+      "createdAt": "2021-08-06T14:17:05.000-05:00",
+      "publishedAt": "2021-08-06T14:17:05.000-05:00",
+      "url": "https://wolf.net/aut-dicta-voluptas-illo-tempora.html",
+      "thumbnailUrl": "https://via.placeholder.com/640x480.png/00ff88?text=cum",
+      "viewable": "public",
+      "language": "en",
+      "type": "archive",
+      "duration": "3m21s",
+      "muted_segments": null
+    },
+    {
+      "videoId": "418617958331",
+      "streamId": "684437763069",
+      "userId": "426209258463",
+      "userLogin": "jsimonis",
+      "userName": "gleichner.eden",
+      "title": "Sit mollitia id quis debitis ex ea quas ea.",
+      "description": "Explicabo ratione aut ipsa rem quia in.",
+      "createdAt": "2021-08-06T14:17:05.000-05:00",
+      "publishedAt": "2021-08-06T14:17:05.000-05:00",
+      "url": "http://www.stoltenberg.com/velit-tenetur-perferendis-perspiciatis.html",
+      "thumbnailUrl": "https://via.placeholder.com/640x480.png/0055ee?text=voluptatem",
+      "viewable": "public",
+      "language": "so_DJ",
+      "type": "archive",
+      "duration": "5h1m43s",
+      "muted_segments": null
+    },
+    {
+      "videoId": "83908666055",
+      "streamId": "217192306071",
+      "userId": "96095972534",
+      "userLogin": "doyle.harris",
+      "userName": "joesph52",
+      "title": "Dolorem officiis ut laudantium id sit et consectetur exercitationem.",
+      "description": "Omnis qui vel ex et magnam quasi.",
+      "createdAt": "2021-08-06T14:17:05.000-05:00",
+      "publishedAt": "2021-08-06T14:17:05.000-05:00",
+      "url": "http://funk.com/recusandae-adipisci-voluptatem-illo-eligendi-ut-cum.html",
+      "thumbnailUrl": "https://via.placeholder.com/640x480.png/006600?text=ratione",
+      "viewable": "private",
+      "language": "en",
+      "type": "archive",
+      "duration": "1m1s",
+      "muted_segments": null
+    },
+    {
+      "videoId": "648688554573",
+      "streamId": "859602823781",
+      "userId": "471845506648",
+      "userLogin": "jaylin04",
+      "userName": "mack87",
+      "title": "Maxime et fugiat tempore assumenda.",
+      "description": "Qui quos sint numquam et accusamus.",
+      "createdAt": "2021-08-06T14:17:05.000-05:00",
+      "publishedAt": "2021-08-06T14:17:05.000-05:00",
+      "url": "http://www.stoltenberg.com/numquam-et-et-excepturi",
+      "thumbnailUrl": "https://via.placeholder.com/640x480.png/00bbdd?text=iusto",
+      "viewable": "private",
+      "language": "en",
+      "type": "upload",
+      "duration": "7h59m43s",
+      "muted_segments": [
+        {
+          "duration": 30,
+          "offset": 120
+        }
+      ]
+    },
+    {
+      "videoId": "335227638744",
+      "streamId": "704528540309",
+      "userId": "380861994817",
+      "userLogin": "genevieve99",
+      "userName": "wolf.orion",
+      "title": "Voluptatibus ut animi eaque est est fugit qui.",
+      "description": "Officia maxime voluptatum exercitationem commodi tempore.",
+      "createdAt": "2021-08-06T14:17:05.000-05:00",
+      "publishedAt": "2021-08-06T14:17:05.000-05:00",
+      "url": "https://www.kunde.com/distinctio-ratione-sed-cum-voluptates",
+      "thumbnailUrl": "https://via.placeholder.com/640x480.png/00ff55?text=officiis",
+      "viewable": "private",
+      "language": "en",
+      "type": "archive",
+      "duration": "34m2s",
+      "muted_segments": null
+    }
+  ],
+  "pagination": {
+    "cursor": "YkKrBKXvkoxruy9G8uM9aSJHZSPTAp"
+  }
+}

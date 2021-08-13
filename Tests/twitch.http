@@ -9,3 +9,9 @@ GET https://api.twitch.tv/helix/streams/tags?broadcaster_id=1
 Accept: application/json
 Client-ID: {{client_id}}
 Authorization: Bearer {{access_token}}
+
+### GET Videos for user
+GET https://api.twitch.tv/helix/videos?user_id={{user_id}}&first=5
+Accept: application/json
+Client-ID: {{client_id}}
+Authorization: Bearer {{access_token}}
