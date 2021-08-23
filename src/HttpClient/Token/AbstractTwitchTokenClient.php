@@ -39,7 +39,7 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
      */
     public function __construct(HttpClientInterface $httpClient, EventDispatcherInterface $dispatcher, string $clientId, string $clientSecret, ?string $userAgent, bool $revokeOnRefresh, bool $fireRevokeOnRefresh, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
-        $headers = Push::createPush(value: $userAgent, key: 'User-Agent')->value();
+        $headers = Push::createPush(value: $userAgent, key: 'User-Agent')->toArray();
         parent::__construct($httpClient, $dispatcher, $userAgent, $revokeOnRefresh, $fireRevokeOnRefresh, array_merge_recursive([
             // the options defined as values apply only to the URLs matching
             // the regular expressions defined as keys
