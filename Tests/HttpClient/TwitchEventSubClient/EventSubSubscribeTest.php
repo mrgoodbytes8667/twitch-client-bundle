@@ -193,7 +193,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
     public function provideUnsupportedTypes()
     {
         foreach (EventSubSubscriptionTypes::getValues() as $value) {
-            $type = EventSubSubscriptionTypes::make($value);
+            $type = EventSubSubscriptionTypes::from($value);
             if (!in_array($type, self::getSupportedTypes())) {
                 yield ['type' => $type];
             }

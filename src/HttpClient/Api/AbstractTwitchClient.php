@@ -55,7 +55,7 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
      */
     public function __construct(HttpClientInterface $httpClient, EventDispatcherInterface $dispatcher, ?RetryStrategyInterface $strategy, string $clientId, string $clientSecret, ?string $userAgent, array $defaultOptionsByRegexp = [], string $defaultRegexp = null)
     {
-        $headers = Push::createPush(value: $userAgent, key: 'User-Agent')->value();
+        $headers = Push::createPush(value: $userAgent, key: 'User-Agent')->toArray();
         parent::__construct($httpClient, $dispatcher, $strategy, $clientId, $userAgent, array_merge_recursive([
             // the options defined as values apply only to the URLs matching
             // the regular expressions defined as keys
@@ -177,7 +177,7 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
             $query = $query->push($toId, 'to_id');
         }
 
-        $query = $query->value();
+        $query = $query->toArray();
 
         return $this->request(url: 'https://api.twitch.tv/helix/users/follows', caller: __METHOD__, type: FollowersResponse::class,
             options: ['query' => $query], responseClass: TwitchFollowersResponse::class,
@@ -217,7 +217,7 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
             ->push($after, 'after');
 
         return $this->request(url: 'https://api.twitch.tv/helix/games/top', caller: __METHOD__, type: GamesResponse::class,
-            options: ['query' => $query->value()], responseClass: TwitchTopGamesResponse::class,
+            options: ['query' => $query->toArray()], responseClass: TwitchTopGamesResponse::class,
             params: ['followPagination' => $followPagination, 'client' => $this, 'before' => $before,
                 'after' => $after, 'limit' => $handoffLimit - $limit]);
     }
@@ -261,7 +261,7 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
         $query = Push::createPush(value: $limit, key: 'first')
             ->push($after, 'after');
 
-        $url = u('https://api.twitch.tv/helix/tags/streams?')->append(http_build_query($query->value()));
+        $url = u('https://api.twitch.tv/helix/tags/streams?')->append(http_build_query($query->toArray()));
         $counter = 0;
         foreach (Arr::wrap($ids) as $id) {
             if ($counter < 100) {

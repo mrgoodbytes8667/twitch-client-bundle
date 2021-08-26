@@ -202,7 +202,7 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
      */
     public function getParameters(): array
     {
-        return $this->parameters?->value() ?? [];
+        return $this->parameters->toArray() ?? [];
     }
 
     /**

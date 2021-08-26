@@ -196,8 +196,8 @@ class TwitchEventSubClient extends AbstractTwitchClient
         $query = $query->push($before, 'before')
             ->push($after, 'after');
 
-        if(!empty($query->value())) {
-            $options['query'] = $query->value();
+        if(!empty($query->toArray())) {
+            $options['query'] = $query->toArray();
         }
         return $this->request(url: 'eventsub/subscriptions', caller: __METHOD__,
             type: Subscriptions::class, options: $options, method: HttpMethods::get(), responseClass: TwitchEventSubGetSubscriptionsResponse::class, params: ['followPagination' => $followPagination, 'client' => $this, 'before' => $before,

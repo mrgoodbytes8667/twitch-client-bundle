@@ -146,7 +146,7 @@ abstract class AbstractEventSubSubscriptionEvent extends Event
     public static function createFromSubscription(Subscription $subscription, ?UserInterface $user)
     {
         $static = new static();
-        $static->setSubscriptionType(EventSubSubscriptionTypes::make($subscription->getType()));
+        $static->setSubscriptionType(EventSubSubscriptionTypes::from($subscription->getType()));
         $static->setUser($user);
         $static->setCallback($subscription->getTransport()?->getCallback());
         $static->setId($subscription->getId());
