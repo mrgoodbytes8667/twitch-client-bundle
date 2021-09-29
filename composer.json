@@ -8,7 +8,7 @@
         "ext-json": "*",
         "doctrine/annotations": "^1.12",
         "doctrine/collections": "^1.6",
-        "mrgoodbytes8667/twitch-response-bundle": "^0.4.13",
+        "mrgoodbytes8667/twitch-response-bundle": "^0.5",
         "symfony/polyfill-uuid": "^1.20"
     },
     "require-dev": {
@@ -16,9 +16,9 @@
         "fakerphp/faker": "^1.13",
         "mrgoodbytes8667/test-common": ">=0.0.17",
         "mrgoodbytes8667/test-twitch-faker": ">=0.0.2",
-        "symfony/security-bundle": "^5.3",
+        "symfony/security-bundle": "^5.3 | ^6.0",
         "symfony/test-pack": "^1.0.8",
-        "symfony/var-dumper": "^5.3"
+        "symfony/var-dumper": "^5.3 | ^6.0"
     },
     "authors": [
         {
@@ -47,8 +47,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Bytes\\TwitchClientBundle\\": "src/",
-            "Bytes\\TwitchClientBundle\\Tests\\": "Tests/"
+            "Bytes\\TwitchClientBundle\\": "src"
         }
-    }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bytes\\TwitchClientBundle\\Tests\\": "Tests"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-symfony5.4": "0.3.x-dev"
+        }
+    },
+    "minimum-stability": "dev"
 }
