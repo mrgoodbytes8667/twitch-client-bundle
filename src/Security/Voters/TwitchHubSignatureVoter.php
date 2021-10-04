@@ -42,7 +42,7 @@ class TwitchHubSignatureVoter extends Voter
      *
      * @return bool True if the attribute and subject are supported, false otherwise
      */
-    protected function supports(string $attribute, $subject)
+    protected function supports(string $attribute, $subject): bool
     {
         if ($attribute !== self::ATTRIBUTE_EVENTSUB && $attribute !== self::ATTRIBUTE_WEBHOOK) {
             return false;
@@ -65,11 +65,13 @@ class TwitchHubSignatureVoter extends Voter
      * Perform a single access check operation on a given attribute, subject and token.
      * It is safe to assume that $attribute and $subject already passed the "supports()" method check.
      *
+     * @param string $attribute
      * @param Request $subject
+     * @param TokenInterface $token
      *
      * @return bool
      */
-    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token)
+    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
         if ($attribute === self::ATTRIBUTE_EVENTSUB) {
             $validator = $this->twitchSignatureLocator->get('EVENTSUB');
