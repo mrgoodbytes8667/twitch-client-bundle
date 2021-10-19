@@ -72,7 +72,7 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
 
     /**
      * @param EventSubSubscriptionTypes $type
-     * @param UserInterface $user
+     * @param UserInterface|null $user
      * @param bool $addType
      * @param string $typeKey
      * @param string $userKey
@@ -81,7 +81,7 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
      * @param array $extraParameters
      * @return $this
      */
-    public function populate(EventSubSubscriptionTypes $type, UserInterface $user, bool $addType = true, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = []): self
+    public function populate(EventSubSubscriptionTypes $type, ?UserInterface $user, bool $addType = true, string $typeKey = 'type', string $userKey = 'stream', bool $addLogin = true, string $loginKey = 'login', array $extraParameters = []): self
     {
         $parameters = Push::create();
 
@@ -89,10 +89,12 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
             $parameters = $parameters->push(value: $type->value, key: $typeKey);
         }
 
-        $parameters = $parameters->push(value: $user->getUserId(), key: $userKey);
+        if(!empty($user)) {
+            $parameters = $parameters->push(value: $user->getUserId(), key: $userKey);
 
-        if ($addLogin) {
-            $parameters = $parameters->push(value: $user->getLogin(), key: $loginKey);
+            if ($addLogin) {
+                $parameters = $parameters->push(value: $user->getLogin(), key: $loginKey);
+            }
         }
 
         if (!empty($extraParameters)) {
