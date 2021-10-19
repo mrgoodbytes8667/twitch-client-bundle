@@ -30,7 +30,6 @@ use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscription;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions;
 use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
 use InvalidArgumentException;
-use JetBrains\PhpStorm\Deprecated;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -48,8 +47,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class TwitchEventSubClient extends AbstractTwitchClient
 {
     /**
-     * TwitchEventSubClient constructor.
      * @param HttpClientInterface $httpClient
+     * @param EventDispatcherInterface $dispatcher
      * @param RetryStrategyInterface|null $strategy
      * @param UrlGeneratorInterface $urlGenerator
      * @param string $clientId
@@ -59,6 +58,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
      * @param string|null $callbackName
      * @param array $defaultOptionsByRegexp
      * @param string|null $defaultRegexp
+     * @param EventSubSubscriptionGenerateCallbackEvent|null $eventSubSubscriptionGenerateCallbackEvent
      */
     public function __construct(HttpClientInterface $httpClient, EventDispatcherInterface $dispatcher, ?RetryStrategyInterface $strategy, protected UrlGeneratorInterface $urlGenerator, string $clientId, string $clientSecret, protected string $hubSecret, ?string $userAgent, protected ?string $callbackName = null, array $defaultOptionsByRegexp = [], string $defaultRegexp = null, protected ?EventSubSubscriptionGenerateCallbackEvent $eventSubSubscriptionGenerateCallbackEvent = null)
     {
@@ -139,22 +139,6 @@ class TwitchEventSubClient extends AbstractTwitchClient
 
     /**
      * @param EventSubSubscriptionTypes $type
-     * @param UserInterface $stream
-     * @param null $callback When null, triggers an EventSubSubscriptionGenerateCallbackEvent event which will generate a full url. Add your own listener/subscriber to add extra parameters or completely replace the built in subscriber.
-     * @param array $extraConditions Placeholder for future types
-     * @return TwitchEventSubSubscribeResponse|ClientResponseInterface
-     * @throws TransportExceptionInterface
-     * @throws NoTokenException
-     * @throws EventSubSubscriptionException
-     */
-    #[Deprecated('since 0.3.1, use subscribe() instead', '%class%->subscribe(%parametersList%)')]
-    public function eventSubSubscribe(EventSubSubscriptionTypes $type, UserInterface $stream, $callback = null, $extraConditions = []): ClientResponseInterface
-    {
-        return $this->subscribe($type, $stream, $callback, $extraConditions);
-    }
-
-    /**
-     * @param EventSubSubscriptionTypes $type
      * @param UserInterface|null $user
      * @return EventSubSubscriptionGenerateCallbackEvent
      */
@@ -216,32 +200,12 @@ class TwitchEventSubClient extends AbstractTwitchClient
         $query = $query->push($before, 'before')
             ->push($after, 'after');
 
-        if(!empty($query->toArray())) {
+        if (!empty($query->toArray())) {
             $options['query'] = $query->toArray();
         }
         return $this->request(url: 'eventsub/subscriptions', caller: __METHOD__,
             type: Subscriptions::class, options: $options, method: HttpMethods::get(), responseClass: TwitchEventSubGetSubscriptionsResponse::class, params: ['followPagination' => $followPagination, 'client' => $this, 'before' => $before,
                 'after' => $after, 'filter' => $responseFilter]);
-    }
-
-    /**
-     * Get EventSub Subscriptions
-     * Get a list of your EventSub subscriptions. The subscriptions are paginated and ordered by most recent first.
-     * @param EventSubStatus|EventSubSubscriptionTypes|null $filter
-     * @param bool $throw
-     * @param string|null $before
-     * @param string|null $after
-     * @param bool $followPagination
-     * @return TwitchEventSubGetSubscriptionsResponse|ClientResponseInterface
-     * @throws NoTokenException
-     * @throws TransportExceptionInterface
-     *
-     * @link https://dev.twitch.tv/docs/api/reference#get-eventsub-subscriptions
-     */
-    #[Deprecated('since 0.3.2, use getSubscriptions() instead', '%class%->getSubscriptions(%parametersList%)')]
-    public function eventSubGetSubscriptions(EventSubStatus|EventSubSubscriptionTypes|null $filter = null, bool $throw = true, ?string $before = null, ?string $after = null, bool $followPagination = true): ClientResponseInterface
-    {
-        return $this->getSubscriptions($filter, $throw, $before, $after, $followPagination);
     }
 
     /**
@@ -267,18 +231,6 @@ class TwitchEventSubClient extends AbstractTwitchClient
     }
 
     /**
-     * @param IdInterface|string $id
-     * @return ClientResponseInterface
-     * @throws NoTokenException
-     * @throws TransportExceptionInterface
-     */
-    #[Deprecated('since 0.3.2, use delete() instead', '%class%->delete(%parametersList%)')]
-    public function eventSubDelete($id): ClientResponseInterface
-    {
-        return $this->delete($id);
-    }
-
-    /**
      * @param string $eventId
      * @return EventSubSubscriptionDeleteEvent
      */
@@ -295,23 +247,6 @@ class TwitchEventSubClient extends AbstractTwitchClient
     {
         $this->eventSubSubscriptionGenerateCallbackEvent = $eventSubSubscriptionGenerateCallbackEvent;
         return $this;
-    }
-
-    /**
-     * @param EventSubSubscriptionTypes $type
-     * @param UserInterface $stream
-     * @return string
-     *
-     * @deprecated Since 0.0.2, use EventSubSubscriptionGenerateCallbackEvent instead
-     */
-    protected function generateEventSubSubscribeCallback(EventSubSubscriptionTypes $type, UserInterface $stream): string
-    {
-        trigger_deprecation('mrgoodbytes8667/twitch-client-bundle', '0.0.2', 'The "%s()" method has been deprecated.', __METHOD__);
-        return $this->urlGenerator->generate($this->callbackName, [
-            'type' => $type,
-            'stream' => $stream->getUserId(),
-            'login' => $stream->getLogin(),
-        ], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /**
