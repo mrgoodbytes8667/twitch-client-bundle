@@ -15,11 +15,11 @@ class EventSubSubscriptionCreatePreRequestEvent extends AbstractEventSubSubscrip
 {
     /**
      * @param EventSubSubscriptionTypes $subscriptionType
-     * @param UserInterface $stream
+     * @param UserInterface|null $stream
      * @param string $callback
      * @return static
      */
-    public static function make(EventSubSubscriptionTypes $subscriptionType, UserInterface $stream, string $callback): static
+    public static function make(EventSubSubscriptionTypes $subscriptionType, ?UserInterface $stream, string $callback): static
     {
         $static = new static();
         $static->setSubscriptionType($subscriptionType);
