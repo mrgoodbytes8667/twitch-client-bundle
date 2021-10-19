@@ -66,7 +66,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
             MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher)
             ->setEventSubSubscriptionGenerateCallbackEvent($callbackEvent);
 
-        $cmd = $client->eventSubSubscribe($type, $this->createMockUser(), $callback, []);
+        $cmd = $client->subscribe($type, $this->createMockUser(), $callback, []);
         $this->assertResponseIsSuccessful($cmd);
         $this->assertResponseStatusCodeSame($cmd, Response::HTTP_OK);
 
@@ -133,7 +133,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         $client = $this->setupClient(dispatcher: $dispatcher)
             ->setEventSubSubscriptionGenerateCallbackEvent($callbackEvent);
 
-        $client->eventSubSubscribe($type, $this->createMockUser(), $callback, []);
+        $client->subscribe($type, $this->createMockUser(), $callback, []);
     }
 
     /**
@@ -144,7 +144,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The argument "callback" must be a valid URL, a callback, or null.');
-        $this->setupClient()->eventSubSubscribe(EventSubSubscriptionTypes::streamOnline(), $this->createMockUser(), new stdClass(), []);
+        $this->setupClient()->subscribe(EventSubSubscriptionTypes::streamOnline(), $this->createMockUser(), new stdClass(), []);
     }
 
     /**
@@ -158,7 +158,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('The type "%s" is not yet supported', $type));
         $client = $this->setupClient();
-        $client->eventSubSubscribe($type, $this->createMockUser(), $this->faker->url(), []);
+        $client->subscribe($type, $this->createMockUser(), $this->faker->url(), []);
     }
 
     /**
@@ -169,7 +169,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         $this->setupFaker();
         $user = $this->getMockBuilder(UserInterface::class)->getMock();
 
-        foreach (self::getSupportedTypes() as $type) {
+        foreach (self::getSupportedTypesUser() as $type) {
 
             yield ['type' => $type, 'user' => $user, 'callback' => $this->faker->url(), 'extraConditions' => []];
             yield ['type' => $type, 'user' => $user, 'callback' => null, 'extraConditions' => []];
@@ -182,7 +182,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
     /**
      * @return array
      */
-    protected static function getSupportedTypes()
+    protected static function getSupportedTypesUser()
     {
         return [
             EventSubSubscriptionTypes::channelUpdate(),
@@ -191,6 +191,15 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
             EventSubSubscriptionTypes::channelSubscribe(),
             EventSubSubscriptionTypes::channelPointsCustomRewardAdd(),
             EventSubSubscriptionTypes::userUpdate(),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected static function getSupportedTypesClient()
+    {
+        return [
             EventSubSubscriptionTypes::userAuthorizationGrant(),
             EventSubSubscriptionTypes::userAuthorizationRevoke(),
         ];
@@ -203,7 +212,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
     {
         foreach (EventSubSubscriptionTypes::getValues() as $value) {
             $type = EventSubSubscriptionTypes::from($value);
-            if (!in_array($type, self::getSupportedTypes())) {
+            if (!in_array($type, self::getSupportedTypesUser()) && !in_array($type, self::getSupportedTypesClient())) {
                 yield ['type' => $type];
             }
         }
@@ -227,7 +236,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher);
 
-        $response = $client->eventSubSubscribe($type, $user, $callback, []);
+        $response = $client->subscribe($type, $user, $callback, []);
 
         /** @var Subscriptions $subscriptions */
         $subscriptions = $response->deserialize();

@@ -31,6 +31,7 @@ use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions;
 use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
 use Exception;
 use InvalidArgumentException;
+use JetBrains\PhpStorm\Deprecated;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -76,7 +77,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
 
     /**
      * @param EventSubSubscriptionTypes $type
-     * @param UserInterface $stream
+     * @param UserInterface|null $stream
      * @param null $callback When null, triggers an EventSubSubscriptionGenerateCallbackEvent event which will generate a full url. Add your own listener/subscriber to add extra parameters or completely replace the built in subscriber.
      * @param array $extraConditions Placeholder for future types
      * @return TwitchEventSubSubscribeResponse|ClientResponseInterface
@@ -84,7 +85,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
      * @throws NoTokenException
      * @throws EventSubSubscriptionException
      */
-    public function eventSubSubscribe(EventSubSubscriptionTypes $type, UserInterface $stream, $callback = null, $extraConditions = []): ClientResponseInterface
+    public function subscribe(EventSubSubscriptionTypes $type, ?UserInterface $stream, $callback = null, $extraConditions = []): ClientResponseInterface
     {
         $conditions = new Condition();
         switch ($type) {
@@ -139,33 +140,49 @@ class TwitchEventSubClient extends AbstractTwitchClient
 
     /**
      * @param EventSubSubscriptionTypes $type
-     * @param UserInterface $user
+     * @param UserInterface $stream
+     * @param null $callback When null, triggers an EventSubSubscriptionGenerateCallbackEvent event which will generate a full url. Add your own listener/subscriber to add extra parameters or completely replace the built in subscriber.
+     * @param array $extraConditions Placeholder for future types
+     * @return TwitchEventSubSubscribeResponse|ClientResponseInterface
+     * @throws TransportExceptionInterface
+     * @throws NoTokenException
+     * @throws EventSubSubscriptionException
+     */
+    #[Deprecated('since 0.3.1, use subscribe() instead', '%class%->subscribe(%parametersList%)')]
+    public function eventSubSubscribe(EventSubSubscriptionTypes $type, UserInterface $stream, $callback = null, $extraConditions = []): ClientResponseInterface
+    {
+        return $this->subscribe($type, $stream, $callback, $extraConditions);
+    }
+
+    /**
+     * @param EventSubSubscriptionTypes $type
+     * @param UserInterface|null $user
      * @return EventSubSubscriptionGenerateCallbackEvent
      */
-    protected function dispatchEventSubSubscriptionGenerateCallbackEvent(EventSubSubscriptionTypes $type, UserInterface $user): EventSubSubscriptionGenerateCallbackEvent
+    protected function dispatchEventSubSubscriptionGenerateCallbackEvent(EventSubSubscriptionTypes $type, ?UserInterface $user): EventSubSubscriptionGenerateCallbackEvent
     {
         return $this->dispatch(EventSubSubscriptionGenerateCallbackEvent::from($this->eventSubSubscriptionGenerateCallbackEvent, $type, $user));
     }
 
     /**
      * @param EventSubSubscriptionTypes $subscriptionType
-     * @param UserInterface $stream
+     * @param UserInterface|null $stream
      * @param string $callback
      * @return EventSubSubscriptionCreatePreRequestEvent
      *
      * @throws EventSubSubscriptionException
      */
-    protected function dispatchEventSubSubscriptionCreatePreRequestEvent(EventSubSubscriptionTypes $subscriptionType, UserInterface $stream, string $callback)
+    protected function dispatchEventSubSubscriptionCreatePreRequestEvent(EventSubSubscriptionTypes $subscriptionType, ?UserInterface $stream, string $callback): EventSubSubscriptionCreatePreRequestEvent
     {
         return $this->dispatch(EventSubSubscriptionCreatePreRequestEvent::make($subscriptionType, $stream, $callback));
     }
 
     /**
      * @param Subscription $subscriptionType
-     * @param UserInterface $stream
+     * @param UserInterface|null $stream
      * @return EventSubSubscriptionCreatePostRequestEvent
      */
-    protected function dispatchEventSubSubscriptionCreatePostRequestEvent(Subscription $subscriptionType, UserInterface $stream)
+    protected function dispatchEventSubSubscriptionCreatePostRequestEvent(Subscription $subscriptionType, ?UserInterface $stream)
     {
         return $this->dispatch(EventSubSubscriptionCreatePostRequestEvent::createFromSubscription($subscriptionType, $stream));
     }
