@@ -236,7 +236,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher);
 
-        $response = $client->subscribe($type, $user, $callback, []);
+        $response = $client->eventSubSubscribe($type, $user, $callback, []);
 
         /** @var Subscriptions $subscriptions */
         $subscriptions = $response->deserialize();

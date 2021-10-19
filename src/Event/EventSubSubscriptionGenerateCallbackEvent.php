@@ -107,10 +107,10 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
     /**
      * @param EventSubSubscriptionGenerateCallbackEvent $event
      * @param EventSubSubscriptionTypes $type
-     * @param UserInterface $user
+     * @param UserInterface|null $user
      * @return static
      */
-    public static function from(EventSubSubscriptionGenerateCallbackEvent $event, EventSubSubscriptionTypes $type, UserInterface $user): static
+    public static function from(EventSubSubscriptionGenerateCallbackEvent $event, EventSubSubscriptionTypes $type, ?UserInterface $user): static
     {
         $static = clone $event;
         $static->setType($type)
