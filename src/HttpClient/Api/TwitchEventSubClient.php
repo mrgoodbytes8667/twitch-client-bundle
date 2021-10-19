@@ -92,11 +92,15 @@ class TwitchEventSubClient extends AbstractTwitchClient
             case EventSubSubscriptionTypes::streamOnline():
             case EventSubSubscriptionTypes::streamOffline():
             case EventSubSubscriptionTypes::channelSubscribe():
-            case EventSubSubscriptionTypes::channelChannelPointsCustomRewardAdd():
+            case EventSubSubscriptionTypes::channelPointsCustomRewardAdd():
                 $conditions->setBroadcasterUserId($stream->getUserId());
                 break;
             case EventSubSubscriptionTypes::userUpdate():
                 $conditions->setUserId($stream->getUserId());
+                break;
+            case EventSubSubscriptionTypes::userAuthorizationGrant():
+            case EventSubSubscriptionTypes::userAuthorizationRevoke():
+                $conditions->setClientId($this->clientId);
                 break;
             default:
                 throw new InvalidArgumentException(sprintf('The type "%s" is not yet supported', $type));

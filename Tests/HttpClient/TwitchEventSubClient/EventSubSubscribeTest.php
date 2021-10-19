@@ -184,7 +184,16 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
      */
     protected static function getSupportedTypes()
     {
-        return [EventSubSubscriptionTypes::channelUpdate(), EventSubSubscriptionTypes::streamOnline(), EventSubSubscriptionTypes::streamOffline(), EventSubSubscriptionTypes::channelSubscribe(), EventSubSubscriptionTypes::channelChannelPointsCustomRewardAdd(), EventSubSubscriptionTypes::userUpdate()];
+        return [
+            EventSubSubscriptionTypes::channelUpdate(),
+            EventSubSubscriptionTypes::streamOnline(),
+            EventSubSubscriptionTypes::streamOffline(),
+            EventSubSubscriptionTypes::channelSubscribe(),
+            EventSubSubscriptionTypes::channelPointsCustomRewardAdd(),
+            EventSubSubscriptionTypes::userUpdate(),
+            EventSubSubscriptionTypes::userAuthorizationGrant(),
+            EventSubSubscriptionTypes::userAuthorizationRevoke(),
+        ];
     }
 
     /**
