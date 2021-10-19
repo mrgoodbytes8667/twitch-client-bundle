@@ -85,7 +85,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
      * @throws NoTokenException
      * @throws EventSubSubscriptionException
      */
-    public function subscribe(EventSubSubscriptionTypes $type, ?UserInterface $stream, $callback = null, $extraConditions = []): ClientResponseInterface
+    public function subscribe(EventSubSubscriptionTypes $type, ?UserInterface $stream = null, $callback = null, $extraConditions = []): ClientResponseInterface
     {
         $conditions = new Condition();
         switch ($type) {
