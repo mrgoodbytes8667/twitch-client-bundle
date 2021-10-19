@@ -29,7 +29,6 @@ use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Create;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscription;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions;
 use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
-use Exception;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\Deprecated;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

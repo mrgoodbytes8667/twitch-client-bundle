@@ -32,6 +32,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
 
     /**
      * @dataProvider provideEventSubSubscribes
+     * @dataProvider provideEventSubSubscribesClient
      * @param $type
      * @param $user
      * @param $callback
@@ -44,7 +45,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
     {
         $event = $this->createPreEvent($type, $user, $callback);
         $dispatcher = $this->createMock(EventDispatcher::class);
-        $callbackEvent = EventSubSubscriptionGenerateCallbackEvent::new('', EventSubSubscriptionTypes::channelUpdate(), $user);
+        $callbackEvent = EventSubSubscriptionGenerateCallbackEvent::new('', $type, $user);
         $callbackEvent->setUrl($this->faker->url());
 
         $dispatcherCount = 1;
@@ -174,6 +175,23 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
             yield ['type' => $type, 'user' => $user, 'callback' => $this->faker->url(), 'extraConditions' => []];
             yield ['type' => $type, 'user' => $user, 'callback' => null, 'extraConditions' => []];
             yield ['type' => $type, 'user' => $user, 'callback' => function ($a, $b) {
+                return $this->faker->url();
+            }, 'extraConditions' => []];
+        }
+    }
+
+    /**
+     * @return Generator
+     */
+    public function provideEventSubSubscribesClient()
+    {
+        $this->setupFaker();
+
+        foreach (self::getSupportedTypesClient() as $type) {
+
+            yield ['type' => $type, 'user' => null, 'callback' => $this->faker->url(), 'extraConditions' => []];
+            yield ['type' => $type, 'user' => null, 'callback' => null, 'extraConditions' => []];
+            yield ['type' => $type, 'user' => null, 'callback' => function ($a, $b) {
                 return $this->faker->url();
             }, 'extraConditions' => []];
         }
