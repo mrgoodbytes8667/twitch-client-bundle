@@ -200,7 +200,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
      *
      * @link https://dev.twitch.tv/docs/api/reference#get-eventsub-subscriptions
      */
-    public function eventSubGetSubscriptions(EventSubStatus|EventSubSubscriptionTypes|null $filter = null, bool $throw = true, ?string $before = null, ?string $after = null, bool $followPagination = true): ClientResponseInterface
+    public function getSubscriptions(EventSubStatus|EventSubSubscriptionTypes|null $filter = null, bool $throw = true, ?string $before = null, ?string $after = null, bool $followPagination = true): ClientResponseInterface
     {
         $options = [];
         $query = Push::create();
@@ -225,12 +225,32 @@ class TwitchEventSubClient extends AbstractTwitchClient
     }
 
     /**
+     * Get EventSub Subscriptions
+     * Get a list of your EventSub subscriptions. The subscriptions are paginated and ordered by most recent first.
+     * @param EventSubStatus|EventSubSubscriptionTypes|null $filter
+     * @param bool $throw
+     * @param string|null $before
+     * @param string|null $after
+     * @param bool $followPagination
+     * @return TwitchEventSubGetSubscriptionsResponse|ClientResponseInterface
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     *
+     * @link https://dev.twitch.tv/docs/api/reference#get-eventsub-subscriptions
+     */
+    #[Deprecated('since 0.3.2, use getSubscriptions() instead', '%class%->getSubscriptions(%parametersList%)')]
+    public function eventSubGetSubscriptions(EventSubStatus|EventSubSubscriptionTypes|null $filter = null, bool $throw = true, ?string $before = null, ?string $after = null, bool $followPagination = true): ClientResponseInterface
+    {
+        return $this->getSubscriptions($filter, $throw, $before, $after, $followPagination);
+    }
+
+    /**
      * @param IdInterface|string $id
      * @return ClientResponseInterface
      * @throws NoTokenException
      * @throws TransportExceptionInterface
      */
-    public function eventSubDelete($id): ClientResponseInterface
+    public function delete($id): ClientResponseInterface
     {
         $id = IdNormalizer::normalizeIdArgument($id, 'The argument "id" is required.');
         return $this->request(url: 'https://api.twitch.tv/helix/eventsub/subscriptions', caller: __METHOD__, options: [
@@ -244,6 +264,18 @@ class TwitchEventSubClient extends AbstractTwitchClient
                 $this->dispatchEventSubSubscriptionDeleteEvent($id);
             }
         }, params: ['id' => $id])->onSuccessCallback();
+    }
+
+    /**
+     * @param IdInterface|string $id
+     * @return ClientResponseInterface
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     */
+    #[Deprecated('since 0.3.2, use delete() instead', '%class%->delete(%parametersList%)')]
+    public function eventSubDelete($id): ClientResponseInterface
+    {
+        return $this->delete($id);
     }
 
     /**
