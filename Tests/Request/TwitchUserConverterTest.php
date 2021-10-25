@@ -92,7 +92,7 @@ class TwitchUserConverterTest extends TestParamConverterCase
         $converter = new TwitchUserConverter($client);
 
         $request = new Request([], [], ['user' => $this->faker->camelWords()]);
-        $config = $this->createConfiguration('DateTime', 'some_faker_id');
+        $config = $this->createConfiguration('DateTime', 'user');
 
         $this->assertFalse($converter->apply($request, $config));
     }
