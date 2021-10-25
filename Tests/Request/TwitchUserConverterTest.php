@@ -44,14 +44,14 @@ class TwitchUserConverterTest extends TestParamConverterCase
      */
     public function testApplyOptional()
     {
-        $request = new Request([], [], []);
+        $request = new Request([], [], ['user' => false]);
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/get-user-success.json')));
         $converter = new TwitchUserConverter($client);
 
         $config = $this->createConfiguration(User::class, 'user', true);
 
-        $this->assertFalse($converter->apply($request, $config));
+        $this->assertTrue($converter->apply($request, $config));
 
         $object = $request->attributes->get('user');
         $this->assertNull($object);
