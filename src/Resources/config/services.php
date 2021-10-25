@@ -19,6 +19,7 @@ use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenClient;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchAppTokenResponse;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenClient;
 use Bytes\TwitchClientBundle\HttpClient\Token\TwitchUserTokenResponse;
+use Bytes\TwitchClientBundle\Request\TwitchUserConverter;
 use Bytes\TwitchClientBundle\Routing\TwitchAppOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchLoginOAuth;
 use Bytes\TwitchClientBundle\Routing\TwitchUserOAuth;
@@ -217,6 +218,17 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('security.voter')
         ->lazy();
+    //endregion
+
+    //region Converters
+    $services->set('bytes_twitch_client.twitch_user_converter', TwitchUserConverter::class)
+        ->args([
+            service('bytes_twitch_client.httpclient.twitch'),
+        ])
+        ->tag('request.param_converter', [
+            'converter' => 'bytes_twitch_client_user',
+            'priority' => false,
+        ]);
     //endregion
 
     //region Subscribers
