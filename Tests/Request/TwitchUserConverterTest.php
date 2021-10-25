@@ -2,11 +2,13 @@
 
 namespace Bytes\TwitchClientBundle\Tests\Request;
 
+use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchClientBundle\Request\TwitchUserConverter;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockJsonResponse;
 use Bytes\TwitchClientBundle\Tests\TwitchClientSetupTrait;
 use Bytes\TwitchResponseBundle\Objects\Users\User;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -35,6 +37,24 @@ class TwitchUserConverterTest extends TestParamConverterCase
         $object = $request->attributes->get('user');
         $this->assertInstanceOf(User::class, $object);
         $this->assertEquals('edd.windler', $object->getLogin());
+    }
+
+    /**
+     *
+     */
+    public function testApplyOptional()
+    {
+        $request = new Request([], [], []);
+        $client = $this->setupClient(MockClient::requests(
+            MockJsonResponse::makeFixture('HttpClient/get-user-success.json')));
+        $converter = new TwitchUserConverter($client);
+
+        $config = $this->createConfiguration(User::class, 'user', true);
+
+        $this->assertFalse($converter->apply($request, $config));
+
+        $object = $request->attributes->get('user');
+        $this->assertNull($object);
     }
 
     /**
@@ -104,6 +124,22 @@ class TwitchUserConverterTest extends TestParamConverterCase
     {
         $request = new Request([], [], ['user' => 414076175084]);
         $client = $this->setupClient(MockClient::emptyBadRequest());
+        $converter = new TwitchUserConverter($client);
+
+        $config = $this->createConfiguration(User::class, 'user');
+
+        $this->assertFalse($converter->apply($request, $config));
+    }
+
+    /**
+     *
+     */
+    public function testApplyTransportException()
+    {
+        $request = new Request([], [], ['user' => 414076175084]);
+
+        $client = $this->getMockBuilder(TwitchClient::class)->disableOriginalConstructor()->getMock();
+        $client->method('getUser')->willThrowException(new TransportException());
         $converter = new TwitchUserConverter($client);
 
         $config = $this->createConfiguration(User::class, 'user');
