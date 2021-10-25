@@ -58,7 +58,7 @@ class TwitchUserConverter implements ParamConverterInterface
             return false;
         }
 
-        $value = $request->attributes->get($param);
+        $value = $request->attributes->getDigits($param);
 
         if (!$value && $configuration->isOptional()) {
             $request->attributes->set($param, null);
