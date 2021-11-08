@@ -228,7 +228,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
      */
     public function provideUnsupportedTypes()
     {
-        foreach (EventSubSubscriptionTypes::getValues() as $value) {
+        foreach (EventSubSubscriptionTypes::toValues() as $value) {
             $type = EventSubSubscriptionTypes::from($value);
             if (!in_array($type, self::getSupportedTypesUser()) && !in_array($type, self::getSupportedTypesClient())) {
                 yield ['type' => $type];
@@ -254,7 +254,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher);
 
-        $response = $client->eventSubSubscribe($type, $user, $callback, []);
+        $response = $client->subscribe($type, $user, $callback, []);
 
         /** @var Subscriptions $subscriptions */
         $subscriptions = $response->deserialize();
