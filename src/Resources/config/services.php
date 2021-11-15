@@ -213,7 +213,7 @@ return static function (ContainerConfigurator $container) {
     //region Voters
     $services->set('bytes_twitch_client.security.voter.signature', TwitchHubSignatureVoter::class)
         ->args([
-            service('bytes_twitch_response.locator.signature') // \Bytes\ResponseBundle\Handler\Locator
+            service('bytes_twitch_response.signature.eventsub') // \Bytes\TwitchResponseBundle\Request\EventSubSignature
         ])
         ->tag('security.voter')
         ->lazy();
