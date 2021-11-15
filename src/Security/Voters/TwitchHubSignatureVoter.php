@@ -47,6 +47,10 @@ class TwitchHubSignatureVoter extends Voter
         if ($attribute !== self::ATTRIBUTE_EVENTSUB && $attribute !== self::ATTRIBUTE_WEBHOOK) {
             return false;
         }
+        if($attribute === self::ATTRIBUTE_WEBHOOK)
+        {
+            trigger_deprecation('mrgoodbytes8667/twitch-client-bundle', '0.3.2', 'The "%s()" attribute has been deprecated. Webhooks are no longer supported by Twitch', self::ATTRIBUTE_WEBHOOK);
+        }
         if (!($subject instanceof Request)) {
             return false;
         }
@@ -76,6 +80,7 @@ class TwitchHubSignatureVoter extends Voter
         if ($attribute === self::ATTRIBUTE_EVENTSUB) {
             $validator = $this->twitchSignatureLocator->get('EVENTSUB');
         } else {
+            trigger_deprecation('mrgoodbytes8667/twitch-client-bundle', '0.3.2', 'The "%s()" attribute has been deprecated. Webhooks are no longer supported by Twitch', self::ATTRIBUTE_WEBHOOK);
             $validator = $this->twitchSignatureLocator->get('WEBHOOK');
         }
         return $validator->validateHubSignature($subject->headers, $subject->getContent(), false);

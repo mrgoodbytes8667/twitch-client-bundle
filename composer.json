@@ -56,5 +56,6 @@
         "psr-4": {
             "Bytes\\TwitchClientBundle\\Tests\\": "Tests"
         }
-    }
+    },
+    "minimum-stability": "dev"
 }
