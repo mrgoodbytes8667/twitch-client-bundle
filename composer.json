@@ -8,7 +8,7 @@
         "ext-json": "*",
         "doctrine/annotations": "^1.12",
         "doctrine/collections": "^1.6",
-        "mrgoodbytes8667/twitch-response-bundle": "^0.5.4",
+        "mrgoodbytes8667/twitch-response-bundle": "^0.6",
         "symfony/polyfill-uuid": "^1.20"
     },
     "require-dev": {
@@ -56,5 +56,6 @@
         "psr-4": {
             "Bytes\\TwitchClientBundle\\Tests\\": "Tests"
         }
-    }
+    },
+    "minimum-stability": "dev"
 }
