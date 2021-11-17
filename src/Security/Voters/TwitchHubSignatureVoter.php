@@ -33,6 +33,26 @@ class TwitchHubSignatureVoter extends Voter
     }
 
     /**
+     * Return false if your voter doesn't support the given attribute. Symfony will cache
+     * that decision and won't call your voter again for that attribute.
+     */
+    public function supportsAttribute(string $attribute): bool
+    {
+        return $attribute === self::ATTRIBUTE_EVENTSUB;
+    }
+
+    /**
+     * Return false if your voter doesn't support the given subject type. Symfony will cache
+     * that decision and won't call your voter again for that subject type.
+     *
+     * @param string $subjectType The type of the subject inferred by `get_class()` or `get_debug_type()`
+     */
+    public function supportsType(string $subjectType): bool
+    {
+        return is_a($subjectType, Request::class, true);
+    }
+
+    /**
      * Determines if the attribute and subject are supported by this voter.
      *
      * @param string $attribute An attribute
