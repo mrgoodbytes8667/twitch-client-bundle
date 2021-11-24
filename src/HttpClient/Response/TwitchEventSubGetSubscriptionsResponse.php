@@ -41,7 +41,7 @@ class TwitchEventSubGetSubscriptionsResponse extends TwitchResponse
         }
         $results = $origResults;
         while (!empty($results->getPagination()?->getCursor())) {
-            $results = $this->getClient()->eventSubGetSubscriptions($this->getFilter(), throw: false, after: $results->getPagination()?->getCursor(), followPagination: true)->deserialize();
+            $results = $this->getClient()->getSubscriptions($this->getFilter(), throw: false, after: $results->getPagination()?->getCursor(), followPagination: true)->deserialize();
             $origResults->setData(array_merge($origResults->getData(), $results->getData()));
             $origResults->setPagination($results->getPagination());
         }
