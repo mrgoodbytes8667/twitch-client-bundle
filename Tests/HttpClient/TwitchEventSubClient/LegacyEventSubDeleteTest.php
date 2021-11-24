@@ -12,10 +12,9 @@ use Symfony\Component\HttpFoundation\Response as Http;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
- * Class EventSubDeleteTest
- * @package Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient
+ *
  */
-class EventSubDeleteTest extends TestTwitchEventSubClientCase
+class LegacyEventSubDeleteTest extends TestTwitchEventSubClientCase
 {
     use TestTwitchFakerTrait;
 
@@ -26,7 +25,7 @@ class EventSubDeleteTest extends TestTwitchEventSubClientCase
     {
         $client = $this->setupClient(MockClient::empty());
 
-        $cmd = $client->delete($this->faker->uuid());
+        $cmd = $client->eventSubDelete($this->faker->uuid());
 
         $this->assertResponseIsSuccessful($cmd);
         $this->assertResponseStatusCodeSame($cmd, Http::HTTP_NO_CONTENT);
@@ -48,6 +47,6 @@ class EventSubDeleteTest extends TestTwitchEventSubClientCase
 
         $client = $this->setupClient(MockClient::empty(), $dispatcher);
 
-        $client->delete($this->faker->uuid())->onSuccessCallback();
+        $client->eventSubDelete($this->faker->uuid())->onSuccessCallback();
     }
 }

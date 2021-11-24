@@ -20,10 +20,9 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
- * Class EventSubGetSubscriptionsTest
- * @package Bytes\TwitchClientBundle\Tests\HttpClient\TwitchEventSubClient
+ *
  */
-class EventSubGetSubscriptionsTest extends TestTwitchEventSubClientCase
+class LegacyEventSubGetSubscriptionsTest extends TestTwitchEventSubClientCase
 {
     use TestTwitchFakerTrait;
 
@@ -39,7 +38,7 @@ class EventSubGetSubscriptionsTest extends TestTwitchEventSubClientCase
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/eventsub-list-1-success.json')));
 
-        $response = $client->getSubscriptions(followPagination: false);
+        $response = $client->eventSubGetSubscriptions(followPagination: false);
         $this->assertResponseIsSuccessful($response);
         $this->assertResponseStatusCodeSame($response, Response::HTTP_OK);
         $this->assertResponseHasContent($response);
@@ -60,7 +59,7 @@ class EventSubGetSubscriptionsTest extends TestTwitchEventSubClientCase
             MockJsonResponse::makeFixture('HttpClient/eventsub-list-1-pagination-success.json'),
             MockJsonResponse::makeFixture('HttpClient/eventsub-list-1-success.json')));
 
-        $response = $client->getSubscriptions(followPagination: true);
+        $response = $client->eventSubGetSubscriptions(followPagination: true);
         $this->assertResponseIsSuccessful($response);
         $this->assertResponseStatusCodeSame($response, Response::HTTP_OK);
         $this->assertResponseHasContent($response);
@@ -80,7 +79,7 @@ class EventSubGetSubscriptionsTest extends TestTwitchEventSubClientCase
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/eventsub-list-1-success.json')));
 
-        $response = $client->getSubscriptions($filter);
+        $response = $client->eventSubGetSubscriptions($filter);
         $this->assertResponseIsSuccessful($response);
         $this->assertResponseStatusCodeSame($response, Response::HTTP_OK);
         $this->assertResponseHasContent($response);
@@ -112,7 +111,7 @@ class EventSubGetSubscriptionsTest extends TestTwitchEventSubClientCase
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/eventsub-list-1-success.json')));
 
-        $response = $client->getSubscriptions();
+        $response = $client->eventSubGetSubscriptions();
 
         /** @var Subscriptions $subscriptions */
         $subscriptions = $response->deserialize();
@@ -142,7 +141,7 @@ class EventSubGetSubscriptionsTest extends TestTwitchEventSubClientCase
             MockJsonResponse::makeFixture('HttpClient/eventsub-list-1-success.json')));
 
         /** @var Subscriptions $response */
-        $response = $client->getSubscriptions(followPagination: true)->deserialize();
+        $response = $client->eventSubGetSubscriptions(followPagination: true)->deserialize();
         $this->assertCount(2, $response->getData());
     }
 }
