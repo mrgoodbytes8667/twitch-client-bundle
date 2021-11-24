@@ -298,23 +298,6 @@ class TwitchEventSubClient extends AbstractTwitchClient
     }
 
     /**
-     * @param EventSubSubscriptionTypes $type
-     * @param UserInterface $stream
-     * @return string
-     *
-     * @deprecated Since 0.0.2, use EventSubSubscriptionGenerateCallbackEvent instead
-     */
-    protected function generateEventSubSubscribeCallback(EventSubSubscriptionTypes $type, UserInterface $stream): string
-    {
-        trigger_deprecation('mrgoodbytes8667/twitch-client-bundle', '0.0.2', 'The "%s()" method has been deprecated.', __METHOD__);
-        return $this->urlGenerator->generate($this->callbackName, [
-            'type' => $type,
-            'stream' => $stream->getUserId(),
-            'login' => $stream->getLogin(),
-        ], UrlGeneratorInterface::ABSOLUTE_URL);
-    }
-
-    /**
      * @param Auth|null $auth
      * @param bool $reset
      * @return AccessTokenInterface|null
