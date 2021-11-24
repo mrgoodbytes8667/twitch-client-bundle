@@ -23,10 +23,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
- * Class EventSubSubscribeTest
- * @package Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient
+ * 
  */
-class EventSubSubscribeTest extends TestTwitchEventSubClientCase
+class LegacyEventSubSubscribeTest extends TestTwitchEventSubClientCase
 {
     use TestTwitchFakerTrait;
 
@@ -67,7 +66,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
             MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher)
             ->setEventSubSubscriptionGenerateCallbackEvent($callbackEvent);
 
-        $cmd = $client->subscribe($type, $this->createMockUser(), $callback, []);
+        $cmd = $client->eventSubSubscribe($type, $this->createMockUser(), $callback, []);
         $this->assertResponseIsSuccessful($cmd);
         $this->assertResponseStatusCodeSame($cmd, Response::HTTP_OK);
 
@@ -134,18 +133,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         $client = $this->setupClient(dispatcher: $dispatcher)
             ->setEventSubSubscriptionGenerateCallbackEvent($callbackEvent);
 
-        $client->subscribe($type, $this->createMockUser(), $callback, []);
-    }
-
-    /**
-     * @throws NoTokenException
-     * @throws TransportExceptionInterface
-     */
-    public function testEventSubSubscribeClientInvalidCallback()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The argument "callback" must be a valid URL, a callback, or null.');
-        $this->setupClient()->subscribe(EventSubSubscriptionTypes::streamOnline(), $this->createMockUser(), new stdClass(), []);
+        $client->eventSubSubscribe($type, $this->createMockUser(), $callback, []);
     }
 
     /**
@@ -159,7 +147,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('The type "%s" is not yet supported', $type));
         $client = $this->setupClient();
-        $client->subscribe($type, $this->createMockUser(), $this->faker->url(), []);
+        $client->eventSubSubscribe($type, $this->createMockUser(), $this->faker->url(), []);
     }
 
     /**
@@ -254,7 +242,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/eventsub-subscribe-success.json')), $dispatcher);
 
-        $response = $client->subscribe($type, $user, $callback, []);
+        $response = $client->eventSubSubscribe($type, $user, $callback, []);
 
         /** @var Subscriptions $subscriptions */
         $subscriptions = $response->deserialize();

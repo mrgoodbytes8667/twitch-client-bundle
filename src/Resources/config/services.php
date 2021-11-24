@@ -44,7 +44,6 @@ return static function (ContainerConfigurator $container) {
         ->call('setResponse', [service('bytes_twitch_client.httpclient.response')])
         ->tag('bytes_response.http_client')
         ->tag('bytes_response.http_client.api')
-        ->lazy()
         ->alias(TwitchClient::class, 'bytes_twitch_client.httpclient.twitch')
         ->public();
 
@@ -64,7 +63,6 @@ return static function (ContainerConfigurator $container) {
         ->call('setEventSubSubscriptionGenerateCallbackEvent', [service('bytes_twitch_client.event.generate_callback')])
         ->tag('bytes_response.http_client')
         ->tag('bytes_response.http_client.api')
-        ->lazy()
         ->alias(TwitchEventSubClient::class, 'bytes_twitch_client.httpclient.twitch.eventsub')
         ->public();
     //endregion
@@ -213,7 +211,7 @@ return static function (ContainerConfigurator $container) {
     //region Voters
     $services->set('bytes_twitch_client.security.voter.signature', TwitchHubSignatureVoter::class)
         ->args([
-            service('bytes_twitch_response.locator.signature') // \Bytes\ResponseBundle\Handler\Locator
+            service('bytes_twitch_response.signature.eventsub') // \Bytes\TwitchResponseBundle\Request\EventSubSignature
         ])
         ->tag('security.voter')
         ->lazy();

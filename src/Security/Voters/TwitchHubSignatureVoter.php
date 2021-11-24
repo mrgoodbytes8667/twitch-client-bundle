@@ -4,7 +4,7 @@
 namespace Bytes\TwitchClientBundle\Security\Voters;
 
 
-use Bytes\ResponseBundle\Handler\Locator;
+use Bytes\TwitchResponseBundle\Request\EventSubSignature;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -15,8 +15,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * @package Bytes\TwitchClientBundle\Security\Voters
  *
  * @example @Security("is_granted('TWITCH_HUBSIGNATURE_EVENTSUB', request)")
- * IsGranted() needs an attribute of TWITCH_HUBSIGNATURE_EVENTSUB to check an EventSub signature, or
- * TWITCH_HUBSIGNATURE_WEBHOOK for a webhook signature. The subject must be the request object.
+ * IsGranted() needs an attribute of TWITCH_HUBSIGNATURE_EVENTSUB to check an EventSub signature. The subject must be
+ * the request object.
  *
  * @link https://symfony.com/doc/current/security/voters.html
  * @link https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/security.html#security
@@ -24,14 +24,32 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class TwitchHubSignatureVoter extends Voter
 {
     const ATTRIBUTE_EVENTSUB = 'TWITCH_HUBSIGNATURE_EVENTSUB';
-    const ATTRIBUTE_WEBHOOK = 'TWITCH_HUBSIGNATURE_WEBHOOK';
 
     /**
-     * TwitchHubSignatureVoter constructor.
-     * @param Locator $twitchSignatureLocator
+     * @param EventSubSignature $twitchSignatureLocator
      */
-    public function __construct(private Locator $twitchSignatureLocator)
+    public function __construct(private EventSubSignature $twitchSignatureLocator)
     {
+    }
+
+    /**
+     * Return false if your voter doesn't support the given attribute. Symfony will cache
+     * that decision and won't call your voter again for that attribute.
+     */
+    public function supportsAttribute(string $attribute): bool
+    {
+        return $attribute === self::ATTRIBUTE_EVENTSUB;
+    }
+
+    /**
+     * Return false if your voter doesn't support the given subject type. Symfony will cache
+     * that decision and won't call your voter again for that subject type.
+     *
+     * @param string $subjectType The type of the subject inferred by `get_class()` or `get_debug_type()`
+     */
+    public function supportsType(string $subjectType): bool
+    {
+        return is_a($subjectType, Request::class, true);
     }
 
     /**
@@ -44,7 +62,7 @@ class TwitchHubSignatureVoter extends Voter
      */
     protected function supports(string $attribute, $subject): bool
     {
-        if ($attribute !== self::ATTRIBUTE_EVENTSUB && $attribute !== self::ATTRIBUTE_WEBHOOK) {
+        if ($attribute !== self::ATTRIBUTE_EVENTSUB) {
             return false;
         }
         if (!($subject instanceof Request)) {
@@ -53,12 +71,7 @@ class TwitchHubSignatureVoter extends Voter
         if ($subject->headers->has('skip-signature') || $subject->query->has('skip-signature')) {
             return false;
         }
-        if ($attribute === self::ATTRIBUTE_EVENTSUB && $this->twitchSignatureLocator->has('EVENTSUB')) {
-            return true;
-        } elseif ($attribute === self::ATTRIBUTE_WEBHOOK && $this->twitchSignatureLocator->has('WEBHOOK')) {
-            return true;
-        }
-        return false;
+        return true;
     }
 
     /**
@@ -74,10 +87,9 @@ class TwitchHubSignatureVoter extends Voter
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
         if ($attribute === self::ATTRIBUTE_EVENTSUB) {
-            $validator = $this->twitchSignatureLocator->get('EVENTSUB');
-        } else {
-            $validator = $this->twitchSignatureLocator->get('WEBHOOK');
+            return $this->twitchSignatureLocator->validateHubSignature($subject->headers, $subject->getContent(), false);
         }
-        return $validator->validateHubSignature($subject->headers, $subject->getContent(), false);
+
+        return false;
     }
 }
