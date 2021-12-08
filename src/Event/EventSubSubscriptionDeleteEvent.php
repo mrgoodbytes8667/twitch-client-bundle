@@ -5,8 +5,8 @@ namespace Bytes\TwitchClientBundle\Event;
 
 
 /**
- * Class EventSubSubscriptionDeleteEvent
- * @package Bytes\TwitchClientBundle\Event
+ * Triggered by a successful subscription delete request
+ * This should not be manually triggered.
  */
 class EventSubSubscriptionDeleteEvent extends AbstractEventSubSubscriptionEvent
 {
