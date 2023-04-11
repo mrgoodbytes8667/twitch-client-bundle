@@ -55,5 +55,5 @@ Note: do not add any retry options to framework's http_client, it will override 
 
 ## License
 [![License](https://i.creativecommons.org/l/by-nc/4.0/88x31.png)]("http://creativecommons.org/licenses/by-nc/4.0/)  
-twitch-client-bundle by [MrGoodBytes](https://www.goodbytes.live) is licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/).  
+twitch-client-bundle by [MrGoodBytes](https://mrgoodbytes.dev) is licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/).  
 Based on a work at [https://github.com/mrgoodbytes8667/twitch-client-bundle](https://github.com/mrgoodbytes8667/twitch-client-bundle).
