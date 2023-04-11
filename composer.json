@@ -4,11 +4,11 @@
     "description": "A Symfony bundle that adds HttpClient (and other) mechanisms for Twitch",
     "license": "CC-BY-NC-4.0",
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-json": "*",
         "doctrine/annotations": "^1.12",
         "doctrine/collections": "^1.6",
-        "mrgoodbytes8667/twitch-response-bundle": "^0.6",
+        "mrgoodbytes8667/twitch-response-bundle": "^0.7",
         "symfony/polyfill-uuid": "^1.20"
     },
     "require-dev": {
@@ -23,7 +23,7 @@
     "authors": [
         {
             "name": "MrGoodBytes",
-            "email": "bytes@goodbytes.live"
+            "email": "bytes@mrgoodbytes.dev"
         }
     ],
     "config": {
