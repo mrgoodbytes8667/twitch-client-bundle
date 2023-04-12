@@ -7,7 +7,7 @@
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mrgoodbytes8667/twitch-client-bundle/release.yml?label=stable&logo=github&logoColor=FFF&style=flat)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mrgoodbytes8667/twitch-client-bundle/run-tests.yml?logo=github&logoColor=FFF&style=flat)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/mrgoodbytes8667/twitch-client-bundle/run-tests-by-version.yml?logo=github&logoColor=FFF&style=flat)
-[![codecov](https://img.shields.io/codecov/c/github/mrgoodbytes8667/twitch-client-bundle?logo=codecov&logoColor=FFF&style=flat)](https://codecov.io/gh/mrgoodbytes8667/twitch-client-bundle)
+[![codecov](https://img.shields.io/codecov/c/github/mrgoodbytes8667/twitch-client-bundle/0.7?logo=codecov&logoColor=FFF&style=flat)](https://codecov.io/gh/mrgoodbytes8667/twitch-client-bundle)
 ![Packagist License](https://img.shields.io/packagist/l/mrgoodbytes8667/twitch-client-bundle?logo=creative-commons&logoColor=FFF&style=flat)  
 A Symfony bundle that adds HttpClient (and other) mechanisms for Twitch
 
