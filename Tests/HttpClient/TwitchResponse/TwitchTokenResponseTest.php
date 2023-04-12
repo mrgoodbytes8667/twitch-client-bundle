@@ -46,7 +46,7 @@ class TwitchTokenResponseTest extends TestCase
      */
     public function provideResponse()
     {
-        yield ['client' => new TwitchAppTokenResponse($this->createSerializer(), new EventDispatcher()), 'tokenSource' => TokenSource::app()];
-        yield ['client' => new TwitchUserTokenResponse($this->createSerializer(), new EventDispatcher()), 'tokenSource' => TokenSource::user()];
+        yield ['client' => new TwitchAppTokenResponse($this->createSerializer(), new EventDispatcher()), 'tokenSource' => TokenSource::app];
+        yield ['client' => new TwitchUserTokenResponse($this->createSerializer(), new EventDispatcher()), 'tokenSource' => TokenSource::user];
     }
 }

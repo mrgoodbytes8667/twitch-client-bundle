@@ -148,7 +148,7 @@ class TwitchUserTokenClientTest extends TestHttpClientCase
         $this->assertInstanceOf(AccessTokenInterface::class, $response);
 
         $token = Token::createFromParts(accessToken: 'vkhp8pva30rb0df4z80fesvarzpxn8', refreshToken: 'svavkhp8pva38pv30rb0df40rb0dsvaf4z80fessvavarpxn8', expiresIn: 13573,
-            scope: 'user:read:email', tokenType: 'bearer', tokenSource: TokenSource::user(), identifier: 'TWITCH');
+            scope: 'user:read:email', tokenType: 'bearer', tokenSource: TokenSource::user, identifier: 'TWITCH');
 
         $this->assertTokenEquals($token, $response);
     }
@@ -173,7 +173,7 @@ class TwitchUserTokenClientTest extends TestHttpClientCase
     public function testClientAnnotations()
     {
         $client = $this->setupClient();
-        $this->assertClientAnnotationEquals('TWITCH', TokenSource::user(), $client);
+        $this->assertClientAnnotationEquals('TWITCH', TokenSource::user, $client);
     }
 
     /**

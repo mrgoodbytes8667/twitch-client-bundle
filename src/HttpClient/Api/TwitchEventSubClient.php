@@ -88,22 +88,22 @@ class TwitchEventSubClient extends AbstractTwitchClient
     {
         $conditions = new Condition();
         switch ($type) {
-            case EventSubSubscriptionTypes::channelUpdate():
-            case EventSubSubscriptionTypes::streamOnline():
-            case EventSubSubscriptionTypes::streamOffline():
-            case EventSubSubscriptionTypes::channelSubscribe():
-            case EventSubSubscriptionTypes::channelPointsCustomRewardAdd():
+            case EventSubSubscriptionTypes::CHANNEL_UPDATE:
+            case EventSubSubscriptionTypes::STREAM_ONLINE:
+            case EventSubSubscriptionTypes::STREAM_OFFLINE:
+            case EventSubSubscriptionTypes::CHANNEL_SUBSCRIBE:
+            case EventSubSubscriptionTypes::CHANNEL_POINTS_CUSTOM_REWARD_ADD:
                 $conditions->setBroadcasterUserId($stream->getUserId());
                 break;
-            case EventSubSubscriptionTypes::userUpdate():
+            case EventSubSubscriptionTypes::USER_UPDATE:
                 $conditions->setUserId($stream->getUserId());
                 break;
-            case EventSubSubscriptionTypes::userAuthorizationGrant():
-            case EventSubSubscriptionTypes::userAuthorizationRevoke():
+            case EventSubSubscriptionTypes::USER_AUTHORIZATION_GRANT:
+            case EventSubSubscriptionTypes::USER_AUTHORIZATION_REVOKE:
                 $conditions->setClientId($this->clientId);
                 break;
             default:
-                throw new InvalidArgumentException(sprintf('The type "%s" is not yet supported', $type));
+                throw new InvalidArgumentException(sprintf('The type "%s::%s" is not yet supported', $type::class, $type->name));
                 break;
         }
 
@@ -127,7 +127,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
             throw new EventSubSubscriptionException('Unable to save new subscription', subscriptionType: $type, user: $stream, callback: $url, id: $event->getId(), status: $event->getStatus(), createdAt: $event->getCreatedAt());
         }
         return $this->jsonRequest(url: 'eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class,
-            options: $params, method: HttpMethods::post(), responseClass: TwitchEventSubSubscribeResponse::class,
+            options: $params, method: HttpMethods::post, responseClass: TwitchEventSubSubscribeResponse::class,
             onSuccessCallable: function ($self, $subscriptions) {
                 /** @var TwitchResponse $self */
                 if (array_key_exists('user', $self->getExtraParams())) {
@@ -204,7 +204,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
             $options['query'] = $query->toArray();
         }
         return $this->request(url: 'eventsub/subscriptions', caller: __METHOD__,
-            type: Subscriptions::class, options: $options, method: HttpMethods::get(), responseClass: TwitchEventSubGetSubscriptionsResponse::class, params: ['followPagination' => $followPagination, 'client' => $this, 'before' => $before,
+            type: Subscriptions::class, options: $options, method: HttpMethods::get, responseClass: TwitchEventSubGetSubscriptionsResponse::class, params: ['followPagination' => $followPagination, 'client' => $this, 'before' => $before,
                 'after' => $after, 'filter' => $responseFilter]);
     }
 
@@ -221,7 +221,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
             'query' => [
                 'id' => $id
             ]
-        ], method: HttpMethods::delete(), onSuccessCallable: function ($self, $subscriptions) {
+        ], method: HttpMethods::delete, onSuccessCallable: function ($self, $subscriptions) {
             /** @var TwitchResponse $self */
             if (array_key_exists('id', $self->getExtraParams())) {
                 $id = $self->getExtraParams()['id'];

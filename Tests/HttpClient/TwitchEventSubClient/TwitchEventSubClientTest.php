@@ -28,7 +28,7 @@ class TwitchEventSubClientTest extends TestTwitchEventSubClientCase
     public function testClientAnnotations()
     {
         $client = $this->setupRealClient();
-        $this->assertClientAnnotationEquals('TWITCH', TokenSource::app(), $client);
+        $this->assertClientAnnotationEquals('TWITCH', TokenSource::app, $client);
     }
 
     /**
