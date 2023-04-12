@@ -145,7 +145,7 @@ class TwitchAppTokenClientTest extends TestHttpClientCase
     public function testClientAnnotations()
     {
         $client = $this->setupClient();
-        $this->assertClientAnnotationEquals('TWITCH', TokenSource::app(), $client);
+        $this->assertClientAnnotationEquals('TWITCH', TokenSource::app, $client);
     }
 
     /**

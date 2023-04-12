@@ -25,7 +25,7 @@ class EventSubSubscriptionGenerateCallbackEventTest extends TestCase
     public function testNew()
     {
         $callbackName = $this->faker->unique()->word();
-        $type = EventSubSubscriptionTypes::channelUpdate();
+        $type = EventSubSubscriptionTypes::CHANNEL_UPDATE;
         $user = $this->getMockBuilder(UserInterface::class)->getMock();
         $user->method('getUserId')
             ->willReturn('123');

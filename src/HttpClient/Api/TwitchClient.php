@@ -97,7 +97,7 @@ class TwitchClient extends AbstractTwitchClient
         }
         $url = $url->append('first=')->append($first)->toString();
         return $this->request(url: $url, caller: __METHOD__,
-            type: StreamsResponse::class, method: HttpMethods::get());
+            type: StreamsResponse::class, method: HttpMethods::get);
     }
 
     /**
@@ -125,6 +125,6 @@ class TwitchClient extends AbstractTwitchClient
                 'user_id' => $userId,
                 'first' => $limit
             ]
-        ], method: HttpMethods::get());
+        ], method: HttpMethods::get);
     }
 }
