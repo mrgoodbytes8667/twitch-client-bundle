@@ -2,11 +2,9 @@
 
 namespace Bytes\TwitchClientBundle\Controller\ArgumentResolver;
 
-use Bytes\TwitchClientBundle\Attribute\MapTwitchName;
+use Bytes\TwitchClientBundle\Attribute\MapTwitchGame;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
-use Bytes\TwitchResponseBundle\Objects\Interfaces\TwitchUserInterface;
-use Bytes\TwitchResponseBundle\Objects\Streams\Stream;
-use Illuminate\Support\Arr;
+use Bytes\TwitchResponseBundle\Objects\Interfaces\GameInterface;
 use LogicException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -21,10 +19,10 @@ use function is_int;
 use function is_string;
 
 /**
- * Converts and hydrates a {@see TwitchUserInterface} object. Assumes the value is a user ID if it is numeric.
- * Use {@see MapTwitchName} to force Login usage.
+ * Converts and hydrates a {@see GameInterface} object. Assumes the value is a game ID if it is numeric.
+ * Use {@see MapTwitchGame} to force name or igdb ID usage.
  */
-class TwitchUserValueResolver implements ValueResolverInterface
+class TwitchGameValueResolver implements ValueResolverInterface
 {
     /**
      * @param TwitchClient $client
@@ -38,7 +36,7 @@ class TwitchUserValueResolver implements ValueResolverInterface
      */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if (!is_subclass_of($argument->getType(), TwitchUserInterface::class)) {
+        if (!is_subclass_of($argument->getType(), GameInterface::class)) {
             return [];
         }
 
@@ -61,7 +59,7 @@ class TwitchUserValueResolver implements ValueResolverInterface
         }
 
         // In theory, this shouldn't be possible...
-        if ($value instanceof TwitchUserInterface) {
+        if ($value instanceof GameInterface) {
             return [$value];
         }
 
@@ -69,32 +67,29 @@ class TwitchUserValueResolver implements ValueResolverInterface
             throw new LogicException(sprintf('Could not resolve the "%s $%s" controller argument: expecting an int or string, got "%s".', $argument->getType(), $argument->getName(), get_debug_type($value)));
         }
         
-        $method = is_numeric($value) ? 'id' : 'login';
+        $method = is_numeric($value) ? 'id' : 'name';
 
-        if ($attributes = $argument->getAttributes(MapTwitchName::class, ArgumentMetadata::IS_INSTANCEOF)) {
-            /** @var MapTwitchName $attribute */
+        if ($attributes = $argument->getAttributes(MapTwitchGame::class, ArgumentMetadata::IS_INSTANCEOF)) {
+            /** @var MapTwitchGame $attribute */
             $attribute = $attributes[0];
-            $method = $attribute->useName ? 'login' : 'id';
+            if ($attribute->useIgdbId) {
+                $method = 'igdb_id';
+            } elseif ($attribute->useName) {
+                $method = 'name';
+            }
         }
 
         try {
-            $isStream = is_a($argument->getType(), Stream::class, allow_string: true);
-            if ($isStream) {
-                $ids = [];
-                $logins = [];
-                if ($method === 'login') {
-                    $logins[] = $value;
-                } else {
-                    $ids[] = $value;
-                }
-                
-                $response = $this->client->getStreams(userIds: $ids, logins: $logins);
-            } else {
-                if ($method === 'login') {
-                    $response = $this->client->getUser(login: $value);
-                } else {
-                    $response = $this->client->getUser(id: $value);
-                }
+            switch ($method) {
+                case 'id':
+                    $response = $this->client->getGame(id: $value);
+                    break;
+                case 'name':
+                    $response = $this->client->getGame(name: $value);
+                    break;
+                case 'igdb_id':
+                    $response = $this->client->getGame(igdbId: $value);
+                    break;
             }
             
             if (!$response->isSuccess()) {
@@ -103,9 +98,6 @@ class TwitchUserValueResolver implements ValueResolverInterface
             
             $user = $response
                 ->deserialize();
-            if ($isStream) {
-                $user = Arr::first($user->getData());
-            }
         } catch (ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|BadRequestHttpException $e) {
             throw new NotFoundHttpException(sprintf('Could not resolve the "%s $%s" controller argument: ', $argument->getType(), $argument->getName()) . $e->getMessage(), $e);
         }
