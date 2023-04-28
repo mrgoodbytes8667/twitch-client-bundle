@@ -4,6 +4,7 @@ namespace Bytes\TwitchClientBundle\Tests\Objects;
 
 use Bytes\Common\Faker\TestFakerTrait;
 use Bytes\TwitchClientBundle\Objects\TwitchImageResize;
+use Generator;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,11 +16,33 @@ class TwitchImageResizeTest extends TestCase
     use TestFakerTrait;
 
     /**
+     * @dataProvider provideFakeImageTests
+     * @param string $url
+     * @param int|string $width
+     * @param int|string $height
+     * @param string $combined
+     * @return void
+     */
+    public function testFakeImageTest($url, $width, $height, $combined)
+    {
+        self::assertStringContainsString($width, $url);
+        self::assertStringContainsString($height, $url);
+        self::assertStringContainsString($combined, $url);
+    }
+
+    public function provideFakeImageTests(): Generator
+    {
+        $this->setupFaker();
+        yield 'fakerImageUrl' => [ 'url' => $this->faker->imageUrl(width: 123, height: 456), 'width' => 123, 'height' => 456, 'combined' => '123/456' ];
+        yield 'getFakeImage' => [ 'url' => $this->getFakeImage(), 'width' => '{width}', 'height' => '{height}', 'combined' => '{width}/{height}' ];
+    }
+
+    /**
      *
      */
     public function testSixteenByNine()
     {
-        $this->assertStringContainsString('480x270', TwitchImageResize::sixteenByNine($this->getFakeImage()));
+        $this->assertStringContainsString('480/270', TwitchImageResize::sixteenByNine($this->getFakeImage()));
         $this->assertEmpty(TwitchImageResize::sixteenByNine(''));
     }
 
@@ -36,7 +59,7 @@ class TwitchImageResizeTest extends TestCase
      */
     public function testResize()
     {
-        $this->assertStringContainsString('480x270', TwitchImageResize::resize($this->getFakeImage(), 480, 270));
+        $this->assertStringContainsString('480/270', TwitchImageResize::resize($this->getFakeImage(), 480, 270));
         $this->assertEmpty(TwitchImageResize::resize('', 0, 0));
     }
 
@@ -45,7 +68,7 @@ class TwitchImageResizeTest extends TestCase
      */
     public function testThumbnail()
     {
-        $this->assertStringContainsString('50x50', TwitchImageResize::thumbnail($this->getFakeImage()));
+        $this->assertStringContainsString('50/50', TwitchImageResize::thumbnail($this->getFakeImage()));
         $this->assertEmpty(TwitchImageResize::thumbnail(''));
     }
 
@@ -54,7 +77,7 @@ class TwitchImageResizeTest extends TestCase
      */
     public function testTwitchGameThumbnail()
     {
-        $this->assertStringContainsString('85x113', TwitchImageResize::twitchGameThumbnail($this->getFakeImage()));
+        $this->assertStringContainsString('85/113', TwitchImageResize::twitchGameThumbnail($this->getFakeImage()));
         $this->assertEmpty(TwitchImageResize::twitchGameThumbnail(''));
     }
 }
