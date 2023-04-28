@@ -1,12 +1,12 @@
 <?php
 
-namespace Bytes\TwitchClientBundle\Tests\Controller;
+namespace Bytes\TwitchClientBundle\Tests\Controller\ArgumentResolver;
 
 use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
 use Bytes\Tests\Common\ClientExceptionResponseProviderTrait;
 use Bytes\Tests\Common\DataProvider\BooleanProviderTrait;
 use Bytes\Tests\Common\TestArgumentMetadataTrait;
-use Bytes\TwitchClientBundle\Attribute\MapTwitchUser;
+use Bytes\TwitchClientBundle\Attribute\MapTwitchName;
 use Bytes\TwitchClientBundle\Controller\ArgumentResolver\TwitchUserValueResolver;
 use Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient\TestTwitchClientCase;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
@@ -35,13 +35,13 @@ class TwitchUserValueResolverTest extends TestTwitchClientCase
      */
     public static function provideMapTwitchUser(): Generator
     {
-        foreach (self::provideUserStreamClasses() as $provider) {
+        foreach (self::provideUserStreamClasses() as $generator) {
             foreach ([true, false] as $provideBoolean) {
-                $className = u($provider['class'])->afterLast("\\")->append('::');
-                yield u('user')->append(' ', 'Mjohns ', $provideBoolean ? 'true' : 'false')->snake()->prepend($className)->toString() => ['class' => $provider['class'], 'mockFile' => $provider['mockFile'], 'argName' => 'user', 'argValue' => 'Mjohns', 'useLogin' => $provideBoolean];
-                yield u('id')->append(' ', '783621262139 ', $provideBoolean ? 'true' : 'false')->snake()->prepend($className)->toString() => ['class' => $provider['class'], 'mockFile' => $provider['mockFile'], 'argName' => 'id', 'argValue' => '783621262139', 'useLogin' => $provideBoolean];
-                yield u('userName')->append(' ', 'Mjohns ', $provideBoolean ? 'true' : 'false')->snake()->prepend($className)->toString() => ['class' => $provider['class'], 'mockFile' => $provider['mockFile'], 'argName' => 'userName', 'argValue' => 'Mjohns', 'useLogin' => $provideBoolean];
-                yield u('userId')->append(' ', '783621262139 ', $provideBoolean ? 'true' : 'false')->snake()->prepend($className)->toString() => ['class' => $provider['class'], 'mockFile' => $provider['mockFile'], 'argName' => 'userId', 'argValue' => '783621262139', 'useLogin' => $provideBoolean];
+                $className = u($generator['class'])->afterLast("\\")->append('::');
+                yield u('user')->append(' ', 'Mjohns ', $provideBoolean ? 'true' : 'false')->snake()->prepend($className)->toString() => ['class' => $generator['class'], 'mockFile' => $generator['mockFile'], 'argName' => 'user', 'argValue' => 'Mjohns', 'useLogin' => $provideBoolean];
+                yield u('id')->append(' ', '783621262139 ', $provideBoolean ? 'true' : 'false')->snake()->prepend($className)->toString() => ['class' => $generator['class'], 'mockFile' => $generator['mockFile'], 'argName' => 'id', 'argValue' => '783621262139', 'useLogin' => $provideBoolean];
+                yield u('userName')->append(' ', 'Mjohns ', $provideBoolean ? 'true' : 'false')->snake()->prepend($className)->toString() => ['class' => $generator['class'], 'mockFile' => $generator['mockFile'], 'argName' => 'userName', 'argValue' => 'Mjohns', 'useLogin' => $provideBoolean];
+                yield u('userId')->append(' ', '783621262139 ', $provideBoolean ? 'true' : 'false')->snake()->prepend($className)->toString() => ['class' => $generator['class'], 'mockFile' => $generator['mockFile'], 'argName' => 'userId', 'argValue' => '783621262139', 'useLogin' => $provideBoolean];
             }
         }
     }
@@ -93,7 +93,7 @@ class TwitchUserValueResolverTest extends TestTwitchClientCase
         ]));
         $converter = new TwitchUserValueResolver($client);
 
-        $config = $this->createArgumentMetadata($class, $argName, false, [new MapTwitchUser($useLogin)]);
+        $config = $this->createArgumentMetadata($class, $argName, false, [new MapTwitchName($useLogin)]);
 
         $objects = (array)$converter->resolve($request, $config);
         self::assertCount(1, $objects);
