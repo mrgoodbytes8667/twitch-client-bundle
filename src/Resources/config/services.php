@@ -8,6 +8,7 @@ use Bytes\ResponseBundle\HttpClient\Token\AppTokenClientInterface;
 use Bytes\ResponseBundle\HttpClient\Token\TokenClientInterface;
 use Bytes\ResponseBundle\HttpClient\Token\UserTokenClientInterface;
 use Bytes\ResponseBundle\Routing\OAuthInterface;
+use Bytes\TwitchClientBundle\Controller\ArgumentResolver\TwitchUserValueResolver;
 use Bytes\TwitchClientBundle\Event\EventSubSubscriptionGenerateCallbackEvent;
 use Bytes\TwitchClientBundle\EventListener\EventSubSubscriptionGenerateCallbackSubscriber;
 use Bytes\TwitchClientBundle\EventListener\RevokeTokenSubscriber;
@@ -215,6 +216,16 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('security.voter')
         ->lazy();
+    //endregion
+
+    //region Resolvers
+    $services->set('bytes_twitch_client.twitch_user_value_resolver', TwitchUserValueResolver::class)
+        ->args([
+            service('bytes_twitch_client.httpclient.twitch'), // Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient
+        ])
+        ->tag('controller.argument_value_resolver', [
+            'priority' => 150,
+        ]);
     //endregion
 
     //region Subscribers
