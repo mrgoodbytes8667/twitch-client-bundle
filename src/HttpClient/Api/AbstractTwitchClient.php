@@ -117,6 +117,7 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
                 throw new InvalidArgumentException('There can only be a maximum of 100 combined ids and logins.');
             }
         }
+        
         $url = u('https://api.twitch.tv/helix/users?');
         $counter = 0;
         foreach ($ids as $id) {
@@ -128,9 +129,11 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
                 break;
             }
         }
+        
         if (!empty($url) && !empty($logins) && $counter < 100) {
             $url = $url->append('&');
         }
+        
         foreach ($logins as $login) {
             if ($counter < 100) {
                 $url = $url->append('login=' . $login . '&');
@@ -139,6 +142,7 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
                 break;
             }
         }
+        
         $url = $url->beforeLast('&')->toString();
         return $this->request(url: $url, caller: $caller,
             type: '\Bytes\TwitchResponseBundle\Objects\Users\User[]',
@@ -205,8 +209,10 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
             if ($throw) {
                 throw new InvalidArgumentException('The "limit" argument must be greater than or equal to 1.');
             }
+            
             $limit = 1;
         }
+        
         $handoffLimit = $limit;
         if ($limit > 100) {
             $limit = 100;
@@ -246,13 +252,16 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
             if ($throw) {
                 throw new InvalidArgumentException('The "limit" argument must be greater than or equal to 1.');
             }
+            
             $limit = 1;
         }
+        
         if ($throw) {
             if (count($ids) > 100) {
                 throw new InvalidArgumentException('There can only be a maximum of 100 tag_ids.');
             }
         }
+        
         $handoffLimit = $limit;
         if ($limit > 100) {
             $limit = 100;
@@ -333,6 +342,7 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
                 throw new InvalidArgumentException('The combined number of game IDs, igdb IDs and game names that you specify in the request must not exceed 100.');
             }
         }
+        
         $url = u('https://api.twitch.tv/helix/games?');
         $param = [];
         $counter = 0;
@@ -345,6 +355,7 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
                 break;
             }
         }
+        
         foreach ($names as $name) {
             if ($counter < 100) {
                 $param[] = 'name=' . $name;
@@ -353,6 +364,7 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
                 break;
             }
         }
+        
         foreach ($igdbIds as $id) {
             if ($counter < 100) {
                 $param[] = 'igdb_id=' . $id;
@@ -361,6 +373,7 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
                 break;
             }
         }
+        
         $url = $url->append(implode('&', $param))->toString();
         return $this->request(url: $url, caller: $caller,
             type: '\Bytes\TwitchResponseBundle\Objects\Games\Game[]',
@@ -378,9 +391,11 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
         if ($url->startsWith(TwitchClientEndpoints::ENDPOINT_TWITCH_API)) {
             return $path;
         }
+        
         if (!empty($prepend)) {
             $url = $url->ensureStart($prepend . '/');
         }
+        
         return $url->ensureStart(TwitchClientEndpoints::ENDPOINT_TWITCH_API)->toString();
     }
 }

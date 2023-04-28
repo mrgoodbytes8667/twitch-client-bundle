@@ -19,7 +19,7 @@ class RevokeTokenSubscriber extends AbstractRevokeTokenSubscriber
      * RevokeTokenSubscriber constructor.
      * @param HttpClientLocator $httpClientTokenLocator
      */
-    public function __construct(private HttpClientLocator $httpClientTokenLocator)
+    public function __construct(private readonly HttpClientLocator $httpClientTokenLocator)
     {
     }
 

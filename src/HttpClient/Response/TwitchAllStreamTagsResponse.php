@@ -37,6 +37,7 @@ class TwitchAllStreamTagsResponse extends TwitchResponse
             $origResults->setPagination(null);
             return $origResults;
         }
+        
         $results = $origResults;
         while (!empty($results->getPagination()?->getCursor()) && count($origResults->getData()) <= $this->getLimit()) {
             $results = $this->getClient()
@@ -46,6 +47,7 @@ class TwitchAllStreamTagsResponse extends TwitchResponse
             $origResults->setData(array_merge($origResults->getData(), $results->getData()));
             $origResults->setPagination($results->getPagination());
         }
+        
         return $origResults;
     }
 
@@ -57,9 +59,11 @@ class TwitchAllStreamTagsResponse extends TwitchResponse
         if (empty($this->getExtraParams())) {
             return false;
         }
+        
         if (!array_key_exists('followPagination', $this->getExtraParams())) {
             return false;
         }
+        
         return $this->getExtraParams()['followPagination'];
     }
 
@@ -71,9 +75,11 @@ class TwitchAllStreamTagsResponse extends TwitchResponse
         if (empty($this->getExtraParams())) {
             return null;
         }
+        
         if (!array_key_exists('client', $this->getExtraParams())) {
             return null;
         }
+        
         return $this->getExtraParams()['client'];
     }
 
@@ -85,9 +91,11 @@ class TwitchAllStreamTagsResponse extends TwitchResponse
         if (empty($this->getExtraParams())) {
             return null;
         }
+        
         if (!array_key_exists('limit', $this->getExtraParams())) {
             return null;
         }
+        
         return $this->getExtraParams()['limit'];
     }
 
@@ -99,9 +107,11 @@ class TwitchAllStreamTagsResponse extends TwitchResponse
         if (empty($this->getExtraParams())) {
             return null;
         }
+        
         if (!array_key_exists('ids', $this->getExtraParams())) {
             return null;
         }
+        
         return $this->getExtraParams()['ids'];
     }
 }

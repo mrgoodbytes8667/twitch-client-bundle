@@ -133,6 +133,7 @@ abstract class TestHttpClientCase extends TestCase
             $type = $faker->optional()->randomElement(['staff', 'admin', 'global_mod', '']);
             $viewCount = $faker->optional()->numberBetween();
         }
+        
         return User::make($userId, $login, $broadcasterType, $description, $displayName, $email, $offlineImageUrl, $profileImageUrl, $type, $viewCount);
     }
 

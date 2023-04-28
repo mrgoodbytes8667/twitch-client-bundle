@@ -56,10 +56,12 @@ class TwitchClient extends AbstractTwitchClient
             if (count($userIds) + count($logins) > 100) {
                 throw new InvalidArgumentException('There can only be a maximum of 100 combined user ids and logins.');
             }
+            
             if (count($gameIds) > 100) {
                 throw new InvalidArgumentException('There can only be a maximum of 100 game ids.');
             }
         }
+        
         $url = u('https://api.twitch.tv/helix/streams?');
         $counter = 0;
         foreach ($userIds as $id) {
@@ -71,9 +73,11 @@ class TwitchClient extends AbstractTwitchClient
                 break;
             }
         }
+        
         if (!empty($logins) && $counter < 100 && !$url->endsWith('?')) {
             $url = $url->ensureEnd('&');
         }
+        
         foreach ($logins as $login) {
             if ($counter < 100) {
                 $url = $url->append('user_login=' . $login . '&');
@@ -82,10 +86,12 @@ class TwitchClient extends AbstractTwitchClient
                 break;
             }
         }
+        
         $counter = 0;
         if (!empty($gameIds) && !$url->endsWith('?')) {
             $url = $url->ensureEnd('&');
         }
+        
         foreach ($gameIds as $id) {
             if ($counter < 100) {
                 $id = IdNormalizer::normalizeIdArgument($id, 'The "gameIds" argument is required.');
@@ -95,6 +101,7 @@ class TwitchClient extends AbstractTwitchClient
                 break;
             }
         }
+        
         $url = $url->append('first=')->append($first)->toString();
         return $this->request(url: $url, caller: __METHOD__,
             type: StreamsResponse::class, method: HttpMethods::get);

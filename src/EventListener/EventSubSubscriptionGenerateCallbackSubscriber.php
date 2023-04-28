@@ -43,7 +43,7 @@ class EventSubSubscriptionGenerateCallbackSubscriber implements EventSubscriberI
      *
      * @return array The event names to listen to
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EventSubSubscriptionGenerateCallbackEvent::class => ['onGenerateCallback', -1],
@@ -61,6 +61,7 @@ class EventSubSubscriptionGenerateCallbackSubscriber implements EventSubscriberI
             $event->stopPropagation();
             return $event;
         }
+        
         $url = $this->urlGenerator->generate($event->getCallbackName(), $event->getParameters(), $event->getReferenceType());
         $event->setUrl($url);
         return $event;

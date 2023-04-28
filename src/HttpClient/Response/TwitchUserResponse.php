@@ -29,6 +29,7 @@ class TwitchUserResponse extends TwitchResponse
         if (empty($results)) {
             return $results;
         }
+        
         return array_shift($results);
     }
 }

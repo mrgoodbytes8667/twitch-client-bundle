@@ -201,6 +201,7 @@ class GetAllStreamTagsTest extends TestTwitchClientCase
         {
             $ids[] = $this->faker->uuid();
         }
+        
         $this->expectException(\InvalidArgumentException::class);
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/get-all-stream-tags-generated-1-success.json')));

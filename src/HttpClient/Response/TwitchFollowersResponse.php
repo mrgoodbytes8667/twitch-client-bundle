@@ -34,6 +34,7 @@ class TwitchFollowersResponse extends TwitchResponse
         if (!$this->getFollowPagination() || empty($this->getClient())) {
             return $origResults;
         }
+        
         $results = $origResults;
         while (!empty($results->getPagination()?->getCursor())) {
             $results = $this->getClient()->getFollows($this->getFromId(), $this->getToId(), $results->getPagination()?->getCursor(), $this->getLimit(), false)->deserialize();
@@ -41,6 +42,7 @@ class TwitchFollowersResponse extends TwitchResponse
             $origResults->setPagination($results->getPagination());
             $origResults->setTotal($origResults->getTotal() + $results->getTotal());
         }
+        
         return $origResults;
     }
 
@@ -52,9 +54,11 @@ class TwitchFollowersResponse extends TwitchResponse
         if (empty($this->getExtraParams())) {
             return false;
         }
+        
         if (!array_key_exists('followPagination', $this->getExtraParams())) {
             return false;
         }
+        
         return $this->getExtraParams()['followPagination'];
     }
 
@@ -66,9 +70,11 @@ class TwitchFollowersResponse extends TwitchResponse
         if (empty($this->getExtraParams())) {
             return null;
         }
+        
         if (!array_key_exists('client', $this->getExtraParams())) {
             return null;
         }
+        
         return $this->getExtraParams()['client'];
     }
 
@@ -80,9 +86,11 @@ class TwitchFollowersResponse extends TwitchResponse
         if (empty($this->getExtraParams())) {
             return null;
         }
+        
         if (!array_key_exists('fromId', $this->getExtraParams())) {
             return null;
         }
+        
         return $this->getExtraParams()['fromId'];
     }
 
@@ -94,9 +102,11 @@ class TwitchFollowersResponse extends TwitchResponse
         if (empty($this->getExtraParams())) {
             return null;
         }
+        
         if (!array_key_exists('toId', $this->getExtraParams())) {
             return null;
         }
+        
         return $this->getExtraParams()['toId'];
     }
 
@@ -108,9 +118,11 @@ class TwitchFollowersResponse extends TwitchResponse
         if (empty($this->getExtraParams())) {
             return null;
         }
+        
         if (!array_key_exists('limit', $this->getExtraParams())) {
             return null;
         }
+        
         return $this->getExtraParams()['limit'];
     }
 }

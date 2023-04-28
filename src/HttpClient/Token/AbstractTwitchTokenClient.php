@@ -122,6 +122,7 @@ abstract class AbstractTwitchTokenClient extends AbstractTokenClient implements 
         {
             throw new TokenRevokeException($response->getResponse(), sprintf('Could not revoke token: %d', $response->getStatusCode()));
         }
+        
         return $response->onSuccessCallback();
     }
 
