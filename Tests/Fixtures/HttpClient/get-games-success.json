@@ -3,22 +3,26 @@
         {
             "id": "953931171574",
             "name": "ea consequatur nihil",
-            "box_art_url": "https:\/\/via.placeholder.com\/640x480.png\/004499?text=Game+ea+consequatur+nihil"
+            "box_art_url": "https:\/\/via.placeholder.com\/{width}x{height}.png\/004499?text=Game+ea+consequatur+nihil",
+            "igdb_id": "7888105"
         },
         {
             "id": "253674780146",
             "name": "iste ut adipisci",
-            "box_art_url": "https:\/\/via.placeholder.com\/640x480.png\/00ff66?text=Game+iste+ut+adipisci"
+            "box_art_url": "https:\/\/via.placeholder.com\/{width}x{height}.png\/00ff66?text=Game+iste+ut+adipisci",
+            "igdb_id": "29223596"
         },
         {
             "id": "43518325304",
             "name": "esse quia repudiandae",
-            "box_art_url": "https:\/\/via.placeholder.com\/640x480.png\/00bb00?text=Game+esse+quia+repudiandae"
+            "box_art_url": "https:\/\/via.placeholder.com\/{width}x{height}.png\/00bb00?text=Game+esse+quia+repudiandae",
+            "igdb_id": "22672905"
         },
         {
             "id": "278190657748",
             "name": "consequatur dolores nihil",
-            "box_art_url": "https:\/\/via.placeholder.com\/640x480.png\/0077dd?text=Game+consequatur+dolores+nihil"
+            "box_art_url": "https:\/\/via.placeholder.com\/{width}x{height}.png\/0077dd?text=Game+consequatur+dolores+nihil",
+            "igdb_id": "82459993"
         }
     ],
     "pagination": {

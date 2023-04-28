@@ -301,22 +301,24 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
 
     /**
      * Helper wrapper around getGames that will deserialize into a single Game
-     * @param string|null $id
+     * @param string|int|null $id
      * @param string|null $name
+     * @param string|int|null $igdbId
      * @return ClientResponseInterface
      * @throws NoTokenException
      * @throws TransportExceptionInterface
      */
-    public function getGame(?string $id = null, ?string $name = null)
+    public function getGame(string|int|null $id = null, ?string $name = null, string|int|null $igdbId = null)
     {
-        return $this->getGames(ids: !is_null($id) ? [$id] : [], names: !is_null($name) ? [$name] : [], throw: false, responseClass: TwitchUserResponse::class, caller: __METHOD__);
+        return $this->getGames(ids: !is_null($id) ? [$id] : [], names: !is_null($name) ? [$name] : [], igdbIds: !is_null($igdbId) ? [$igdbId] : [], throw: false, responseClass: TwitchUserResponse::class, caller: __METHOD__);
     }
 
     /**
      * Get Games
-     * Gets game information by game ID or name.
-     * @param string[] $ids
+     * Gets game information by game ID, name, or Igdb ID.
+     * @param array<string|int> $ids
      * @param string[] $names
+     * @param array<string|int> $igdbIds
      * @param bool $throw
      * @param ClientResponseInterface|string|null $responseClass
      * @param ReflectionMethod|string $caller
@@ -324,36 +326,42 @@ abstract class AbstractTwitchClient extends AbstractApiClient implements Seriali
      * @throws NoTokenException
      * @throws TransportExceptionInterface
      */
-    public function getGames(array $ids = [], array $names = [], bool $throw = true, ClientResponseInterface|string|null $responseClass = null, ReflectionMethod|string $caller = __METHOD__)
+    public function getGames(array $ids = [], array $names = [], array $igdbIds = [], bool $throw = true, ClientResponseInterface|string|null $responseClass = null, ReflectionMethod|string $caller = __METHOD__): ClientResponseInterface
     {
         if ($throw) {
-            if (count($ids) + count($names) > 100) {
-                throw new InvalidArgumentException('There can only be a maximum of 100 combined ids and names.');
+            if (count($ids) + count($names) + count($igdbIds) > 100) {
+                throw new InvalidArgumentException('The combined number of game IDs, igdb IDs and game names that you specify in the request must not exceed 100.');
             }
         }
         $url = u('https://api.twitch.tv/helix/games?');
+        $param = [];
         $counter = 0;
         foreach ($ids as $id) {
             if ($counter < 100) {
                 $id = IdNormalizer::normalizeIdArgument($id, 'The "id" argument is required.');
-                $url = $url->append('id=' . $id . '&');
+                $param[] = 'id=' . $id;
                 $counter++;
             } else {
                 break;
             }
-        }
-        if (!empty($url) && !empty($names) && $counter < 100) {
-            $url = $url->append('&');
         }
         foreach ($names as $name) {
             if ($counter < 100) {
-                $url = $url->append('name=' . $name . '&');
+                $param[] = 'name=' . $name;
                 $counter++;
             } else {
                 break;
             }
         }
-        $url = $url->beforeLast('&')->toString();
+        foreach ($igdbIds as $id) {
+            if ($counter < 100) {
+                $param[] = 'igdb_id=' . $id;
+                $counter++;
+            } else {
+                break;
+            }
+        }
+        $url = $url->append(implode('&', $param))->toString();
         return $this->request(url: $url, caller: $caller,
             type: '\Bytes\TwitchResponseBundle\Objects\Games\Game[]',
             responseClass: $responseClass, context: [UnwrappingDenormalizer::UNWRAP_PATH => '[data]']);

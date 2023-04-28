@@ -13,8 +13,6 @@ use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockJsonResponse;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockStandaloneResponse;
 use Bytes\TwitchResponseBundle\Objects\Games\Game;
 use Bytes\TwitchResponseBundle\Objects\Users\User;
-use DateTime;
-use DateTimeInterface;
 use Generator;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,12 +39,12 @@ class GetGamesTest extends TestTwitchClientCase
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      */
-    public function testGetGamesClientSuccess($ids, $names)
+    public function testGetGamesClientSuccess($ids, $names, $igdbIds)
     {
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/get-games-success.json')));
 
-        $response = $client->getGames(ids: $ids, names: $names, throw: false);
+        $response = $client->getGames(ids: $ids, names: $names, igdbIds: $igdbIds, throw: false);
         $this->assertResponseIsSuccessful($response);
         $this->assertResponseStatusCodeSame($response, Response::HTTP_OK);
         $this->assertResponseHasContent($response);
@@ -62,12 +60,12 @@ class GetGamesTest extends TestTwitchClientCase
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      */
-    public function testGetGamesResponseTooManyArguments($ids, $names)
+    public function testGetGamesResponseTooManyArguments($ids, $names, $igdbIds)
     {
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/get-games-success.json')));
 
-        $users = $client->getGames(ids: $ids, names: $names, throw: false)->deserialize();
+        $users = $client->getGames(ids: $ids, names: $names, igdbIds: $igdbIds, throw: false)->deserialize();
 
         $this->assertCount(4, $users);
     }
@@ -92,9 +90,11 @@ class GetGamesTest extends TestTwitchClientCase
      */
     public function provideUsers()
     {
-        yield ['ids' => ["222516945777", "60387332406", "962819907194", "439941614823"], 'names' => []];
-        yield ['ids' => [], 'names' => ["morgan.oberbrunner", "cwitting", "lilliana99", "nkunde"]];
-        yield ['ids' => ["222516945777", "60387332406"], 'names' => ["lilliana99", "nkunde"]];
+        yield ['ids' => ["222516945777", "60387332406", "962819907194", "439941614823"], 'names' => [], 'igdb_ids' => []];
+        yield ['ids' => [], 'names' => ["morgan.oberbrunner", "cwitting", "lilliana99", "nkunde"], 'igdb_ids' => []];
+        yield ['ids' => ["222516945777", "60387332406"], 'names' => ["lilliana99", "nkunde"], 'igdb_ids' => []];
+        yield ['ids' => [], 'names' => [], 'igdb_ids' => ["222516945777", "60387332406", "962819907194", "439941614823"]];
+        yield ['ids' => ["222516945777", "60387332406"], 'names' => ["lilliana99", "nkunde"], 'igdb_ids' => ["222516945777", "60387332406"]];
     }
 
     /**
@@ -104,9 +104,11 @@ class GetGamesTest extends TestTwitchClientCase
     {
         $this->setupFaker();
 
-        yield ['ids' => $this->idRange(1, 101), 'names' => $this->faker->words(101)];
-        yield ['ids' => $this->idRange(1, 55), 'names' => $this->faker->words(55)];
-        yield ['ids' => [], 'names' => $this->faker->words(101)];
+        yield ['ids' => $this->idRange(1, 101), 'names' => $this->faker->words(101), 'igdb_ids' => []];
+        yield ['ids' => $this->idRange(1, 55), 'names' => $this->faker->words(55), 'igdb_ids' => []];
+        yield ['ids' => [], 'names' => $this->faker->words(101), 'igdb_ids' => []];
+        yield ['ids' => $this->idRange(1, 55), 'names' => $this->faker->words(55), 'igdb_ids' => $this->idRange(1, 55)];
+        yield ['ids' => [], 'names' => [], 'igdb_ids' => $this->idRange(1, 101)];
     }
 
     /**
@@ -176,26 +178,26 @@ class GetGamesTest extends TestTwitchClientCase
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      */
-    public function testGetGamesDeserialize($ids, $names)
+    public function testGetGamesDeserialize($ids, $names, $igdbIds)
     {
         $client = $this->setupClient(MockClient::requests(
             MockJsonResponse::makeFixture('HttpClient/get-games-success.json')));
 
         /** @var User[] $users */
-        $users = $client->getGames(ids: $ids, names: $names)->deserialize();
+        $users = $client->getGames(ids: $ids, names: $names, igdbIds: $igdbIds)->deserialize();
         $this->assertCount(4, $users);
 
         $user = array_shift($users);
-        $this->validateGame($user, "953931171574", "ea consequatur nihil", "https://via.placeholder.com/640x480.png/004499?text=Game+ea+consequatur+nihil");
+        $this->validateGame($user, "953931171574", "ea consequatur nihil", "https://via.placeholder.com/640x480.png/004499?text=Game+ea+consequatur+nihil", "7888105");
 
         $user = array_shift($users);
-        $this->validateGame($user, "253674780146", "iste ut adipisci", "https://via.placeholder.com/640x480.png/00ff66?text=Game+iste+ut+adipisci");
+        $this->validateGame($user, "253674780146", "iste ut adipisci", "https://via.placeholder.com/640x480.png/00ff66?text=Game+iste+ut+adipisci", "29223596");
 
         $user = array_shift($users);
-        $this->validateGame($user, "43518325304", "esse quia repudiandae", "https://via.placeholder.com/640x480.png/00bb00?text=Game+esse+quia+repudiandae");
+        $this->validateGame($user, "43518325304", "esse quia repudiandae", "https://via.placeholder.com/640x480.png/00bb00?text=Game+esse+quia+repudiandae", "22672905");
 
         $user = array_shift($users);
-        $this->validateGame($user, "278190657748", "consequatur dolores nihil", "https://via.placeholder.com/640x480.png/0077dd?text=Game+consequatur+dolores+nihil");
+        $this->validateGame($user, "278190657748", "consequatur dolores nihil", "https://via.placeholder.com/640x480.png/0077dd?text=Game+consequatur+dolores+nihil", "82459993");
     }
 
     /**
@@ -203,12 +205,15 @@ class GetGamesTest extends TestTwitchClientCase
      * @param string $id
      * @param string $name
      * @param string $boxArtUrl
+     * @param string $igdbId
+     * @return void
      */
-    protected function validateGame(Game $game, string $id, string $name, string $boxArtUrl)
+    protected function validateGame(Game $game, string $id, string $name, string $boxArtUrl, string $igdbId)
     {
         $this->assertEquals($id, $game->getGameID());
         $this->assertEquals($name, $game->getName());
-        $this->assertEquals($boxArtUrl, $game->getBoxArtURL());
+        $this->assertEquals($boxArtUrl, $game->getBoxArtURLWithSize(640, 480));
+        self::assertEquals($igdbId, $game->getIgdbId());
     }
 
     /**
@@ -225,7 +230,7 @@ class GetGamesTest extends TestTwitchClientCase
         /** @var User $users */
         $user = $client->getGame(id: '222516945777')->deserialize();
 
-        $this->validateGame($user, "953931171574", "ea consequatur nihil", "https://via.placeholder.com/640x480.png/004499?text=Game+ea+consequatur+nihil");
+        $this->validateGame($user, "953931171574", "ea consequatur nihil", "https://via.placeholder.com/640x480.png/004499?text=Game+ea+consequatur+nihil", "7888105");
     }
 
     /**
@@ -243,7 +248,7 @@ class GetGamesTest extends TestTwitchClientCase
         /** @var User $users */
         $user = $client->getGame(id: '222516945777')->deserialize();
 
-        $this->validateGame($user, "953931171574", "ea consequatur nihil", "https://via.placeholder.com/640x480.png/004499?text=Game+ea+consequatur+nihil");
+        $this->validateGame($user, "953931171574", "ea consequatur nihil", "https://via.placeholder.com/640x480.png/004499?text=Game+ea+consequatur+nihil", "7888105");
     }
 
     /**
