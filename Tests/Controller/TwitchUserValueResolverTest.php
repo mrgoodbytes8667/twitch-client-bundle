@@ -6,7 +6,7 @@ use Bytes\Common\Faker\Twitch\TestTwitchFakerTrait;
 use Bytes\Tests\Common\ClientExceptionResponseProviderTrait;
 use Bytes\Tests\Common\DataProvider\BooleanProviderTrait;
 use Bytes\Tests\Common\TestArgumentMetadataTrait;
-use Bytes\TwitchClientBundle\Attribute\MapTwitchUser;
+use Bytes\TwitchClientBundle\Attribute\MapTwitchName;
 use Bytes\TwitchClientBundle\Controller\ArgumentResolver\TwitchUserValueResolver;
 use Bytes\TwitchClientBundle\Tests\HttpClient\TwitchClient\TestTwitchClientCase;
 use Bytes\TwitchClientBundle\Tests\MockHttpClient\MockClient;
@@ -93,7 +93,7 @@ class TwitchUserValueResolverTest extends TestTwitchClientCase
         ]));
         $converter = new TwitchUserValueResolver($client);
 
-        $config = $this->createArgumentMetadata($class, $argName, false, [new MapTwitchUser($useLogin)]);
+        $config = $this->createArgumentMetadata($class, $argName, false, [new MapTwitchName($useLogin)]);
 
         $objects = (array)$converter->resolve($request, $config);
         self::assertCount(1, $objects);

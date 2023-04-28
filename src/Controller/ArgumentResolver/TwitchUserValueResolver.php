@@ -2,7 +2,7 @@
 
 namespace Bytes\TwitchClientBundle\Controller\ArgumentResolver;
 
-use Bytes\TwitchClientBundle\Attribute\MapTwitchUser;
+use Bytes\TwitchClientBundle\Attribute\MapTwitchName;
 use Bytes\TwitchClientBundle\HttpClient\Api\TwitchClient;
 use Bytes\TwitchResponseBundle\Objects\Interfaces\TwitchUserInterface;
 use Bytes\TwitchResponseBundle\Objects\Streams\Stream;
@@ -22,7 +22,7 @@ use function is_string;
 
 /**
  * Converts and hydrates a {@see TwitchUserInterface} object. Assumes the value is a user ID if it is numeric.
- * Use {@see MapTwitchUser} to force ID or Login usage.
+ * Use {@see MapTwitchName} to force ID or Login usage.
  */
 class TwitchUserValueResolver implements ValueResolverInterface
 {
@@ -70,10 +70,10 @@ class TwitchUserValueResolver implements ValueResolverInterface
         }
         $method = is_numeric($value) ? 'id' : 'login';
 
-        if ($attributes = $argument->getAttributes(MapTwitchUser::class, ArgumentMetadata::IS_INSTANCEOF)) {
-            /** @var MapTwitchUser $attribute */
+        if ($attributes = $argument->getAttributes(MapTwitchName::class, ArgumentMetadata::IS_INSTANCEOF)) {
+            /** @var MapTwitchName $attribute */
             $attribute = $attributes[0];
-            $method = $attribute->useLogin ? 'login' : 'id';
+            $method = $attribute->useName ? 'login' : 'id';
         }
 
         try {
