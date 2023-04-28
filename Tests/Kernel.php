@@ -8,6 +8,7 @@ use Bytes\TwitchClientBundle\Tests\Fixtures\Fixture;
 use Bytes\TwitchResponseBundle\BytesTwitchResponseBundle;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -15,9 +16,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 /**
  * Class Kernel
@@ -94,8 +93,8 @@ class Kernel extends BaseKernel
             $container->register('security.csrf.token_manager', CsrfTokenManagerInterface::class);
 
             foreach ($this->classes as $class) {
-                if(is_array($class)) {
-                    if(array_key_exists('id', $class) && array_key_exists('class', $class)) {
+                if (is_array($class)) {
+                    if (array_key_exists('id', $class) && array_key_exists('class', $class)) {
                         $container->register($class['id'], $class['class']);
                     } else {
                         $container->register($class[0], $class[1]);

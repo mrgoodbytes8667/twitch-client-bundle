@@ -23,12 +23,15 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  */
 class TwitchHubSignatureVoter extends Voter
 {
+    /**
+     * @var string
+     */
     const ATTRIBUTE_EVENTSUB = 'TWITCH_HUBSIGNATURE_EVENTSUB';
 
     /**
      * @param EventSubSignature $twitchSignatureLocator
      */
-    public function __construct(private EventSubSignature $twitchSignatureLocator)
+    public function __construct(private readonly EventSubSignature $twitchSignatureLocator)
     {
     }
 
@@ -65,12 +68,15 @@ class TwitchHubSignatureVoter extends Voter
         if ($attribute !== self::ATTRIBUTE_EVENTSUB) {
             return false;
         }
+        
         if (!($subject instanceof Request)) {
             return false;
         }
+        
         if ($subject->headers->has('skip-signature') || $subject->query->has('skip-signature')) {
             return false;
         }
+        
         return true;
     }
 

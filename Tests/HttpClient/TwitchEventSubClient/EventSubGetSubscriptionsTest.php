@@ -98,6 +98,7 @@ class EventSubGetSubscriptionsTest extends TestTwitchEventSubClientCase
             $type = EventSubSubscriptionTypes::from($value);
             yield ['filter' => $type];
         }
+        
         foreach (EventSubStatus::values() as $value) {
             $status = EventSubStatus::from($value);
             yield ['filter' => $status];

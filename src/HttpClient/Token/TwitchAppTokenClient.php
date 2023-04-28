@@ -72,6 +72,7 @@ class TwitchAppTokenClient extends AbstractTwitchTokenClient implements AppToken
                 return $event->getToken();
             };
         }
+        
         try {
             return $this->request($this->buildURL('oauth2/token'), type: Token::class, options: ['query' => [
                 'grant_type' => 'client_credentials'

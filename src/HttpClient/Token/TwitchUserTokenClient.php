@@ -42,6 +42,7 @@ class TwitchUserTokenClient extends AbstractTwitchTokenClient implements UserTok
         if (empty($tokenString)) {
             return null;
         }
+        
         $redirect = $this->oAuth->getRedirect();
         return $this->tokenExchange($tokenString, url: $redirect, scopes: OAuthScopes::getUserScopes(), grantType: OAuthGrantTypes::refreshToken,
             onDeserializeCallable: function ($self, $results) use ($token) {

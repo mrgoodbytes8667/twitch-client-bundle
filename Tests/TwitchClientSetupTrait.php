@@ -94,6 +94,7 @@ trait TwitchClientSetupTrait
         if (method_exists($response, 'setDispatcher')) {
             $response->setDispatcher($dispatcher ?? new EventDispatcher());
         }
+        
         $client->setResponse($response);
         return $client;
     }

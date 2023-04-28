@@ -38,6 +38,7 @@ class DependencyInjectionTest extends TestCase
 
         $kernel = $this->kernel;
         $kernel->boot();
+        
         $container = $kernel->getContainer();
         $dispatcher = $container->get('event_dispatcher');
 
@@ -61,6 +62,7 @@ class DependencyInjectionTest extends TestCase
         if (is_null($this->fs)) {
             $this->fs = new Filesystem();
         }
+        
         $this->fs->remove($this->kernel->getCacheDir());
         $this->kernel = null;
     }

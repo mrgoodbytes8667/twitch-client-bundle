@@ -91,6 +91,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
         } else {
             $url = $this->faker->url();
         }
+        
         $event = EventSubSubscriptionCreatePreRequestEvent::make($type, $user, $url);
         $event->setEntity(new stdClass());
         return $event;
@@ -112,6 +113,7 @@ class EventSubSubscribeTest extends TestTwitchEventSubClientCase
 
         $event = $this->createPreEvent($type, $user, $callback);
         $event->setEntity(null);
+        
         $dispatcher = $this->createMock(EventDispatcher::class);
         $callbackEvent = EventSubSubscriptionGenerateCallbackEvent::new('', EventSubSubscriptionTypes::CHANNEL_UPDATE, $user);
         $callbackEvent->setUrl($this->faker->url());

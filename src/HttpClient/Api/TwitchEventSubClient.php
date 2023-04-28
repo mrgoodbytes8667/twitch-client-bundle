@@ -126,6 +126,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
         if (!$event->hasEntity()) {
             throw new EventSubSubscriptionException('Unable to save new subscription', subscriptionType: $type, user: $stream, callback: $url, id: $event->getId(), status: $event->getStatus(), createdAt: $event->getCreatedAt());
         }
+        
         return $this->jsonRequest(url: 'eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class,
             options: $params, method: HttpMethods::post, responseClass: TwitchEventSubSubscribeResponse::class,
             onSuccessCallable: function ($self, $subscriptions) {
@@ -133,6 +134,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
                 if (array_key_exists('user', $self->getExtraParams())) {
                     $user = $self->getExtraParams()['user'];
                 }
+                
                 $this->dispatchEventSubSubscriptionCreatePostRequestEvent($subscriptions->getSubscription(), $user);
             }, params: ['user' => $stream, 'url' => $url]);
     }
@@ -195,14 +197,17 @@ class TwitchEventSubClient extends AbstractTwitchClient
             } elseif ($filter instanceof EventSubSubscriptionTypes) {
                 $query = $query->push($filter->value, 'type');
             }
+            
             $responseFilter = $filter;
         }
+        
         $query = $query->push($before, 'before')
             ->push($after, 'after');
 
         if (!empty($query->toArray())) {
             $options['query'] = $query->toArray();
         }
+        
         return $this->request(url: 'eventsub/subscriptions', caller: __METHOD__,
             type: Subscriptions::class, options: $options, method: HttpMethods::get, responseClass: TwitchEventSubGetSubscriptionsResponse::class, params: ['followPagination' => $followPagination, 'client' => $this, 'before' => $before,
                 'after' => $after, 'filter' => $responseFilter]);

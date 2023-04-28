@@ -31,23 +31,27 @@ class EventSubSubscriptionException extends Exception
      * @param int $code [optional] The Exception code.
      * @param Throwable|null $previous [optional] The previous throwable used for the exception chaining.
      */
-    public function __construct($message = "", ?SubscriptionInterface $subscription = null, private ?EventSubSubscriptionTypes $subscriptionType = null, private ?UserInterface $user = null, private ?string $callback = null, private ?string $id = null, private ?string $status = null, private ?DateTimeInterface $createdAt = null, $code = 0, Throwable $previous = null)
+    public function __construct($message = "", ?SubscriptionInterface $subscription = null, private ?EventSubSubscriptionTypes $subscriptionType = null, private readonly ?UserInterface $user = null, private ?string $callback = null, private ?string $id = null, private ?string $status = null, private readonly ?DateTimeInterface $createdAt = null, $code = 0, Throwable $previous = null)
     {
         if(!empty($subscription))
         {
             if(empty($subscriptionType) && !empty($subscription->getType())) {
                 $this->subscriptionType = $subscription->getType() instanceof EventSubSubscriptionTypes ? $subscription->getType() : EventSubSubscriptionTypes::from($subscription->getType());
             }
+            
             if(empty($callback)) {
                 $this->callback = $subscription->getCallback();
             }
+            
             if(empty($id)) {
                 $this->id = $subscription->getEventSubId();
             }
+            
             if(empty($status)) {
                 $this->status = $subscription->getStatus();
             }
         }
+        
         parent::__construct($message, $code, $previous);
     }
 

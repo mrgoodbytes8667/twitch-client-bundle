@@ -18,9 +18,11 @@ class TwitchEventSubSubscribeResponse extends TwitchResponse
         if (empty($this->getExtraParams())) {
             return null;
         }
+        
         if (!array_key_exists('url', $this->getExtraParams())) {
             return null;
         }
+        
         return $this->getExtraParams()['url'];
     }
 }

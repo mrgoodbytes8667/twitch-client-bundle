@@ -44,9 +44,11 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
         if (!empty($url)) {
             $this->generationSkipped = true;
         }
+        
         if (is_null($referenceType)) {
             $this->referenceType = UrlGeneratorInterface::ABSOLUTE_URL;
         }
+        
         $this->parameters = Push::create();
     }
 
@@ -102,6 +104,7 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
                 $parameters = $parameters->push(value: $value, key: $key);
             }
         }
+        
         $this->setParameters($parameters);
         return $this;
     }
@@ -220,9 +223,11 @@ class EventSubSubscriptionGenerateCallbackEvent extends Event
             foreach ($parameters as $key => $value) {
                 $temp = $temp->push(value: $value, key: $key);
             }
+            
             $parameters = $temp;
             unset($temp);
         }
+        
         $this->parameters = $parameters;
         return $this;
     }
