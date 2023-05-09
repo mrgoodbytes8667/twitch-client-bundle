@@ -30,6 +30,7 @@ use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscription;
 use Bytes\TwitchResponseBundle\Objects\EventSub\Subscription\Subscriptions;
 use Bytes\TwitchResponseBundle\Objects\Interfaces\UserInterface;
 use InvalidArgumentException;
+use JetBrains\PhpStorm\Deprecated;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -76,10 +77,26 @@ class TwitchEventSubClient extends AbstractTwitchClient
 
     /**
      * @param EventSubSubscriptionTypes $type
+     * @param UserInterface $stream
+     * @param null $callback When null, triggers an EventSubSubscriptionGenerateCallbackEvent event which will generate a full url. Add your own listener/subscriber to add extra parameters or completely replace the built in subscriber.
+     * @param array $extraConditions Placeholder for future types
+     * @return TwitchEventSubSubscribeResponse
+     * @throws TransportExceptionInterface
+     * @throws NoTokenException
+     * @throws EventSubSubscriptionException
+     */
+    #[Deprecated('since 0.3.1, use subscribe() instead', '%class%->subscribe(%parametersList%)')]
+    public function eventSubSubscribe(EventSubSubscriptionTypes $type, UserInterface $stream, $callback = null, $extraConditions = []): ClientResponseInterface
+    {
+        return $this->subscribe($type, $stream, $callback, $extraConditions);
+    }
+
+    /**
+     * @param EventSubSubscriptionTypes $type
      * @param UserInterface|null $stream
      * @param null $callback When null, triggers an EventSubSubscriptionGenerateCallbackEvent event which will generate a full url. Add your own listener/subscriber to add extra parameters or completely replace the built in subscriber.
      * @param array $extraConditions Placeholder for future types
-     * @return TwitchEventSubSubscribeResponse|ClientResponseInterface
+     * @return TwitchEventSubSubscribeResponse
      * @throws TransportExceptionInterface
      * @throws NoTokenException
      * @throws EventSubSubscriptionException
@@ -126,7 +143,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
         if (!$event->hasEntity()) {
             throw new EventSubSubscriptionException('Unable to save new subscription', subscriptionType: $type, user: $stream, callback: $url, id: $event->getId(), status: $event->getStatus(), createdAt: $event->getCreatedAt());
         }
-        
+
         return $this->jsonRequest(url: 'eventsub/subscriptions', caller: __METHOD__, type: Subscriptions::class,
             options: $params, method: HttpMethods::post, responseClass: TwitchEventSubSubscribeResponse::class,
             onSuccessCallable: function ($self, $subscriptions) {
@@ -134,7 +151,7 @@ class TwitchEventSubClient extends AbstractTwitchClient
                 if (array_key_exists('user', $self->getExtraParams())) {
                     $user = $self->getExtraParams()['user'];
                 }
-                
+
                 $this->dispatchEventSubSubscriptionCreatePostRequestEvent($subscriptions->getSubscription(), $user);
             }, params: ['user' => $stream, 'url' => $url]);
     }
@@ -180,7 +197,27 @@ class TwitchEventSubClient extends AbstractTwitchClient
      * @param string|null $before
      * @param string|null $after
      * @param bool $followPagination
-     * @return TwitchEventSubGetSubscriptionsResponse|ClientResponseInterface
+     * @return TwitchEventSubGetSubscriptionsResponse
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     *
+     * @link https://dev.twitch.tv/docs/api/reference#get-eventsub-subscriptions
+     */
+    #[Deprecated('since 0.3.2, use getSubscriptions() instead', '%class%->getSubscriptions(%parametersList%)')]
+    public function eventSubGetSubscriptions(EventSubStatus|EventSubSubscriptionTypes|null $filter = null, bool $throw = true, ?string $before = null, ?string $after = null, bool $followPagination = true): ClientResponseInterface
+    {
+        return $this->getSubscriptions($filter, $throw, $before, $after, $followPagination);
+    }
+
+    /**
+     * Get EventSub Subscriptions
+     * Get a list of your EventSub subscriptions. The subscriptions are paginated and ordered by most recent first.
+     * @param EventSubStatus|EventSubSubscriptionTypes|null $filter
+     * @param bool $throw
+     * @param string|null $before
+     * @param string|null $after
+     * @param bool $followPagination
+     * @return TwitchEventSubGetSubscriptionsResponse
      * @throws NoTokenException
      * @throws TransportExceptionInterface
      *
@@ -197,20 +234,32 @@ class TwitchEventSubClient extends AbstractTwitchClient
             } elseif ($filter instanceof EventSubSubscriptionTypes) {
                 $query = $query->push($filter->value, 'type');
             }
-            
+
             $responseFilter = $filter;
         }
-        
+
         $query = $query->push($before, 'before')
             ->push($after, 'after');
 
         if (!empty($query->toArray())) {
             $options['query'] = $query->toArray();
         }
-        
+
         return $this->request(url: 'eventsub/subscriptions', caller: __METHOD__,
             type: Subscriptions::class, options: $options, method: HttpMethods::get, responseClass: TwitchEventSubGetSubscriptionsResponse::class, params: ['followPagination' => $followPagination, 'client' => $this, 'before' => $before,
                 'after' => $after, 'filter' => $responseFilter]);
+    }
+
+    /**
+     * @param IdInterface|string $id
+     * @return ClientResponseInterface
+     * @throws NoTokenException
+     * @throws TransportExceptionInterface
+     */
+    #[Deprecated('since 0.3.2, use delete() instead', '%class%->delete(%parametersList%)')]
+    public function eventSubDelete($id): ClientResponseInterface
+    {
+        return $this->delete($id);
     }
 
     /**
